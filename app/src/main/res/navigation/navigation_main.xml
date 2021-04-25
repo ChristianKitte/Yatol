@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_main"
+    app:startDestination="@id/toDoListFragment">
+
+    <fragment
+        android:id="@+id/toDoListFragment"
+        android:name="de.ckitte.myapplication.ToDoListFragment"
+        android:label="fragment_todolist"
+        tools:layout="@layout/fragment_todo_list">
+        <action
+            android:id="@+id/action_toDoListFragment_to_editToDo"
+            app:destination="@id/editToDo" />
+        <action
+            android:id="@+id/action_toDoListFragment_to_deleteToDo"
+            app:destination="@id/deleteToDo" />
+        <action
+            android:id="@+id/action_toDoListFragment_to_addToDo"
+            app:destination="@id/addToDo" />
+    </fragment>
+    <fragment
+        android:id="@+id/addToDo"
+        android:name="de.ckitte.myapplication.AddToDo"
+        android:label="fragment_add_todo"
+        tools:layout="@layout/fragment_add_todo">
+        <action
+            android:id="@+id/action_addToDo_to_toDoListFragment"
+            app:destination="@id/toDoListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/deleteToDo"
+        android:name="de.ckitte.myapplication.DeleteToDo"
+        android:label="fragment_delete_todo"
+        tools:layout="@layout/fragment_delete_todo">
+        <action
+            android:id="@+id/action_deleteToDo_to_toDoListFragment"
+            app:destination="@id/toDoListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editToDo"
+        android:name="de.ckitte.myapplication.EditToDo"
+        android:label="fragment_edit_todo"
+        tools:layout="@layout/fragment_edit_todo">
+        <action
+            android:id="@+id/action_editToDo_to_toDoListFragment"
+            app:destination="@id/toDoListFragment" />
+        <action
+            android:id="@+id/action_editToDo_to_deleteToDo"
+            app:destination="@id/deleteToDo" />
+    </fragment>
+</navigation>
