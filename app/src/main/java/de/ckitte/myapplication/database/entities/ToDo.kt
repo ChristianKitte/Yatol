@@ -20,7 +20,7 @@ data class ToDo(
     @ColumnInfo(name = "toDo_IsFavourite")
     val toDoIsFavourite: Boolean,
     @ColumnInfo(name = "toDo_DoUntil")
-    val toDoDoUntil: String,
+    val toDoDoUntil: java.util.Date,
     @ColumnInfo(name = "toDoGroup_Id")
     val toDoGroupId: Int
 )

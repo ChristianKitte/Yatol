@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import de.ckitte.myapplication.database.dao.ToDoDao
+import androidx.room.TypeConverters
+import de.ckitte.myapplication.database.converters.DateConverter
+import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.entities.ToDo
 import de.ckitte.myapplication.database.entities.ToDoGroup
 
@@ -13,8 +15,9 @@ import de.ckitte.myapplication.database.entities.ToDoGroup
         ToDo::class,
         ToDoGroup::class
     ],
-    version = 1
+    version = 2
 )
+@TypeConverters(DateConverter::class)
 abstract class ToDoDatabase : RoomDatabase() {
     abstract val toToDao: ToDoDao
 
