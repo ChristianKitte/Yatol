@@ -24,6 +24,12 @@ interface ToDoDao {
     @Delete
     suspend fun deleteGroup(vararg toDoGroups: ToDoGroup)
 
+    @Query("delete from ToDo")
+    suspend fun deleteAllToDos()
+
+    @Query("delete from ToDo_Group")
+    suspend fun deleteAllToDoGroups()
+
     @Query("select * from todo")
     suspend fun getAllToDos(): List<ToDo>
 }

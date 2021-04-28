@@ -1,12 +1,18 @@
 package de.ckitte.myapplication.database.entities
 
-import androidx.room.ColumnInfo
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 import java.sql.Date
+import java.time.LocalDateTime
 
-@Entity(tableName = "ToDo")
+@Entity(
+    tableName = "ToDo",
+    foreignKeys = [ForeignKey(
+        entity = ToDoGroup::class,
+        parentColumns = arrayOf("toDoGroup_Id"),
+        childColumns = arrayOf("toDoGroup_Id"),
+        onDelete = ForeignKey.CASCADE
+    )]
+)
 data class ToDo(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "toDo_Id")
@@ -20,7 +26,7 @@ data class ToDo(
     @ColumnInfo(name = "toDo_IsFavourite")
     val toDoIsFavourite: Boolean,
     @ColumnInfo(name = "toDo_DoUntil")
-    val toDoDoUntil: java.util.Date,
+    val toDoDoUntil: LocalDateTime,
     @ColumnInfo(name = "toDoGroup_Id")
     val toDoGroupId: Int
 )

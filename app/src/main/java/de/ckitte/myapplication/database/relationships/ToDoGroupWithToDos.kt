@@ -8,8 +8,8 @@ import de.ckitte.myapplication.database.entities.ToDoGroup
 data class ToDoGroupWithToDos (
     @Embedded val toDoGroup: ToDoGroup,
     @Relation(
-        parentColumn = "toDoGroupId",
-        entityColumn = "toDoId"
+        parentColumn = "toDoGroup_Id",
+        entityColumn = "toDoGroup_Id"
     )
     val toDos: List<ToDo>
 )

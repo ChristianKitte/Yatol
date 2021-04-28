@@ -18,20 +18,12 @@ class MainActivity : AppCompatActivity() {
 
         val db: ToDoDao = ToDoDatabase.getInstance(this).toToDao
 
-        val toDo=ToDo(0,"Erstes ToDo", "Mein erstes ToDo",false,false, Date.from(),0)
+        val toDo = ToDo(0, "Erstes ToDo", "Mein erstes ToDo", false, false, LocalDateTime.now(), 0)
         val todogroup = ToDoGroup(0, "Default", "Alle Einträge ohne Zuordnung zu einer Gruppe")
 
-        //Wie erhalte ich die ID der Gruppe. Embedded nehmen?
-        //Datumskonvertierung ==> https://androidkt.com/datetime-datatype-sqlite-using-room/
-        //val todo1=(0,"Titel 1","Erster Eintrag",false,false,"1.1.1900",)
-
-
-        //==> suspend und lifecycle scope....
-
         lifecycleScope.launch {
-            db.addGroup(todogroup)
+            var d=db.addGroup(todogroup)
+            db.addUser(toDo)
         }
-
-
     }
 }
