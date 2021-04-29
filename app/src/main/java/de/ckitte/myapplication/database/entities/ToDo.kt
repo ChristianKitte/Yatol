@@ -11,7 +11,17 @@ import java.time.LocalDateTime
         parentColumns = arrayOf("toDoGroup_Id"),
         childColumns = arrayOf("toDoGroup_Id"),
         onDelete = ForeignKey.CASCADE
-    )]
+    )],
+    indices = arrayOf(
+        Index(
+            value = ["toDo_Id"],
+            unique = true
+        ),
+        Index(
+            value = ["toDoGroup_Id"],
+            unique = false
+        )
+    )
 )
 data class ToDo(
     @PrimaryKey(autoGenerate = true)
@@ -28,5 +38,5 @@ data class ToDo(
     @ColumnInfo(name = "toDo_DoUntil")
     val toDoDoUntil: LocalDateTime,
     @ColumnInfo(name = "toDoGroup_Id")
-    val toDoGroupId: Int
+    val toDoGroupId: Long
 )

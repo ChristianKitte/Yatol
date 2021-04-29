@@ -18,7 +18,8 @@ import java.nio.file.Path
         ToDo::class,
         ToDoGroup::class
     ],
-    version = 3
+    exportSchema = false,
+    version = 4
 )
 @TypeConverters(DateConverter::class)
 abstract class ToDoDatabase : RoomDatabase() {

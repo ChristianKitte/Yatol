@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_main"
-    app:startDestination="@id/toDoListFragment">
+    app:startDestination="@id/logIn">
 
     <fragment
         android:id="@+id/toDoListFragment"
@@ -49,5 +49,14 @@
         <action
             android:id="@+id/action_editToDo_to_deleteToDo"
             app:destination="@id/deleteToDo" />
+    </fragment>
+    <fragment
+        android:id="@+id/logIn"
+        android:name="de.ckitte.myapplication.LogIn"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_logIn_to_toDoListFragment"
+            app:destination="@id/toDoListFragment" />
     </fragment>
 </navigation>

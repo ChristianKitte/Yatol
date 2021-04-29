@@ -16,7 +16,7 @@ interface ToDoDao {
     suspend fun deleteUser(vararg toDos: ToDo)
 
     @Insert
-    suspend fun addGroup(vararg toDoGroups: ToDoGroup)
+    suspend fun addGroup(toDoGroup: ToDoGroup): Long
 
     @Update
     suspend fun updateGroup(vararg toDoGroups: ToDoGroup)
