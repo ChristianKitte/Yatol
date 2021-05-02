@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 class LogIn : Fragment() {
     private val hideHandler = Handler()
 
+
     @Suppress("InlinedApi")
     private val hidePart2Runnable = Runnable {
         // Delayed removal of status and navigation bar

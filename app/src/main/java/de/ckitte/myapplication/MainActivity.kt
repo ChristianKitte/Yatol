@@ -1,39 +1,34 @@
 package de.ckitte.myapplication
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.Settings
-import androidx.lifecycle.lifecycleScope
+import androidx.appcompat.app.AppCompatActivity
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.entities.ToDo
-import de.ckitte.myapplication.database.entities.ToDoGroup
 import de.ckitte.myapplication.database.repository.ToDoRepository
-import kotlinx.coroutines.launch
-import java.io.Console
-import java.time.LocalDateTime
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
+    private var MeineListe: List<ToDo>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val db: ToDoDao = ToDoDatabase.getInstance(this).toToDao
+        //var rep = ToDoRepository(db)
+        //var factory = MainViewModelFactory(rep)
 
-        lifecycleScope.launch {
+        //var testmodel: MainViewModel = ViewModelProvider(this, factory).get(MainViewModel::class.java)
+
+        //testmodel.allToDos()
+
+        suspend fun initializeDatabase() {
             ToDoRepository(db).emptyDatabase()
             ToDoRepository(db).ensureDefaultGroup()
-
-            val toDo = ToDo(
-                0,
-                "Erstes ToDo",
-                "Mein erstes ToDo",
-                false,
-                false,
-                LocalDateTime.now(),
-                ToDoRepository.defaultGroup)
-            db.addUser(toDo)
+            ToDoRepository(db).createSampleEntities()
         }
+
     }
+
+    //#https://agrawalsuneet.github.io/blogs/variable-number-of-arguments-vararg-kotlin/
 }

@@ -5,11 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
+import de.ckitte.myapplication.database.repository.ToDoRepository
+import de.ckitte.myapplication.databinding.FragmentTodoListBinding
+import de.ckitte.myapplication.main.ToDoApplication
+import de.ckitte.myapplication.viewmodel.MainViewModel
 
 /**
  * A simple [Fragment] subclass.
@@ -17,43 +18,53 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class ToDoListFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    // View Binding
+    private var _binding: FragmentTodoListBinding? = null
+    private val binding get() = _binding!!
+
+    // Create a viewModel
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_todo_list, container, false)
+        _binding = FragmentTodoListBinding.inflate(inflater, container, false)
+        val view = binding.root
+        viewModel = MainViewModel(ToDoRepository(ToDoApplication().repository))
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ToDoListFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ToDoListFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+
+
+
+
+        setupClickListeners()
+        fragmentTextUpdateObserver()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    // Setup the button in our fragment to call getUpdatedText method in viewModel
+    private fun setupClickListeners() {
+        binding.btnDoSomething.setOnClickListener { viewModel.getUpdatedText() }
+    }
+
+    // Observer is waiting for viewModel to update our UI
+    private fun fragmentTextUpdateObserver() {
+        viewModel.uiAlleToDos.observe(viewLifecycleOwner, Observer { updatedText ->
+            binding.tvShowSomething.text = updatedText.toString()
+        })
     }
 }

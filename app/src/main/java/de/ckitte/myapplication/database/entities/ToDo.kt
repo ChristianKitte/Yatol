@@ -1,7 +1,6 @@
 package de.ckitte.myapplication.database.entities
 
 import androidx.room.*
-import java.sql.Date
 import java.time.LocalDateTime
 
 @Entity(

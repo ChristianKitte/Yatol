@@ -18,6 +18,8 @@ data class ToDoGroup(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "toDoGroup_Id")
     val toDoGroupId: Int,
+    @ColumnInfo(name = "toDoGroup_IsDefault")
+    val toDoGroupIsDefault: Boolean,
     @ColumnInfo(name = "toDoGroup_Title")
     val toDoGroupTitle: String,
     @ColumnInfo(name = "toDoGroup_Description")

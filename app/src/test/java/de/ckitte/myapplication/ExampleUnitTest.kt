@@ -1,5 +1,6 @@
 package de.ckitte.myapplication
 
+import de.ckitte.myapplication.login.LoginProvider
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -9,9 +10,48 @@ import org.junit.Assert.*
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-class ExampleUnitTest {
+class LogInCredentialUnitTest {
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun login_credentialsTest() {
+        assertEquals(
+            false,
+            LoginProvider.ValidateCredentials(LoginProvider.Companion.YATOLCredentials("", ""))
+        )
+        assertEquals(
+            false,
+            LoginProvider.ValidateCredentials(
+                LoginProvider.Companion.YATOLCredentials(
+                    "jhsjhjs@jkl ",
+                    "234"
+                )
+            )
+        )
+        assertEquals(
+            false,
+            LoginProvider.ValidateCredentials(
+                LoginProvider.Companion.YATOLCredentials(
+                    "yattol @hallo.ms ",
+                    "012345 "
+                )
+            )
+        )
+        assertEquals(
+            true,
+            LoginProvider.ValidateCredentials(
+                LoginProvider.Companion.YATOLCredentials(
+                    "yattol@hallo.ms",
+                    "01234"
+                )
+            )
+        )
+        assertEquals(
+            false,
+            LoginProvider.ValidateCredentials(
+                LoginProvider.Companion.YATOLCredentials(
+                    "yattol@hallo.ms ",
+                    "0 1234"
+                )
+            )
+        )
     }
 }
