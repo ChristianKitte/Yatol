@@ -79,8 +79,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    fun getAllToDos(): Flow<List<ToDo>> {
-        // Flow from kotlinx-coroutines...
+    suspend fun getAllToDos(): List<ToDo> {
         return toDoDao.getAllToDos()
     }
 

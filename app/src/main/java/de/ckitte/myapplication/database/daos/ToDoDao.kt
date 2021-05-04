@@ -38,5 +38,9 @@ interface ToDoDao {
     // Flow from kotlinx-coroutines...
 
     @Query("select * from todo")
+    fun getAllToDos(): List<ToDo>
+    /*
+        @Query("select * from todo")
     fun getAllToDos(): Flow<List<ToDo>>
+     */
 }

@@ -19,7 +19,7 @@ import java.nio.file.Path
         ToDoGroup::class
     ],
     exportSchema = false,
-    version = 1
+    version = 2
 )
 @TypeConverters(DateConverter::class)
 abstract class ToDoDatabase : RoomDatabase() {
@@ -36,7 +36,6 @@ abstract class ToDoDatabase : RoomDatabase() {
                     ToDoDatabase::class.java,
                     "toDoDatabase"
                 ).allowMainThreadQueries().fallbackToDestructiveMigration()
-                    .fallbackToDestructiveMigrationOnDowngrade()
                     .build().also { instance = it }
             }
 

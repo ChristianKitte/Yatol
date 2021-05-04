@@ -31,7 +31,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
@@ -74,5 +74,9 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.3.1"
     // End Room Section
 
-    implementation 'androidx.fragment:fragment-ktx:latest-version'
+    // Start Initializer
+    //implementation "androidx.startup:startup-runtime:1.0.0-alpha01"
+    // End Initializer
+
+    //implementation 'androidx.fragment:fragment-ktx:latest-version'
 }
