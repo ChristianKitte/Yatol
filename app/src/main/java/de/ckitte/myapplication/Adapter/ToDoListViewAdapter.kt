@@ -14,7 +14,7 @@ import de.ckitte.myapplication.databinding.FragmentTodoListitemBinding
 import java.time.LocalDateTime
 import java.util.ArrayList
 
-class ToDoListViewAdapter : androidx.recyclerview.widget.ListAdapter<ToDo, ToDoListViewAdapter.ViewHolder>() {
+class ToDoListViewAdapter : RecyclerView.Adapter<ToDoListViewAdapter.ViewHolder>() {
     var toDoList: List<ToDo> = ArrayList<ToDo>()
 
 
