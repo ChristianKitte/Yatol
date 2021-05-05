@@ -8,8 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import de.ckitte.myapplication.Adapter.ToDoListViewAdapter
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.daos.ToDoDao
+import de.ckitte.myapplication.database.entities.ToDo
 import de.ckitte.myapplication.database.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.FragmentTodoListBinding
 import de.ckitte.myapplication.main.ToDoApplication
@@ -18,6 +20,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
+import java.util.ArrayList
 
 class ToDoList : Fragment() {
     // View Binding
@@ -29,6 +33,8 @@ class ToDoList : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
     }
 
     override fun onCreateView(
@@ -37,7 +43,13 @@ class ToDoList : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         viewModel = MainViewModel(ToDoRepository(ToDoApplication().repository))
-        _binding = FragmentTodoListBinding.inflate(inflater, container, false)
+        _binding = de.ckitte.myapplication.databinding.FragmentTodoListBinding.inflate(inflater, container, false)
+
+        var toDoListViewAdapter = ToDoListViewAdapter()
+        _binding?.rvtodoitems?.adapter = toDoListViewAdapter
+
+        toDoListViewAdapter.setNewUser(refreshUserList())
+        //toDoListViewAdapter.notifyItemInserted(0)
 
         val view = binding.root
         return view
@@ -45,7 +57,25 @@ class ToDoList : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupClickListeners()
+        //setupClickListeners()
+    }
+
+
+    fun refreshUserList(): ArrayList<ToDo> {
+        var toDoList: ArrayList<ToDo> = ArrayList()
+        toDoList.add(
+            ToDo(
+                0,
+                "Sample 1",
+                "toDo Sample 1",
+                false,
+                true,
+                LocalDateTime.now(),
+                ToDoRepository.defaultGroup
+            )
+        )
+
+        return toDoList
     }
 
     override fun onDestroyView() {
@@ -53,6 +83,7 @@ class ToDoList : Fragment() {
         _binding = null
     }
 
+    /*
     private fun setupClickListeners() {
         binding.btnDoSomething.setOnClickListener {
             GlobalScope.launch {
@@ -69,4 +100,5 @@ class ToDoList : Fragment() {
             }
         }
     }
+    */
 }
