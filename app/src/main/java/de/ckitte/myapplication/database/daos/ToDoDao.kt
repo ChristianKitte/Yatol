@@ -35,13 +35,10 @@ interface ToDoDao {
     @Query("delete from ToDo_Group")
     suspend fun deleteAllToDoGroups()
 
-    // Flow from kotlinx-coroutines...
-    /*
     @Query("select * from todo")
-    fun getAllToDos(): List<ToDo>
-    */
+    suspend fun getAllToDos(): List<ToDo>
 
     @Query("select * from todo")
-    fun getAllToDos(): Flow<List<ToDo>>
+    fun getAllToDosFlow(): Flow<List<ToDo>>
 
 }

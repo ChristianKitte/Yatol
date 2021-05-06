@@ -5,33 +5,49 @@ import de.ckitte.myapplication.database.entities.ToDo
 import de.ckitte.myapplication.database.repository.ToDoRepository
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import de.ckitte.myapplication.database.ToDoDatabase
+import de.ckitte.myapplication.database.daos.ToDoDao
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class MainViewModel(private val repository: ToDoRepository) : ViewModel() {
-    var uiAlleToDos: LiveData<List<ToDo>> = repository.allToDos.asLiveData()
+class MainViewModel(private val toDoDao: ToDoDao?) : ViewModel() {
+    //var uiAlleToDos: LiveData<List<ToDo>> = repository.allToDos.asLiveData()
+
+    var toDos = toDoDao?.getAllToDosFlow()?.asLiveData()
+    var s = 0
 
     fun insert(toDo: ToDo) = viewModelScope.launch {
-        repository.addToDo(toDo)
+        //repository.addToDo(toDo)
     }
 
+    /*
     fun test() {
 
     }
 
-    suspend fun getUpdatedText() {
+    var x: String = ""
+    @InternalCoroutinesApi
+    fun getUpdatedText() {
         //Holen der Daten aus Query und einschießen
-        //val updatedToDos = repository.getAllToDos()
-        //withContext(Dispatchers.IO) {
-        //uiAlleToDos = updatedToDos
-        //}
-    }
-}
+        GlobalScope.launch {
+            val updatedToDos = repository.allToDosFlow.collect({
+                value->println()
+            })
 
+            updatedToDos.collect {
+                    value-> println(value)
+            }
+        }
+
+*/
+
+    //withContext(Dispatchers.IO) {
+    //    x += updatedToDos[0].toDoTitle
+    //}
+    //}
+}
+/*
 class WordViewModelFactory(private val repository: ToDoRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
@@ -41,3 +57,4 @@ class WordViewModelFactory(private val repository: ToDoRepository) : ViewModelPr
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+*/

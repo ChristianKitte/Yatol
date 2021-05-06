@@ -22,21 +22,29 @@ import de.ckitte.myapplication.Adapter.ToDoListViewAdapter.ToDoViewHolder
 //https://developer.android.com/codelabs/android-room-with-a-view-kotlin#11
 class ToDoListViewAdapter : ListAdapter<ToDo, ToDoViewHolder>(ToDoComparator()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
-        return ToDoViewHolder.create(parent)
+        val binding =
+            FragmentTodoListitemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ToDoViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ToDoViewHolder, position: Int) {
-        val current = getItem(position)
-        holder.bind(current.toDoTitle)
+        val currentItem = getItem(position)
+        holder.bind(currentItem)
     }
 
-    class ToDoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val toDoItemView: TextView = itemView.findViewById(R.id.tvContent)
+    class ToDoViewHolder(private val binding: FragmentTodoListitemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(text: String?) {
-            toDoItemView.text = text
+        //private val toDoItemView: TextView = itemView.findViewById(R.id.tvContent)
+
+        fun bind(toDo: ToDo) {
+            binding.apply {
+                tvContent.text = toDo.toDoTitle
+            }
+            //toDoItemView.text = text
         }
 
+        /*
         companion object {
             fun create(parent: ViewGroup): ToDoViewHolder {
                 val view: View = LayoutInflater.from(parent.context)
@@ -44,11 +52,13 @@ class ToDoListViewAdapter : ListAdapter<ToDo, ToDoViewHolder>(ToDoComparator()) 
                 return ToDoViewHolder(view)
             }
         }
+        */
+
     }
 
     class ToDoComparator : DiffUtil.ItemCallback<ToDo>() {
         override fun areItemsTheSame(oldItem: ToDo, newItem: ToDo): Boolean {
-            return oldItem === newItem
+            return oldItem.toDoId === newItem.toDoId
         }
 
         override fun areContentsTheSame(oldItem: ToDo, newItem: ToDo): Boolean {

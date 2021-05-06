@@ -10,7 +10,8 @@ class DateConverter {
     @TypeConverter
     fun timestampToDate(date: String?): LocalDateTime? {
         try {
-            return LocalDateTime.parse(date)
+            return LocalDateTime.now()
+            //return LocalDateTime.parse(date)
         } catch (e: Exception) {
             return LocalDateTime.now()
         }
@@ -19,7 +20,8 @@ class DateConverter {
 
     @TypeConverter
     fun dateToTimestamp(date: LocalDateTime?): String? {
-        return date?.toString()
+        return ""
+        //return date?.toString()
     }
 }
 

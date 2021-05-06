@@ -1,6 +1,5 @@
 package de.ckitte.myapplication.database
 
-import android.app.Application
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -12,8 +11,6 @@ import de.ckitte.myapplication.database.entities.ToDo
 import de.ckitte.myapplication.database.entities.ToDoGroup
 import de.ckitte.myapplication.database.repository.ToDoRepository
 import kotlinx.coroutines.CoroutineScope
-import java.io.File
-import java.nio.file.Path
 import java.time.LocalDateTime
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.Dispatchers
@@ -33,14 +30,14 @@ abstract class ToDoDatabase : RoomDatabase() {
 
     companion object {
         @Volatile
-        private var instancex: ToDoDatabase? = null
+        private var instance: ToDoDatabase? = null
 
         fun getInstance(
             context: Context,
             scope: CoroutineScope
         ): ToDoDatabase {
-            return instancex ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
+            return instance ?: synchronized(this) {
+                val newInstance = Room.databaseBuilder(
                     context.applicationContext,
                     ToDoDatabase::class.java,
                     "toDoDatabase"
@@ -48,8 +45,8 @@ abstract class ToDoDatabase : RoomDatabase() {
                     .fallbackToDestructiveMigration()
                     .addCallback(ToDoDatabaseCallback(scope))
                     .build()
-                instancex = instance
-                return instance
+                instance = newInstance
+                return newInstance
             }
 
         }
@@ -65,7 +62,7 @@ abstract class ToDoDatabase : RoomDatabase() {
 
                 // If you want to keep the data through app restarts,
                 // comment out the following line.
-                instancex?.let { database ->
+                instance?.let { database ->
                     scope.launch(Dispatchers.IO) {
                         //populateDatabase(database.toToDao)
                     }
