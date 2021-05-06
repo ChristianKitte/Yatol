@@ -58,7 +58,7 @@ class ToDoListViewAdapter : ListAdapter<ToDo, ToDoViewHolder>(ToDoComparator()) 
 
     class ToDoComparator : DiffUtil.ItemCallback<ToDo>() {
         override fun areItemsTheSame(oldItem: ToDo, newItem: ToDo): Boolean {
-            return oldItem.toDoId === newItem.toDoId
+            return oldItem === newItem
         }
 
         override fun areContentsTheSame(oldItem: ToDo, newItem: ToDo): Boolean {

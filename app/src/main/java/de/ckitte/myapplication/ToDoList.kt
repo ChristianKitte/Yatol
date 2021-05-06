@@ -66,9 +66,13 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         }
 
         this.viewModel.toDos?.observe(viewLifecycleOwner){
-            toDoListViewAdapter.submitList(it)  //==> es werden die sieben Items übergeben !!!
+            toDoListViewAdapter.submitList(null)
+            toDoListViewAdapter.notifyDataSetChanged()
+            toDoListViewAdapter.submitList(it)//==> es werden die sieben Items übergeben !!!
+            toDoListViewAdapter.notifyDataSetChanged()
         }
         //https://www.youtube.com/watch?v=eLbgQYMGMm4&list=PLrnPJCHvNZuCfAe7QK2BoMPkv2TGM_b0E&index=5
+        //https://stackoverflow.com/questions/49726385/listadapter-not-updating-item-in-recyclerview
     }
 /*
     override fun onCreateView(

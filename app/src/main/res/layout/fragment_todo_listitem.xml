@@ -7,12 +7,6 @@
     'android:orientation="vertical"
     'tools:context=".ToDoListItem">
 
-
-    <data>
-        <variable
-            android:name="ToDo"/>
-    </data>
-
     <TextView
         android:id="@+id/tvContent"
         android:layout_width="match_parent"
