@@ -77,11 +77,17 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         toDoDao.deleteAllToDoGroups()
     }
 
+    // Query mit Datnrückgabe
+    /*
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun getAllToDos(): List<ToDo> {
+        suspend fun getAllToDos(): List<ToDo> {
         return toDoDao.getAllToDos()
     }
+    */
+
+    //EIgenschaft für Observer
+    val allToDos: Flow<List<ToDo>> = toDoDao.getAllToDos()
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread

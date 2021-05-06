@@ -3,8 +3,9 @@ package de.ckitte.myapplication.Adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ListAdapter
+import androidx.recyclerview.widget.ListAdapter
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.entities.ToDo
@@ -13,32 +14,45 @@ import de.ckitte.myapplication.databinding.FragmentTodoListBinding
 import de.ckitte.myapplication.databinding.FragmentTodoListitemBinding
 import java.time.LocalDateTime
 import java.util.ArrayList
+import de.ckitte.myapplication.Adapter.ToDoListViewAdapter.ToDoViewHolder
 
-class ToDoListViewAdapter : RecyclerView.Adapter<ToDoListViewAdapter.ViewHolder>() {
-    var toDoList: List<ToDo> = ArrayList<ToDo>()
-
-
-    // Neue Users anzeigen...
-    fun setNewUser(toDoList: ArrayList<ToDo>) {
-        this.toDoList = toDoList
-        notifyDataSetChanged()
+//ListADapter neuer als RecyclerView.Adapter. Keine Implementirung mti getItemCount
+//Es muss keine Liste gehalten werden. Arbeitet mit SubmitList aus dem Model
+//https://blog.usejournal.com/why-you-should-be-using-the-new-and-improved-listadapter-in-android-17a2ab7ca644
+//https://developer.android.com/codelabs/android-room-with-a-view-kotlin#11
+class ToDoListViewAdapter : ListAdapter<ToDo, ToDoViewHolder>(ToDoComparator()) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
+        return ToDoViewHolder.create(parent)
     }
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var tvContent: TextView = itemView.findViewById(R.id.tvContent)
+    override fun onBindViewHolder(holder: ToDoViewHolder, position: Int) {
+        val current = getItem(position)
+        holder.bind(current.toDoTitle)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        var view: View = LayoutInflater.from(parent.context)
-            .inflate(R.layout.fragment_todo_listitem, parent, false)
-        return ViewHolder(view)
+    class ToDoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val toDoItemView: TextView = itemView.findViewById(R.id.tvContent)
+
+        fun bind(text: String?) {
+            toDoItemView.text = text
+        }
+
+        companion object {
+            fun create(parent: ViewGroup): ToDoViewHolder {
+                val view: View = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.fragment_todo_listitem, parent, false)
+                return ToDoViewHolder(view)
+            }
+        }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.tvContent.text = toDoList[position].toString()
-    }
+    class ToDoComparator : DiffUtil.ItemCallback<ToDo>() {
+        override fun areItemsTheSame(oldItem: ToDo, newItem: ToDo): Boolean {
+            return oldItem === newItem
+        }
 
-    override fun getItemCount(): Int {
-        return this.toDoList.count()
+        override fun areContentsTheSame(oldItem: ToDo, newItem: ToDo): Boolean {
+            return oldItem.toDoId == newItem.toDoId
+        }
     }
 }

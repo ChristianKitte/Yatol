@@ -1,29 +1,25 @@
 package de.ckitte.myapplication
 
-import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import de.ckitte.myapplication.Adapter.ToDoListViewAdapter
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.daos.ToDoDao
-import de.ckitte.myapplication.database.entities.ToDo
 import de.ckitte.myapplication.database.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.FragmentTodoListBinding
 import de.ckitte.myapplication.main.ToDoApplication
 import de.ckitte.myapplication.viewmodel.MainViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.time.LocalDateTime
-import java.util.ArrayList
+import de.ckitte.myapplication.viewmodel.WordViewModelFactory
 
 class ToDoList : Fragment() {
+    // Add RecyclerView member
+    //private var recyclerView: RecyclerView? = null
+
     // View Binding
     private var _binding: FragmentTodoListBinding? = null
     private val binding get() = _binding!!
@@ -33,8 +29,6 @@ class ToDoList : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
     }
 
     override fun onCreateView(
@@ -43,44 +37,20 @@ class ToDoList : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         viewModel = MainViewModel(ToDoRepository(ToDoApplication().repository))
-        _binding = de.ckitte.myapplication.databinding.FragmentTodoListBinding.inflate(inflater, container, false)
-
-        var toDoListViewAdapter = ToDoListViewAdapter()
-        _binding?.rvtodoitems?.adapter = toDoListViewAdapter
-
-        toDoListViewAdapter.setNewUser(refreshUserList())
-        //toDoListViewAdapter.notifyItemInserted(0)
+        _binding = FragmentTodoListBinding.inflate(inflater, container, false)
 
         val view = binding.root
-        return view
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         //setupClickListeners()
-    }
+        val recyclerView = view.findViewById<RecyclerView>(R.id.rvtodoitems)
+        val toDoListViewAdapter = ToDoListViewAdapter()
+        recyclerView.adapter = toDoListViewAdapter
+        recyclerView.layoutManager = LinearLayoutManager(this.context)
 
+        //_binding?.rvtodoitems?.adapter = toDoListViewAdapter
+        //_binding?.rvtodoitems?.layoutManager=LinearLayout(this)
 
-    fun refreshUserList(): ArrayList<ToDo> {
-        var toDoList: ArrayList<ToDo> = ArrayList()
-        toDoList.add(
-            ToDo(
-                0,
-                "Sample 1",
-                "toDo Sample 1",
-                false,
-                true,
-                LocalDateTime.now(),
-                ToDoRepository.defaultGroup
-            )
-        )
-
-        return toDoList
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        return view
     }
 
     /*

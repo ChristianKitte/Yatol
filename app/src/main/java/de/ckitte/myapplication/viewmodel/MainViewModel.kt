@@ -13,17 +13,31 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainViewModel(private val repository: ToDoRepository) : ViewModel() {
-    var uiAlleToDos: List<ToDo> = emptyList()
-    fun test(): List<ToDo> {
-        return uiAlleToDos
+    var uiAlleToDos: LiveData<List<ToDo>> = repository.allToDos.asLiveData()
+
+    fun insert(toDo: ToDo) = viewModelScope.launch {
+        repository.addToDo(toDo)
+    }
+
+    fun test() {
+
     }
 
     suspend fun getUpdatedText() {
-        val updatedToDos = repository.getAllToDos()
-        withContext(Dispatchers.IO) {
-            uiAlleToDos = updatedToDos
-        }
+        //Holen der Daten aus Query und einschießen
+        //val updatedToDos = repository.getAllToDos()
+        //withContext(Dispatchers.IO) {
+        //uiAlleToDos = updatedToDos
+        //}
     }
 }
 
-
+class WordViewModelFactory(private val repository: ToDoRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MainViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
