@@ -22,7 +22,7 @@ import java.time.LocalDateTime
         )
     )
 )
-data class ToDo(
+data class ToDoItem(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "toDo_Id")
     val toDoId: Int,

@@ -1,23 +1,18 @@
 package de.ckitte.myapplication.viewmodel
 
 import androidx.lifecycle.*
-import de.ckitte.myapplication.database.entities.ToDo
-import de.ckitte.myapplication.database.repository.ToDoRepository
-import androidx.lifecycle.MutableLiveData
+import de.ckitte.myapplication.database.entities.ToDoItem
 import androidx.lifecycle.ViewModel
-import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.daos.ToDoDao
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 
 class MainViewModel(private val toDoDao: ToDoDao?) : ViewModel() {
     //var uiAlleToDos: LiveData<List<ToDo>> = repository.allToDos.asLiveData()
 
-    var toDos = toDoDao?.getAllToDosFlow()?.asLiveData()
+    var toDos = toDoDao?.getAllToDosAsFlow()?.asLiveData()
     var s = 0
 
-    fun insert(toDo: ToDo) = viewModelScope.launch {
+    fun insert(toDo: ToDoItem) = viewModelScope.launch {
         //repository.addToDo(toDo)
     }
 

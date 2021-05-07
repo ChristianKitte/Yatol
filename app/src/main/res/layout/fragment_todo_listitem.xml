@@ -4,14 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    'android:orientation="vertical"
-    'tools:context=".ToDoListItem">
 
     <TextView
         android:id="@+id/tvContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#7E6C6C"
+        android:background="#E8E6E6"
         android:text="TextView"
         android:textSize="24sp" />
 </LinearLayout>

@@ -4,9 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.daos.ToDoDao
-import de.ckitte.myapplication.database.entities.ToDo
 import de.ckitte.myapplication.database.repository.ToDoRepository
-import de.ckitte.myapplication.main.ToDoApplication
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.SupervisorJob
@@ -22,7 +20,7 @@ class MainActivity : AppCompatActivity() {
 
         GlobalScope.launch {
             ToDoRepository(db).emptyDatabase()
-            ToDoRepository(db).ensureDefaultGroup()
+            ToDoRepository(db).ensureDefaultToDoGroup()
             ToDoRepository(db).createSampleEntities()
         }
     }

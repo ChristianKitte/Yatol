@@ -1,26 +1,19 @@
 package de.ckitte.myapplication.Adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import de.ckitte.myapplication.R
-import de.ckitte.myapplication.database.entities.ToDo
-import de.ckitte.myapplication.database.repository.ToDoRepository
-import de.ckitte.myapplication.databinding.FragmentTodoListBinding
+import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.databinding.FragmentTodoListitemBinding
-import java.time.LocalDateTime
-import java.util.ArrayList
 import de.ckitte.myapplication.Adapter.ToDoListViewAdapter.ToDoViewHolder
 
 //ListADapter neuer als RecyclerView.Adapter. Keine Implementirung mti getItemCount
 //Es muss keine Liste gehalten werden. Arbeitet mit SubmitList aus dem Model
 //https://blog.usejournal.com/why-you-should-be-using-the-new-and-improved-listadapter-in-android-17a2ab7ca644
 //https://developer.android.com/codelabs/android-room-with-a-view-kotlin#11
-class ToDoListViewAdapter : ListAdapter<ToDo, ToDoViewHolder>(ToDoComparator()) {
+class ToDoListViewAdapter : ListAdapter<ToDoItem, ToDoViewHolder>(ToDoComparator()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
         val binding =
             FragmentTodoListitemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -37,7 +30,7 @@ class ToDoListViewAdapter : ListAdapter<ToDo, ToDoViewHolder>(ToDoComparator()) 
 
         //private val toDoItemView: TextView = itemView.findViewById(R.id.tvContent)
 
-        fun bind(toDo: ToDo) {
+        fun bind(toDo: ToDoItem) {
             binding.apply {
                 tvContent.text = toDo.toDoTitle
             }
@@ -56,12 +49,12 @@ class ToDoListViewAdapter : ListAdapter<ToDo, ToDoViewHolder>(ToDoComparator()) 
 
     }
 
-    class ToDoComparator : DiffUtil.ItemCallback<ToDo>() {
-        override fun areItemsTheSame(oldItem: ToDo, newItem: ToDo): Boolean {
+    class ToDoComparator : DiffUtil.ItemCallback<ToDoItem>() {
+        override fun areItemsTheSame(oldItem: ToDoItem, newItem: ToDoItem): Boolean {
             return oldItem === newItem
         }
 
-        override fun areContentsTheSame(oldItem: ToDo, newItem: ToDo): Boolean {
+        override fun areContentsTheSame(oldItem: ToDoItem, newItem: ToDoItem): Boolean {
             return oldItem.toDoId == newItem.toDoId
         }
     }
