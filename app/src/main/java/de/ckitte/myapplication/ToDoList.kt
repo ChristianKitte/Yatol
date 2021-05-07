@@ -66,10 +66,17 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         }
 
         this.viewModel.toDos?.observe(viewLifecycleOwner){
-            toDoListViewAdapter.submitList(null)
-            toDoListViewAdapter.notifyDataSetChanged()
+            //Achtung: Ich habe lange gesucht. Problem:
+            //zunächst Höhe Text auf 0 gesetzt
+            //dann Die Umgebung, den Frame nicht auf den Inhalt angepasst.
+            //sehr böse Falle und nciht leicht aufzuspüren
+
             toDoListViewAdapter.submitList(it)//==> es werden die sieben Items übergeben !!!
-            toDoListViewAdapter.notifyDataSetChanged()
+
+            //toDoListViewAdapter.submitList(ArrayList(it))
+
+            //toDoListViewAdapter.submitList(it?.toMutableList())
+            //toDoListViewAdapter.notifyDataSetChanged()
         }
         //https://www.youtube.com/watch?v=eLbgQYMGMm4&list=PLrnPJCHvNZuCfAe7QK2BoMPkv2TGM_b0E&index=5
         //https://stackoverflow.com/questions/49726385/listadapter-not-updating-item-in-recyclerview
