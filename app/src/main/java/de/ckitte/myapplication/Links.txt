@@ -1,6 +1,0 @@
-Linksammlung
-
-Initializer
-https://proandroiddev.com/androidx-app-startup-698855342f80
-https://www.rockandnull.com/app-startup-android/
-https://agrawalsuneet.github.io/blogs/variable-number-of-arguments-vararg-kotlin/

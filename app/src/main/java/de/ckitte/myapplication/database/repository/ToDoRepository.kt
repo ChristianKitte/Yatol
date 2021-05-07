@@ -81,7 +81,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
     // Für die Verwendung mit Flow und zur Nutzung mit einem Observer
     // ist dies Pattern notwendig. ACHTUNG: fun ohne suspend!
-    fun allToDosAsFlow(): Flow<List<ToDoItem>> = toDoDao.getAllToDosAsFlow()
+    fun getAllToDosAsFlow(): Flow<List<ToDoItem>> = toDoDao.getAllToDosAsFlow()
 
     // Zusätzliche Funktionalität
 

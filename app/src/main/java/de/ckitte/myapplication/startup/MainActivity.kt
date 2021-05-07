@@ -1,7 +1,8 @@
-package de.ckitte.myapplication
+package de.ckitte.myapplication.startup
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.repository.ToDoRepository
@@ -24,9 +25,4 @@ class MainActivity : AppCompatActivity() {
             ToDoRepository(db).createSampleEntities()
         }
     }
-    // https://developer.android.com/codelabs/android-room-with-a-view-kotlin#12
-    // https://github.com/googlecodelabs/android-room-with-a-view/blob/kotlin/app/src/main/java/com/example/android/roomwordssample/WordsApplication.kt
-    // https://developer.android.com/training/dependency-injection
-    // https://medium.com/swlh/create-recyclerview-in-android-fragment-c0f0b151125f
-
 }

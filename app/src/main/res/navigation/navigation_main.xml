@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/toDoListFragment"
-        android:name="de.ckitte.myapplication.ToDoList"
+        android:name="de.ckitte.myapplication.surface.ToDoList"
         android:label="fragment_todolist"
         tools:layout="@layout/fragment_todo_list">
         <action
@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/addToDo"
-        android:name="de.ckitte.myapplication.AddToDo"
+        android:name="de.ckitte.myapplication.surface.AddToDo"
         android:label="fragment_add_todo"
         tools:layout="@layout/fragment_add_todo">
         <action
@@ -28,7 +28,7 @@
     </fragment>
     <fragment
         android:id="@+id/editToDo"
-        android:name="de.ckitte.myapplication.EditToDo"
+        android:name="de.ckitte.myapplication.surface.EditToDo"
         android:label="fragment_edit_todo"
         tools:layout="@layout/fragment_edit_todo">
         <action

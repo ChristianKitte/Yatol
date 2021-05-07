@@ -1,17 +1,13 @@
 package de.ckitte.myapplication.database.converters
 
 import androidx.room.TypeConverter
-import java.lang.Exception
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
 
 class DateConverter {
     @TypeConverter
     fun timestampToDate(date: String?): LocalDateTime? {
         try {
-            return LocalDateTime.now()
-            //return LocalDateTime.parse(date)
+            return LocalDateTime.parse(date)
         } catch (e: Exception) {
             return LocalDateTime.now()
         }
@@ -20,8 +16,7 @@ class DateConverter {
 
     @TypeConverter
     fun dateToTimestamp(date: LocalDateTime?): String? {
-        return ""
-        //return date?.toString()
+        return date?.toString()
     }
 }
 
