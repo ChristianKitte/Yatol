@@ -26,8 +26,13 @@ class ToDoListViewAdapter : ListAdapter<ToDoItem, ToDoViewHolder>(ToDoComparator
 
         fun bind(toDo: ToDoItem) {
             binding.apply {
-                //tvContent.text = toDo.toDoTitle
-                tvContent.text = toDo.toDoDoUntil.toString()
+                tvTitle.text = toDo.toDoTitle
+                tvDescription.text = toDo.toDoDescription
+
+                checkIsDone.isChecked = toDo.toDoIsDone
+                checkIsFavourite.isChecked = toDo.toDoIsFavourite
+
+                tvDoUntil.text = toDo.toDoDoUntil.toString()
             }
         }
     }
