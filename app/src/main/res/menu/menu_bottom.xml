@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/miClose"
-        android:icon="@drawable/ic_close"
+        android:icon="@drawable/ic_dump"
         android:title="Schließen" />
 
     <item
         android:id="@+id/miRefresh"
-        android:icon="@drawable/ic_refresh"
+        android:icon="@drawable/ic_dump"
         android:title="Aktualisieren" />
 
     <item
@@ -16,11 +16,11 @@
 
     <item
         android:id="@+id/miEdit"
-        android:icon="@drawable/ic_edit"
+        android:icon="@drawable/ic_dump"
         android:title="Ändern" />
 
     <item
         android:id="@+id/miDelete"
-        android:icon="@drawable/ic_delete"
+        android:icon="@drawable/ic_dump"
         android:title="Löschen" />
 </menu>

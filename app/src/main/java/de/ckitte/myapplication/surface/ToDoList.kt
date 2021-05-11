@@ -2,7 +2,7 @@ package de.ckitte.myapplication.surface
 
 //import android.app.Fragment
 import android.os.Bundle
-import android.view.View
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +16,19 @@ import de.ckitte.myapplication.database.repository.ToDoRepository
 class ToDoList : Fragment(R.layout.fragment_todo_list) {
     private lateinit var viewModel: ToDoListModel
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        setHasOptionsMenu(true)
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_aside,menu)
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
