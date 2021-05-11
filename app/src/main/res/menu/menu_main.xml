@@ -1,7 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/miCleanLokal"
+        android:title="Lokale Daten löschen" />
+
+    <item
+        android:id="@+id/miCleanRemote"
+        android:title="Remote Daten löschen" />
+
+    <item
+        android:id="@+id/miRefresh"
+        android:title="Daten aktualisieren" />
+
+    <item
+        android:id="@+id/miDoneFirst"
+        android:checkable="true"
+        android:title="Erledigt -> Unerledigt" />
+
+    <item
+        android:id="@+id/miNotDoneFirst"
+        android:checkable="true"
+        android:title="Unerledigt -> Erledigt" />
+
+    <item
+        android:id="@+id/miDateFirst"
+        android:checkable="true"
+        android:title="Datum -> Wichtigkeit" />
+
+    <item
+        android:id="@+id/miPriorityFirst"
+        android:checkable="true"
+        android:title="Wichtigkeit -> Datum" />
+
     <item
         android:id="@+id/miClose"
-        android:icon="@drawable/ic_close"
         android:title="Schließen" />
+
 </menu>

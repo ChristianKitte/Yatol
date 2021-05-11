@@ -44,7 +44,6 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
             //Achtung: Ich habe lange gesucht. Problem: Zunächst TextView Höhe auf 0 gewesen
             //dann das Fragment selbst nicht auf den Inhalt angepasst.
             //Sehr böse Falle und nicht leicht aufzuspüren...
-
             toDoListViewAdapter.submitList(it)
         }
     }

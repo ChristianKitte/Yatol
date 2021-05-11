@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityMainBinding
-    //R.layout.activity_main
+    private lateinit var db: ToDoDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         _binding.menuBottomNavigation.menu.getItem(2).isEnabled = false
 
         val applicationScope = CoroutineScope(SupervisorJob())
-        val db: ToDoDao = ToDoDatabase.getInstance(this, applicationScope).toToDao
+        this.db = ToDoDatabase.getInstance(this, applicationScope).toToDao
 
         GlobalScope.launch {
             ToDoRepository(db).emptyDatabase()
@@ -49,19 +49,61 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle item selection
-        return when (item.itemId) {
-            R.id.miClose -> {
-                val text = "Hello toast!"
-                val duration = Toast.LENGTH_SHORT
-
-                val toast = Toast.makeText(applicationContext, text, duration)
-                toast.show()
-
-                true
+        when (item.itemId) {
+            R.id.miCleanLokal -> {
+                val toast =
+                    Toast.makeText(applicationContext, "Die lokalen Daten wurden gelöscht", Toast.LENGTH_SHORT).show()
+                GlobalScope.launch {
+                    ToDoRepository(db).emptyDatabase()
+                    ToDoRepository(db).ensureDefaultToDoGroup()
+                }
+                return true
             }
-            else -> super.onOptionsItemSelected(item)
+            R.id.miCleanRemote -> {
+                val toast =
+                    Toast.makeText(applicationContext, "miCleanRemote", Toast.LENGTH_SHORT).show()
+                return true
+            }
+            R.id.miRefresh -> {
+                val toast =
+                    Toast.makeText(applicationContext, "miRefresh", Toast.LENGTH_SHORT).show()
+                GlobalScope.launch {
+                    ToDoRepository(db).emptyDatabase()
+                    ToDoRepository(db).ensureDefaultToDoGroup()
+                    ToDoRepository(db).createSampleEntities()
+                }
+                return true
+            }
+            R.id.miDoneFirst -> {
+                val toast =
+                    Toast.makeText(applicationContext, "miDoneFirst", Toast.LENGTH_SHORT).show()
+                return true
+            }
+            R.id.miNotDoneFirst -> {
+                val toast =
+                    Toast.makeText(applicationContext, "miNotDoneFirst", Toast.LENGTH_SHORT).show()
+                return true
+            }
+            R.id.miDateFirst -> {
+                val toast =
+                    Toast.makeText(applicationContext, "miDateFirst", Toast.LENGTH_SHORT).show()
+                return true
+            }
+            R.id.miPriorityFirst -> {
+                val toast =
+                    Toast.makeText(applicationContext, "miPriorityFirst", Toast.LENGTH_SHORT).show()
+                return true
+            }
+            R.id.miClose -> {
+                val toast =
+                    Toast.makeText(applicationContext, "miClose", Toast.LENGTH_SHORT).show()
+                return true
+            }
+
+            else -> {
+                super.onOptionsItemSelected(item)
+                return false
+            }
         }
     }
-
 }

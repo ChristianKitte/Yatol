@@ -22,7 +22,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
             ToDoItem(
                 0,
                 "Sample 2",
-                "toDo Sample 2",
+                "toDo Sample 2wwwwwwwwwwwwwwwwwwwwwwwwwwwwwoooooooooooooooooooooooooooooooooooppppppppppppppppppppppppppp",
                 true,
                 false,
                 LocalDateTime.now().plusDays(1),
