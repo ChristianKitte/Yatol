@@ -29,11 +29,6 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         val toDoRepository = dao?.let { ToDoRepository(it) }
         this.viewModel = toDoRepository?.let { ToDoListModel(it) }!!
 
-        // Wenn im Konstruktor nichts weiter angegeben ist:
-        // _binding = FragmentTodoListBinding.inflate(inflater, container, false)
-        // Wenn R.layout.fragment_todo_list im Konstruktor übergeben
-        // wird, ist der folgende Code mögliche:
-
         val _binding = FragmentTodoListBinding.bind(view)
         val toDoListViewAdapter = ToDoListViewAdapter()
 
