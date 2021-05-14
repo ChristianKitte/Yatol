@@ -10,10 +10,6 @@
         android:title="Remote Daten löschen" />
 
     <item
-        android:id="@+id/miRefresh"
-        android:title="Daten aktualisieren" />
-
-    <item
         android:id="@+id/miDoneFirst"
         android:checkable="true"
         android:title="Erledigt -> Unerledigt" />
@@ -32,9 +28,5 @@
         android:id="@+id/miPriorityFirst"
         android:checkable="true"
         android:title="Wichtigkeit -> Datum" />
-
-    <item
-        android:id="@+id/miClose"
-        android:title="Schließen" />
 
 </menu>

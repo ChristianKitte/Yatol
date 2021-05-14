@@ -38,6 +38,9 @@ interface ToDoDao {
 
     // Abfragen
 
+    @Query("delete from ToDo where toDo_Id = :toDoId")
+    suspend fun deleteToDo(toDoId: Int)
+
     @Query("delete from ToDo_Group")
     suspend fun deleteAllToDoGroups()
 

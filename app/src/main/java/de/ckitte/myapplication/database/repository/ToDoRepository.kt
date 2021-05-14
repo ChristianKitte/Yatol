@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 class ToDoRepository(private val toDoDao: ToDoDao) {
     // Statische Eigenschaften
 
-    companion object x {
+    companion object StaticMembers {
         var defaultGroup: Long = 0
     }
 
@@ -66,6 +66,12 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
+    suspend fun deleteToDo(toDoId: Int) {
+        toDoDao.deleteToDo(toDoId)
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
     suspend fun deleteAllToDoGroups() {
         toDoDao.deleteAllToDoGroups()
     }
@@ -87,9 +93,17 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun emptyDatabase() {
+    suspend fun emptyLokalDatabase() {
         toDoDao.deleteAllToDoItems()
         toDoDao.deleteAllToDoGroups()
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun RefreshDatabase() {
+        emptyLokalDatabase()
+        ensureDefaultToDoGroup()
+        createSampleEntities()
     }
 
     @Suppress("RedundantSuspendModifier")
@@ -97,7 +111,9 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     suspend fun ensureDefaultToDoGroup(): Long {
         val todogroup = ToDoGroup(0, true, "Default", "Alle Einträge ohne Gruppe")
         val id = toDoDao.addToDoGroup(todogroup)
+
         ToDoRepository.defaultGroup = id
+
         return id
     }
 
