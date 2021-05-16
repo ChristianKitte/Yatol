@@ -2,16 +2,21 @@ package de.ckitte.myapplication.viewadapter
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.annotation.RestrictTo
 import androidx.annotation.WorkerThread
+import androidx.navigation.NavDirections
 import androidx.navigation.NavHost
 import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import de.ckitte.myapplication.Model.ToDoListModel
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.entities.ToDoItem
@@ -23,20 +28,25 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class ToDoListViewAdapter : ListAdapter<ToDoItem, ToDoViewHolder>(ToDoComparator()) {
+class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
+    ListAdapter<ToDoItem, ToDoViewHolder>(ToDoComparator()) {
+    //private var viewModel: ToDoListModel=viewModel
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
         val binding =
             FragmentTodoListitemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ToDoViewHolder(binding)
+        return ToDoViewHolder(binding, viewModel)
     }
 
     override fun onBindViewHolder(holder: ToDoViewHolder, position: Int) {
         val currentItem = getItem(position)
         holder.bind(currentItem)
-
     }
 
-    class ToDoViewHolder(private val binding: FragmentTodoListitemBinding) :
+    class ToDoViewHolder(
+        private val binding: FragmentTodoListitemBinding,
+        private var viewModel: ToDoListModel
+    ) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(toDo: ToDoItem) {
@@ -50,26 +60,18 @@ class ToDoListViewAdapter : ListAdapter<ToDoItem, ToDoViewHolder>(ToDoComparator
                 tvDoUntil.text = toDo.toDoDoUntil.toString()
 
                 fabEdit.setOnClickListener {
-                    Toast.makeText(
-                        root.context,
-                        "Den aktuellen Eintrag editieren ( ${toDo.toDoId} )",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    //var x = Navigation.findNavController(R.id.activityLayout)
+                    viewModel.setCurrentToDoItem(toDo)
+                    it.findNavController().navigate(R.id.action_toDoListFragment_to_editToDo)
                 }
 
-                fabDelete.setOnClickListener {
-                    GlobalScope.launch {
-                        val db = ToDoDatabase.getInstance(root.context, GlobalScope).toToDao
-                        ToDoRepository(db).deleteToDo(toDo.toDoId)
-                    }
+                checkIsDone.setOnClickListener {
+                    toDo.toDoIsDone = checkIsDone.isChecked
+                    viewModel.updateToDoItem(toDo)
+                }
 
-                    Toast.makeText(
-                        root.context,
-                        "Der Eintrag ${toDo.toDoTitle} wurde gelöscht ( ${toDo.toDoId} )",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                checkIsFavourite.setOnClickListener {
+                    toDo.toDoIsFavourite = checkIsFavourite.isChecked
+                    viewModel.updateToDoItem(toDo)
                 }
             }
         }

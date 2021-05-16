@@ -12,7 +12,20 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
     companion object StaticMembers {
         var defaultGroup: Long = 0
+
+        @Volatile
+        private var currentToDoItem: ToDoItem? = null
+
+        fun setCurrentToDoItem(currentToDoItem: ToDoItem) {
+            this.currentToDoItem = currentToDoItem
+        }
+
+        fun getCurrentToDoItem(): ToDoItem? {
+            return this.currentToDoItem
+
+        }
     }
+
 
     // CRUD ToDoItem
 
@@ -25,13 +38,13 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun updateToDoItem(vararg toDos: ToDoItem) {
-        toDoDao.addToDoItem(*toDos)
+        toDoDao.updateToDoItem(*toDos)
     }
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun deleteToDoItem(vararg toDos: ToDoItem) {
-        toDoDao.addToDoItem(*toDos)
+        toDoDao.deleteToDoItem(*toDos)
     }
 
     @Suppress("RedundantSuspendModifier")

@@ -10,6 +10,8 @@ import android.widget.Toast
 import androidx.annotation.ContentView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.solver.widgets.analyzer.Dependency
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
@@ -43,6 +45,7 @@ class MainActivity : AppCompatActivity() {
                 "Ein neues ToDo Item anlegen",
                 Toast.LENGTH_SHORT
             ).show()
+            //this.findNavController(R.id.nav_host_fragment_container).navigate(R.id.action_toDoListFragment_to_addToDo)
         }
 
         _binding.menuBottomNavigation.setOnNavigationItemSelectedListener {
@@ -65,6 +68,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        return super.onSupportNavigateUp()
+    }
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
 

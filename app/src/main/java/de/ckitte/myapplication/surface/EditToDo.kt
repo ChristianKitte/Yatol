@@ -5,7 +5,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
+import de.ckitte.myapplication.Model.EditToDoModel
+import de.ckitte.myapplication.Model.ToDoListModel
 import de.ckitte.myapplication.R
+import de.ckitte.myapplication.database.ToDoDatabase
+import de.ckitte.myapplication.database.repository.ToDoRepository
+import de.ckitte.myapplication.databinding.FragmentEditTodoBinding
+import de.ckitte.myapplication.databinding.FragmentTodoListBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -18,17 +26,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class EditToDo : Fragment(R.layout.fragment_edit_todo) {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var viewModel: EditToDoModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,23 +36,34 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo) {
         return inflater.inflate(R.layout.fragment_edit_todo, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment EditToDo.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            EditToDo().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val dao = parentFragment?.let {
+            ToDoDatabase.getInstance(
+                view.context,
+                it.lifecycleScope
+            ).toToDao
+        }
+
+        val toDoRepository = dao?.let { ToDoRepository(it) }
+        this.viewModel = toDoRepository?.let { EditToDoModel(it) }!!
+
+        val _binding = FragmentEditTodoBinding.bind(view)
+        val currentToDoItem = viewModel.getCurrentToDoItem()
+
+        _binding.apply {
+            tvTest.setText(currentToDoItem?.toDoTitle)
+        }
+
+        _binding.button.setOnClickListener {
+            if (currentToDoItem != null) {
+                currentToDoItem.toDoTitle = _binding.tvTest.text.toString()
+
+                viewModel.updateToDoItem(currentToDoItem)
             }
+
+            it.findNavController().navigate(R.id.action_editToDo_to_toDoListFragment)
+        }
     }
 }

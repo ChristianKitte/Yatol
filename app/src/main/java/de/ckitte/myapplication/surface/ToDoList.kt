@@ -1,11 +1,13 @@
 package de.ckitte.myapplication.surface
 
-//import android.app.Fragment
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
@@ -30,14 +32,43 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         this.viewModel = toDoRepository?.let { ToDoListModel(it) }!!
 
         val _binding = FragmentTodoListBinding.bind(view)
-        val toDoListViewAdapter = ToDoListViewAdapter()
+        val toDoListViewAdapter = ToDoListViewAdapter(viewModel)
 
         _binding.apply {
-            this.rvtodoitems.apply {
+            rvtodoitems.apply {
                 adapter = toDoListViewAdapter
                 layoutManager = LinearLayoutManager(requireContext())
                 setHasFixedSize(true) //optimierung
             }
+        }
+
+        val ItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val currentItemIndex = viewHolder.adapterPosition
+                val currentItem = toDoListViewAdapter.currentList[currentItemIndex]
+                viewModel.deleteToDoItem(currentItem)
+
+                Snackbar.make(view, "Der Eintrag wurde gelöscht", Snackbar.LENGTH_LONG).apply {
+                    setAction("Abbruch") {
+                        viewModel.addToDoItem(currentItem)
+                    }
+                }.show()
+            }
+        }
+
+        ItemTouchHelper(ItemTouchHelperCallback).apply {
+            attachToRecyclerView(_binding.rvtodoitems)
         }
 
         this.viewModel.toDos.observe(viewLifecycleOwner) {
