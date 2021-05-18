@@ -7,6 +7,10 @@ import de.ckitte.myapplication.database.repository.ToDoRepository
 import kotlinx.coroutines.launch
 
 class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
+    fun addToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
+        toDoDao.addToDoItem(toDoItem)
+    }
+
     fun updateToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
         toDoDao.updateToDoItem(toDoItem)
     }

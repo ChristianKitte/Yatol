@@ -12,7 +12,6 @@ class ToDoListItem : Fragment() {
     private var _binding: FragmentTodoListitemBinding? = null
     private val binding get() = _binding!!
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -21,8 +20,6 @@ class ToDoListItem : Fragment() {
         this._binding = FragmentTodoListitemBinding.inflate(inflater, container, false)
 
         val view = binding.root
-
-
 
         return view
     }
