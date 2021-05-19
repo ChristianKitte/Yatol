@@ -27,10 +27,10 @@ import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter.ToDoViewHolder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
     ListAdapter<ToDoItem, ToDoViewHolder>(ToDoComparator()) {
-    //private var viewModel: ToDoListModel=viewModel
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
         val binding =
@@ -57,7 +57,7 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
                 checkIsDone.isChecked = toDo.toDoIsDone
                 checkIsFavourite.isChecked = toDo.toDoIsFavourite
 
-                tvDoUntil.text = toDo.toDoDoUntil.toString()
+                tvDoUntil.text = getDoUntilString(toDo.toDoDoUntil)
 
                 fabEdit.setOnClickListener {
                     viewModel.setCurrentToDoItem(toDo)
@@ -74,6 +74,16 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
                     viewModel.updateToDoItem(toDo)
                 }
             }
+        }
+
+        private fun getDoUntilString(dateTime: LocalDateTime): String {
+            val currentDayString = dateTime.dayOfMonth.toString().padStart(2, '0')
+            val currentMonthString = dateTime.monthValue.toString().padStart(2, '0')
+            val currentYearString = dateTime.year.toString().padStart(4, '0')
+            val currentHourString = dateTime.hour.toString().padStart(2, '0')
+            val currentMinuteString = dateTime.minute.toString().padStart(2, '0')
+
+            return "Am $currentDayString.$currentMonthString.$currentYearString um $currentHourString:$currentMinuteString Uhr"
         }
     }
 

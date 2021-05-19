@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 class DateConverter {
     @TypeConverter
     fun timestampToDate(date: String?): LocalDateTime? {
+        // month is one based!
         try {
             return LocalDateTime.parse(date)
         } catch (e: Exception) {
@@ -16,6 +17,7 @@ class DateConverter {
 
     @TypeConverter
     fun dateToTimestamp(date: LocalDateTime?): String? {
+        // month is one based!
         return date?.toString()
     }
 }
