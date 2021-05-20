@@ -2,8 +2,10 @@ package de.ckitte.myapplication.surface
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +16,8 @@ import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.databinding.FragmentTodoListBinding
 import de.ckitte.myapplication.Model.ToDoListModel
 import de.ckitte.myapplication.database.repository.ToDoRepository
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class ToDoList : Fragment(R.layout.fragment_todo_list) {
     private lateinit var viewModel: ToDoListModel
@@ -40,6 +44,29 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
                 layoutManager = LinearLayoutManager(requireContext())
                 setHasFixedSize(true) //optimierung
             }
+        }
+
+        _binding.menuBottomNavigation.menu.getItem(2).isEnabled = false
+        _binding.menuBottomNavigation.menu.getItem(3).isEnabled = false
+        _binding.menuBottomNavigation.menu.getItem(4).isEnabled = false
+
+        _binding.fabAdd.setOnClickListener {
+            it.findNavController().navigate(R.id.action_toDoListFragment_to_addToDo)
+        }
+
+        _binding.menuBottomNavigation.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.miClose -> {
+                    this.activity?.finish()
+                }
+                R.id.miRefresh -> {
+                    GlobalScope.launch {
+                        viewModel.refreshDatabase()
+                    }
+                }
+            }
+
+            true
         }
 
         val ItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(

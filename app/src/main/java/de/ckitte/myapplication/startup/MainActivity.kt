@@ -35,42 +35,11 @@ class MainActivity : AppCompatActivity() {
         val applicationScope = CoroutineScope(SupervisorJob())
         this.db = ToDoDatabase.getInstance(this, applicationScope).toToDao
 
-        _binding.menuBottomNavigation.menu.getItem(2).isEnabled = false
-        _binding.menuBottomNavigation.menu.getItem(3).isEnabled = false
-        _binding.menuBottomNavigation.menu.getItem(4).isEnabled = false
-
-        _binding.fabAdd.setOnClickListener {
-            Toast.makeText(
-                applicationContext,
-                "Ein neues ToDo Item anlegen",
-                Toast.LENGTH_SHORT
-            ).show()
-            //this.findNavController(R.id.nav_host_fragment_container).navigate(R.id.action_toDoListFragment_to_addToDo)
-        }
-
-        _binding.menuBottomNavigation.setOnNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.miClose -> {
-                    finish()
-                }
-                R.id.miRefresh -> {
-                    GlobalScope.launch {
-                        ToDoRepository(db).RefreshDatabase()
-                    }
-                }
-            }
-
-            true
-        }
-
         GlobalScope.launch {
             ToDoRepository(db).RefreshDatabase()
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        return super.onSupportNavigateUp()
-    }
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
 

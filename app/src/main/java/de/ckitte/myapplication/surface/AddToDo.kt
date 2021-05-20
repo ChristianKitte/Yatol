@@ -1,34 +1,48 @@
 package de.ckitte.myapplication.surface
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import android.icu.util.Calendar
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.DatePicker
+import android.widget.TimePicker
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
+import de.ckitte.myapplication.Model.AddToDoModel
+import de.ckitte.myapplication.Model.EditToDoModel
 import de.ckitte.myapplication.R
+import de.ckitte.myapplication.database.ToDoDatabase
+import de.ckitte.myapplication.database.entities.ToDoItem
+import de.ckitte.myapplication.database.repository.ToDoRepository
+import de.ckitte.myapplication.databinding.FragmentAddTodoBinding
+import de.ckitte.myapplication.databinding.FragmentEditTodoBinding
+import java.time.LocalDateTime
+import java.util.*
+import kotlin.time.days
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+class AddToDo : Fragment(R.layout.fragment_add_todo),
+    TimePickerDialog.OnTimeSetListener {
+    private lateinit var _viewModel: AddToDoModel
+    private lateinit var _binding: FragmentAddTodoBinding
 
-/**
- * A simple [Fragment] subclass.
- * Use the [AddToDo.newInstance] factory method to
- * create an instance of this fragment.
- */
-class AddToDo : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var newToDoItem: ToDoItem
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private val cal = Calendar.getInstance()
+    private var currentDay = cal.get(Calendar.DAY_OF_MONTH)
+    private var currentMonth = cal.get(Calendar.MONTH)
+    private var currentYear = cal.get(Calendar.YEAR)
+    private var currentHour = cal.get(Calendar.HOUR)
+    private var currentMinute = cal.get(Calendar.MINUTE)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,23 +52,179 @@ class AddToDo : Fragment() {
         return inflater.inflate(R.layout.fragment_add_todo, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment AddToDo.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            AddToDo().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val dao = parentFragment?.let {
+            ToDoDatabase.getInstance(
+                view.context,
+                it.lifecycleScope
+            ).toToDao
+        }
+
+        val toDoRepository = dao?.let { ToDoRepository(it) }
+
+        _viewModel = toDoRepository?.let { AddToDoModel(it) }!!
+        _binding = FragmentAddTodoBinding.bind(view)
+
+        val currentToDoItem = _viewModel.getNewToDoItem()
+
+        _binding.apply {
+            currentToDoItem?.apply {
+                setCalender(toDoDoUntil)
+
+                etTitle.setText(toDoTitle)
+                etDescription.setText(toDoDescription)
+                tvDoUntil.text = getDoUntilString()
+                checkIsDone.isChecked = toDoIsDone
+                checkIsFavourite.isChecked = toDoIsFavourite
+            }
+        }
+
+        _binding.etTitle.addTextChangedListener(
+            object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    _binding.apply {
+                        btnSave.isEnabled = (etTitle.length() > 0) && (etDescription.length() > 0)
+                    }
+                }
+
+                override fun afterTextChanged(s: Editable?) {
                 }
             }
+        )
+
+        _binding.etDescription.addTextChangedListener(
+            object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    _binding.apply {
+                        val x = 0
+                        btnSave.isEnabled = (etTitle.length() > 0) && (etDescription.length() > 0)
+                    }
+                }
+
+                override fun afterTextChanged(s: Editable?) {
+                }
+            }
+        )
+
+        setUpCalender()
+
+        _binding.btnSave.setOnClickListener {
+            if (currentToDoItem != null) {
+                _binding.apply {
+                    currentToDoItem.apply {
+                        toDoTitle = etTitle.text.toString()
+                        toDoDescription = etDescription.text.toString()
+
+                        toDoDoUntil = LocalDateTime.of(
+                            currentYear,
+                            currentMonth,
+                            currentDay,
+                            currentHour,
+                            currentMinute
+                        )
+
+                        toDoIsDone = checkIsDone.isChecked
+                        toDoIsFavourite = checkIsFavourite.isChecked
+
+                        _viewModel.addToDoItem(currentToDoItem)
+                    }
+                }
+            }
+
+            it.findNavController().navigate(R.id.action_addToDo_to_toDoListFragment)
+        }
+
+        _binding.btnBack.setOnClickListener {
+            it.findNavController().navigate(R.id.action_addToDo_to_toDoListFragment)
+        }
+    }
+
+    //https://material.io/components/date-pickers/android#using-date-pickers
+    private fun setUpCalender() {
+        _binding.tvDoUntil.setOnClickListener {
+            // month is zero based!
+            val x = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Test")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .build()
+
+            x.addOnPositiveButtonClickListener {
+                cal.time= Date(it)
+
+                currentDay = cal.get(Calendar.DAY_OF_MONTH)
+                currentMonth = cal.get(Calendar.MONTH)
+                currentYear = cal.get(Calendar.YEAR)
+                currentHour = cal.get(Calendar.HOUR)
+                currentMinute = cal.get(Calendar.MINUTE)
+
+                _binding.tvDoUntil.text = getDoUntilString()
+            }
+
+            x.show(this.parentFragmentManager, "Showtext")
+        }
+    }
+
+    private fun getDoUntilString(): String {
+        val currentDayString = currentDay.toString().padStart(2, '0')
+        val currentMonthString = currentMonth.toString().padStart(2, '0')
+        val currentYearString = currentYear.toString().padStart(4, '0')
+        val currentHourString = currentHour.toString().padStart(2, '0')
+        val currentMinuteString = currentMinute.toString().padStart(2, '0')
+
+        return "Am $currentDayString.$currentMonthString.$currentYearString um $currentHourString:$currentMinuteString Uhr"
+    }
+
+    private fun setCalender(dateTime: LocalDateTime) {
+        dateTime.apply {
+            currentDay = dayOfMonth
+            currentMonth = monthValue
+            currentYear = year
+            currentHour = hour
+            currentMinute = minute
+        }
+    }
+
+    /*
+    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+        currentDay = dayOfMonth
+        currentMonth = month + 1 // month is zero based!
+        currentYear = year
+
+        _binding.tvDoUntil.text = getDoUntilString()
+
+        if (view != null) {
+            view.releasePointerCapture()
+        }
+
+        TimePickerDialog(this.view?.context, this, currentHour, currentMinute, true).show()
+    }
+*/
+    override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+        currentHour = hourOfDay
+        currentMinute = minute
+
+        _binding.tvDoUntil.text = getDoUntilString()
+
+        if (view != null) {
+            view.releasePointerCapture()
+        }
     }
 }

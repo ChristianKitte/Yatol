@@ -33,4 +33,10 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
     fun setCurrentToDoItem(toDoItem: ToDoItem) {
         ToDoRepository.setCurrentToDoItem(toDoItem)
     }
+
+    fun refreshDatabase() {
+        GlobalScope.launch {
+            toDoRepository.RefreshDatabase()
+        }
+    }
 }

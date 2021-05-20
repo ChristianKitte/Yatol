@@ -7,28 +7,71 @@
     android:layout_height="match_parent"
     tools:context="surface.AddToDo">
 
-    <!-- TODO: Update blank fragment layout -->
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/etTitle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="232dp"
-        android:text="Hier kann ein neues ToDo erstellt werden...."
+        android:hint="Titel"
+        android:maxLength="250"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <EditText
+        android:id="@+id/etDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Beschreibung"
+        android:maxLength="250"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etTitle" />
+
+    <TextView
+        android:id="@+id/tvDoUntil"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:text="1.1.2000"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etDescription" />
+
+    <CheckBox
+        android:id="@+id/checkIsDone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Erledigt"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvDoUntil" />
+
+    <CheckBox
+        android:id="@+id/checkIsFavourite"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Wichtig"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/checkIsDone" />
+
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="52dp"
         android:text="Zurück"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Speichern"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
