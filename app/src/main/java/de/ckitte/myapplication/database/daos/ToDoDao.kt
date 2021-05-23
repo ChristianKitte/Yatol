@@ -48,7 +48,7 @@ interface ToDoDao {
 
     // Für die Verwendung mit Flow und zur Nutzung mit einem Observer
     // ist dies Pattern notwendig. ACHTUNG: fun ohne suspend!
-    @Query("select * from todo order by toDo_IsDone, toDo_DoUntil, toDo_IsFavourite asc")
+    @Query("select * from todo order by toDo_IsDone, toDo_DoUntil, toDo_IsFavourite desc")
     fun getAllToDosAsFlow_DateThenImportance(): Flow<List<ToDoItem>>
 
     @Query("select * from todo order by toDo_IsDone, toDo_IsFavourite, toDo_DoUntil asc")

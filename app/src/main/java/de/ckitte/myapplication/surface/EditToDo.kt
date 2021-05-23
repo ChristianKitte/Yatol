@@ -68,8 +68,6 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
                 tvDoUntil.text = getDoUntilString()
                 checkIsDone.isChecked = toDoIsDone
                 checkIsFavourite.isChecked = toDoIsFavourite
-
-
             }
         }
 
@@ -146,6 +144,10 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
         _binding.btnBack.setOnClickListener {
             it.findNavController().navigate(R.id.action_editToDo_to_toDoListFragment)
+        }
+
+        _binding.btnContacts.setOnClickListener {
+            it.findNavController().navigate(R.id.action_editToDo_to_contactsFragment)
         }
 
         _binding.btnDelete.setOnClickListener {

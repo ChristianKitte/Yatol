@@ -15,6 +15,7 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import de.ckitte.myapplication.Model.AddToDoModel
 import de.ckitte.myapplication.R
+import de.ckitte.myapplication.Util.DateTimeUtil
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.repository.ToDoRepository
@@ -57,7 +58,7 @@ class AddToDo : Fragment(R.layout.fragment_add_todo) {
             newToDoItem.apply {
                 etTitle.setText(toDoTitle)
                 etDescription.setText(toDoDescription)
-                tvDoUntil.text = getDoUntilString(toDoDoUntil)
+                tvDoUntil.text = DateTimeUtil.getTimeString(toDoDoUntil)
                 checkIsDone.isChecked = toDoIsDone
                 checkIsFavourite.isChecked = toDoIsFavourite
             }
@@ -138,7 +139,9 @@ class AddToDo : Fragment(R.layout.fragment_add_todo) {
                 cal.timeInMillis = datePicker.selection!!
 
                 val localDate = LocalDate.of(
-                    cal.get(Calendar.YEAR), cal.get(Calendar.MONTH).plus(1), cal.get(Calendar.DAY_OF_MONTH)
+                    cal.get(Calendar.YEAR),
+                    cal.get(Calendar.MONTH).plus(1),
+                    cal.get(Calendar.DAY_OF_MONTH)
                 )
 
                 newToDoItem.toDoDoUntil =
@@ -148,7 +151,8 @@ class AddToDo : Fragment(R.layout.fragment_add_todo) {
                     newToDoItem.apply {
                         etTitle.setText(toDoTitle)
                         etDescription.setText(toDoDescription)
-                        tvDoUntil.text = getDoUntilString(toDoDoUntil)
+                        tvDoUntil.text =
+                            DateTimeUtil.getTimeString(toDoDoUntil)
                         checkIsDone.isChecked = toDoIsDone
                         checkIsFavourite.isChecked = toDoIsFavourite
                     }
@@ -176,21 +180,11 @@ class AddToDo : Fragment(R.layout.fragment_add_todo) {
 
             newToDoItem.toDoDoUntil =
                 LocalDateTime.of(newToDoItem.toDoDoUntil.toLocalDate(), localTime)
-            _binding.tvDoUntil.text = getDoUntilString(newToDoItem.toDoDoUntil)
+            _binding.tvDoUntil.text = DateTimeUtil.getTimeString(newToDoItem.toDoDoUntil)
 
             timePicker.dismissAllowingStateLoss()
         }
 
         timePicker.show(this.parentFragmentManager, "Showtext")
-    }
-
-    private fun getDoUntilString(dateTime: LocalDateTime): String {
-        val currentDayString = dateTime.dayOfMonth.toString().padStart(2, '0')
-        val currentMonthString = dateTime.monthValue.toString().padStart(2, '0')
-        val currentYearString = dateTime.year.toString().padStart(4, '0')
-        val currentHourString = dateTime.hour.toString().padStart(2, '0')
-        val currentMinuteString = dateTime.minute.toString().padStart(2, '0')
-
-        return "Am $currentDayString.$currentMonthString.$currentYearString um $currentHourString:$currentMinuteString Uhr"
     }
 }

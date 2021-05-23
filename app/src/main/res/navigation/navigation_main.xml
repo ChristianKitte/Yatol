@@ -34,5 +34,17 @@
         <action
             android:id="@+id/action_editToDo_to_toDoListFragment"
             app:destination="@id/toDoListFragment" />
+        <action
+            android:id="@+id/action_editToDo_to_contactsFragment"
+            app:destination="@id/contactsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/contactsFragment"
+        android:name="de.ckitte.myapplication.surface.ContactsFragment"
+        android:label="fragment_contacts"
+        tools:layout="@layout/fragment_contacts">
+        <action
+            android:id="@+id/action_contactsFragment_to_editToDo"
+            app:destination="@id/editToDo" />
     </fragment>
 </navigation>

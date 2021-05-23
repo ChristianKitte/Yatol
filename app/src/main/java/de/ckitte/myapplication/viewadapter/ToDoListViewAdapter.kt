@@ -1,33 +1,23 @@
 package de.ckitte.myapplication.viewadapter
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.Toast
-import androidx.annotation.RestrictTo
-import androidx.annotation.WorkerThread
-import androidx.navigation.NavDirections
-import androidx.navigation.NavHost
-import androidx.navigation.Navigation
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import de.ckitte.myapplication.Model.ToDoListModel
 import de.ckitte.myapplication.R
-import de.ckitte.myapplication.database.ToDoDatabase
+import de.ckitte.myapplication.Util.DateTimeUtil.Companion.getTimeString
 import de.ckitte.myapplication.database.entities.ToDoItem
-import de.ckitte.myapplication.database.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.FragmentTodoListitemBinding
-import de.ckitte.myapplication.surface.ToDoList
 import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter.ToDoViewHolder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+
 
 class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
     ListAdapter<ToDoItem, ToDoViewHolder>(ToDoComparator()) {
@@ -57,7 +47,9 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
                 checkIsDone.isChecked = toDo.toDoIsDone
                 checkIsFavourite.isChecked = toDo.toDoIsFavourite
 
-                tvDoUntil.text = getDoUntilString(toDo.toDoDoUntil)
+                tvDoUntil.text = getTimeString(toDo.toDoDoUntil)
+                setTitleColor(toDo)
+                setFavouriteIcon()
 
                 fabEdit.setOnClickListener {
                     viewModel.setCurrentToDoItem(toDo)
@@ -67,23 +59,99 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
                 checkIsDone.setOnClickListener {
                     toDo.toDoIsDone = checkIsDone.isChecked
                     viewModel.updateToDoItem(toDo)
+
+                    setTitleColor(toDo)
                 }
 
                 checkIsFavourite.setOnClickListener {
                     toDo.toDoIsFavourite = checkIsFavourite.isChecked
                     viewModel.updateToDoItem(toDo)
+
+                    setFavouriteIcon()
                 }
             }
         }
 
-        private fun getDoUntilString(dateTime: LocalDateTime): String {
-            val currentDayString = dateTime.dayOfMonth.toString().padStart(2, '0')
-            val currentMonthString = dateTime.monthValue.toString().padStart(2, '0')
-            val currentYearString = dateTime.year.toString().padStart(4, '0')
-            val currentHourString = dateTime.hour.toString().padStart(2, '0')
-            val currentMinuteString = dateTime.minute.toString().padStart(2, '0')
+        private fun FragmentTodoListitemBinding.setFavouriteIcon() {
+            val image: Drawable? = getDrawable()
 
-            return "Am $currentDayString.$currentMonthString.$currentYearString um $currentHourString:$currentMinuteString Uhr"
+            if (checkIsFavourite.isChecked == true) {
+                tvTitle.setCompoundDrawables(
+                    image,
+                    null,
+                    null,
+                    null
+                )
+            } else {
+                tvTitle.setCompoundDrawables(
+                    null,
+                    null,
+                    null,
+                    null
+                )
+            }
+        }
+
+        @SuppressLint("UseCompatLoadingForDrawables")
+        private fun getDrawable(): Drawable? {
+            // WICHTIG ! Sehr lange für gesucht !!!
+            // https://www.programmersought.com/article/67787700192/
+            // Einzig mir bekannter Weg dafür...
+            //val image: Drawable = this@ToDoViewHolder.itemView.context.resources.getDrawable(R.drawable.ic_favourite)
+
+            val image: Drawable? =
+                this@ToDoViewHolder.itemView.context.getDrawable(R.drawable.ic_favourite)
+
+            val h = image?.intrinsicHeight
+            val w = image?.intrinsicWidth
+
+            if (image != null) {
+                if (w != null) {
+                    if (h != null) {
+                        image.setBounds(0, 0, w, h)
+                    }
+                }
+            }
+
+            return image
+        }
+
+        private fun FragmentTodoListitemBinding.setTitleColor(toDo: ToDoItem) {
+            if (toDo.toDoDoUntil.isBefore(LocalDateTime.now())) {
+                if (toDo.toDoDoUntil.isBefore(LocalDateTime.now())) {
+                    if (checkIsDone.isChecked == false) {
+                        tvTitle.setTextColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.isLate
+                            )
+                        )
+                    } else {
+                        tvTitle.setTextColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.isDone
+                            )
+                        )
+                    }
+                } else if (toDo.toDoDoUntil.isAfter(LocalDateTime.now())) {
+                    if (checkIsDone.isChecked == false) {
+                        tvTitle.setTextColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.black_overlay
+                            )
+                        )
+                    } else {
+                        tvTitle.setTextColor(
+                            ContextCompat.getColor(
+                                binding.root.context,
+                                R.color.isDone
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 

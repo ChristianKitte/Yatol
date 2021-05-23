@@ -2,7 +2,6 @@ package de.ckitte.myapplication.surface
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -10,13 +9,13 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter
-import de.ckitte.myapplication.R
-import de.ckitte.myapplication.database.ToDoDatabase
-import de.ckitte.myapplication.databinding.FragmentTodoListBinding
 import de.ckitte.myapplication.Model.ToDoListModel
+import de.ckitte.myapplication.R
 import de.ckitte.myapplication.Util.ListSort
+import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.repository.ToDoRepository
+import de.ckitte.myapplication.databinding.FragmentTodoListBinding
+import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 

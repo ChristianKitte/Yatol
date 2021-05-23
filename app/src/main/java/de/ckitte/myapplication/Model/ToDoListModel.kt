@@ -1,15 +1,10 @@
 package de.ckitte.myapplication.Model
 
-import android.content.Context
 import androidx.lifecycle.*
 import de.ckitte.myapplication.Util.ListSort
-import de.ckitte.myapplication.database.ToDoDatabase
-import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.repository.ToDoRepository
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 // Es wird abgeraten, ein Context auf die View zu übergeben wegen möglicher
@@ -17,6 +12,7 @@ import kotlinx.coroutines.launch
 // Status.
 class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
     val toDoRepository = toDoDao
+
     var toDos = toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
 
     fun addToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
@@ -43,10 +39,16 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
 
     fun changeSortOrder(newSortOrder: ListSort) {
         when (newSortOrder) {
-            ListSort.DateThenImportance -> this.toDos =
-                toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
-            ListSort.ImportanceThenDate -> this.toDos =
-                toDoRepository.getAllToDosAsFlow_ImportanceThenDate().asLiveData()
+            ListSort.DateThenImportance -> {
+                this.toDos =
+                    toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
+                //toDos = toDosa
+            }
+            ListSort.ImportanceThenDate -> {
+                this.toDos =
+                    toDoRepository.getAllToDosAsFlow_ImportanceThenDate().asLiveData()
+                //toDos = toDosb
+            }
             else -> return
         }
     }
