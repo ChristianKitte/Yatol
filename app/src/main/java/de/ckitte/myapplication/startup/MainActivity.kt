@@ -49,74 +49,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        // https://developer.android.com/guide/topics/ui/menus
+
+        return when (item.itemId) {
             R.id.miCleanLokal -> {
                 GlobalScope.launch {
                     ToDoRepository(db).emptyLokalDatabase()
                 }
 
-                val toast =
-                    Toast.makeText(
-                        applicationContext,
-                        "Die lokalen Daten werden gelöscht",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                Toast.makeText(
+                    applicationContext,
+                    "Die lokalen Daten werden gelöscht",
+                    Toast.LENGTH_SHORT
+                ).show()
 
-                return true
+                true
             }
             R.id.miCleanRemote -> {
-                val toast =
-                    Toast.makeText(
-                        applicationContext,
-                        "miCleanRemote - Die Remotedaten werden gleöscht",
-                        Toast.LENGTH_SHORT
-                    ).show()
 
-                return true
-            }
-            R.id.miDoneFirst -> {
-                val toast =
-                    Toast.makeText(
-                        applicationContext,
-                        "miDoneFirst - Die Sortierung wurde geändert",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                Toast.makeText(
+                    applicationContext,
+                    "miCleanRemote - Die Remotedaten werden gleöscht",
+                    Toast.LENGTH_SHORT
+                ).show()
 
-                return true
-            }
-            R.id.miNotDoneFirst -> {
-                val toast =
-                    Toast.makeText(
-                        applicationContext,
-                        "miNotDoneFirst - Die Sortierung wurde geändert",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                return true
-            }
-            R.id.miDateFirst -> {
-                val toast =
-                    Toast.makeText(
-                        applicationContext,
-                        "miDateFirst - Die Sortierung wurde geändert",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                return true
-            }
-            R.id.miPriorityFirst -> {
-                val toast =
-                    Toast.makeText(
-                        applicationContext,
-                        "miPriorityFirst - Die Sortierung wurde geändert",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                return true
+                true
             }
             else -> {
                 super.onOptionsItemSelected(item)
-                return false
             }
         }
     }

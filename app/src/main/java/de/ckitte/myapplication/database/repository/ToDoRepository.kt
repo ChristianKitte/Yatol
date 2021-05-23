@@ -2,6 +2,10 @@ package de.ckitte.myapplication.database.repository
 
 import android.view.inspector.InspectionCompanion
 import androidx.annotation.WorkerThread
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
+import androidx.room.Query
 import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.entities.ToDoGroup
@@ -25,7 +29,6 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
         }
     }
-
 
     // CRUD ToDoItem
 
@@ -89,18 +92,24 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         toDoDao.deleteAllToDoGroups()
     }
 
+    /*
     // Eine Abfrage mit Rückgabe von Daten als Liste
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun getAllToDos(): List<ToDoItem> {
-        return toDoDao.getAllToDos()
+        return toDoDao.getAllToDosAsFlow()
     }
+    */
 
     // Flow und Observer
 
     // Für die Verwendung mit Flow und zur Nutzung mit einem Observer
     // ist dies Pattern notwendig. ACHTUNG: fun ohne suspend!
-    fun getAllToDosAsFlow(): Flow<List<ToDoItem>> = toDoDao.getAllToDosAsFlow()
+    fun getAllToDosAsFlow_DateThenImportance(): Flow<List<ToDoItem>> =
+        toDoDao.getAllToDosAsFlow_DateThenImportance()
+
+    fun getAllToDosAsFlow_ImportanceThenDate(): Flow<List<ToDoItem>> =
+        toDoDao.getAllToDosAsFlow_ImportanceThenDate()
 
     // Zusätzliche Funktionalität
 

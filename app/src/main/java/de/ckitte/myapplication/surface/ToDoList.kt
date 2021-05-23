@@ -15,6 +15,7 @@ import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.databinding.FragmentTodoListBinding
 import de.ckitte.myapplication.Model.ToDoListModel
+import de.ckitte.myapplication.Util.ListSort
 import de.ckitte.myapplication.database.repository.ToDoRepository
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -47,8 +48,6 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         }
 
         _binding.menuBottomNavigation.menu.getItem(2).isEnabled = false
-        _binding.menuBottomNavigation.menu.getItem(3).isEnabled = false
-        _binding.menuBottomNavigation.menu.getItem(4).isEnabled = false
 
         _binding.fabAdd.setOnClickListener {
             it.findNavController().navigate(R.id.action_toDoListFragment_to_addToDo)
@@ -62,6 +61,16 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
                 R.id.miRefresh -> {
                     GlobalScope.launch {
                         viewModel.refreshDatabase()
+                    }
+                }
+                R.id.mi_sort_date -> {
+                    GlobalScope.launch {
+                        viewModel.changeSortOrder(ListSort.DateThenImportance)
+                    }
+                }
+                R.id.mi_sort_favourite -> {
+                    GlobalScope.launch {
+                        viewModel.changeSortOrder(ListSort.ImportanceThenDate)
                     }
                 }
             }

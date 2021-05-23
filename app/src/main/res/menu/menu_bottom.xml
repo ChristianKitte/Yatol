@@ -15,10 +15,12 @@
         android:title="" />
 
     <item
-        android:id="@+id/miPlaceholer2"
-        android:title="" />
+        android:id="@+id/mi_sort_date"
+        android:icon="@drawable/ic_sort"
+        android:title="Datum" />
 
     <item
-        android:id="@+id/miPlaceholer3"
-        android:title="" />
+        android:id="@+id/mi_sort_favourite"
+        android:icon="@drawable/ic_sort"
+        android:title="Wichtigkeit" />
 </menu>

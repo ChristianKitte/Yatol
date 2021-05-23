@@ -44,14 +44,13 @@ interface ToDoDao {
     @Query("delete from ToDo_Group")
     suspend fun deleteAllToDoGroups()
 
-    @Query("select * from todo")
-    suspend fun getAllToDos(): List<ToDoItem>
-
     // Flow und Observer
 
     // Für die Verwendung mit Flow und zur Nutzung mit einem Observer
     // ist dies Pattern notwendig. ACHTUNG: fun ohne suspend!
-    @Query("select * from todo")
-    fun getAllToDosAsFlow(): Flow<List<ToDoItem>>
+    @Query("select * from todo order by toDo_IsDone, toDo_DoUntil, toDo_IsFavourite asc")
+    fun getAllToDosAsFlow_DateThenImportance(): Flow<List<ToDoItem>>
 
+    @Query("select * from todo order by toDo_IsDone, toDo_IsFavourite, toDo_DoUntil asc")
+    fun getAllToDosAsFlow_ImportanceThenDate(): Flow<List<ToDoItem>>
 }

@@ -7,6 +7,7 @@ import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.repository.ToDoRepository
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 class AddToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
     fun addToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
@@ -20,7 +21,7 @@ class AddToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
             "",
             false,
             true,
-            LocalDateTime.now(),
+            LocalDateTime.now(ZoneId.systemDefault()),
             ToDoRepository.defaultGroup
         )
     }
