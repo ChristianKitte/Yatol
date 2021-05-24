@@ -10,6 +10,7 @@ import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.entities.ToDoGroup
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDateTime
 
 class ToDoRepository(private val toDoDao: ToDoDao) {
     // Statische Eigenschaften
@@ -27,6 +28,18 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         fun getCurrentToDoItem(): ToDoItem? {
             return this.currentToDoItem
 
+        }
+
+        fun getNewToDoItem(): ToDoItem {
+            return ToDoItem(
+                0,
+                "",
+                "",
+                false,
+                false,
+                LocalDateTime.now(),
+                ToDoRepository.defaultGroup
+            )
         }
     }
 
@@ -118,6 +131,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     suspend fun emptyLokalDatabase() {
         toDoDao.deleteAllToDoItems()
         toDoDao.deleteAllToDoGroups()
+        ensureDefaultToDoGroup()
     }
 
     @Suppress("RedundantSuspendModifier")

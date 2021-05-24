@@ -6,12 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.findNavController
-import de.ckitte.myapplication.Model.EditToDoModel
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.databinding.FragmentContactsBinding
-import de.ckitte.myapplication.databinding.FragmentEditTodoBinding
 
-class ContactsFragment : Fragment(R.layout.fragment_contacts) {
+class Contacts : Fragment(R.layout.fragment_contacts) {
     //private lateinit var _viewModel: EditToDoModel
     private lateinit var _binding: FragmentContactsBinding
 
@@ -30,11 +28,11 @@ class ContactsFragment : Fragment(R.layout.fragment_contacts) {
 
         _binding.apply {
             btnBack.setOnClickListener {
-                it.findNavController().navigate(R.id.action_contactsFragment_to_editToDo)
+                it.findNavController().navigate(R.id.action_contacts_to_editToDo)
             }
 
             btnSave.setOnClickListener {
-                it.findNavController().navigate(R.id.action_contactsFragment_to_editToDo)
+                it.findNavController().navigate(R.id.action_contacts_to_editToDo)
             }
 
         }

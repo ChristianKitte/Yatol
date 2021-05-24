@@ -49,7 +49,8 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         _binding.menuBottomNavigation.menu.getItem(2).isEnabled = false
 
         _binding.fabAdd.setOnClickListener {
-            it.findNavController().navigate(R.id.action_toDoListFragment_to_addToDo)
+            viewModel.iniNewToDoItem()
+            it.findNavController().navigate(R.id.action_toDoList_to_editToDo)
         }
 
         _binding.menuBottomNavigation.setOnNavigationItemSelectedListener {

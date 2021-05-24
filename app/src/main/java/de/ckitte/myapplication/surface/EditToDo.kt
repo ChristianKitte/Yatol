@@ -104,7 +104,6 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     _binding.apply {
-                        val x = 0
                         btnSave.isEnabled = (etTitle.length() > 0) && (etDescription.length() > 0)
                     }
                 }

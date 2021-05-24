@@ -1,7 +1,6 @@
 package de.ckitte.myapplication.viewadapter
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -53,7 +52,7 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
 
                 fabEdit.setOnClickListener {
                     viewModel.setCurrentToDoItem(toDo)
-                    it.findNavController().navigate(R.id.action_toDoListFragment_to_editToDo)
+                    it.findNavController().navigate(R.id.action_toDoList_to_editToDo)
                 }
 
                 checkIsDone.setOnClickListener {

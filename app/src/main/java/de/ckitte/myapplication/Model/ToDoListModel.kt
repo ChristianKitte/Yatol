@@ -12,8 +12,11 @@ import kotlinx.coroutines.launch
 // Status.
 class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
     val toDoRepository = toDoDao
-
     var toDos = toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
+
+    fun deleteToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
+        toDoRepository.deleteToDoItem(toDoItem)
+    }
 
     fun addToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
         toDoRepository.addToDoItem(toDoItem)
@@ -23,12 +26,12 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
         toDoRepository.updateToDoItem(toDoItem)
     }
 
-    fun deleteToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
-        toDoRepository.deleteToDoItem(toDoItem)
+    fun setCurrentToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
+        ToDoRepository.setCurrentToDoItem(toDoItem)
     }
 
-    fun setCurrentToDoItem(toDoItem: ToDoItem) {
-        ToDoRepository.setCurrentToDoItem(toDoItem)
+    fun iniNewToDoItem() {
+        ToDoRepository.setCurrentToDoItem(ToDoRepository.getNewToDoItem())
     }
 
     fun refreshDatabase() {

@@ -12,7 +12,10 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
     }
 
     fun updateToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
-        toDoDao.updateToDoItem(toDoItem)
+        when (toDoItem.toDoId) {
+            0 -> toDoDao.addToDoItem(toDoItem)
+            else -> toDoDao.updateToDoItem(toDoItem)
+        }
     }
 
     fun deleteToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
