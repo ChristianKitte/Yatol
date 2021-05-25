@@ -27,15 +27,15 @@ data class ToDoItem(
     @ColumnInfo(name = "toDo_Id")
     val toDoId: Int,
     @ColumnInfo(name = "toDo_Title")
-    val toDoTitle: String,
+    var toDoTitle: String,
     @ColumnInfo(name = "toDo_Description")
-    val toDoDescription: String,
+    var toDoDescription: String,
     @ColumnInfo(name = "toDo_IsDone")
-    val toDoIsDone: Boolean,
+    var toDoIsDone: Boolean,
     @ColumnInfo(name = "toDo_IsFavourite")
-    val toDoIsFavourite: Boolean,
+    var toDoIsFavourite: Boolean,
     @ColumnInfo(name = "toDo_DoUntil")
-    val toDoDoUntil: LocalDateTime,
+    var toDoDoUntil: LocalDateTime,
     @ColumnInfo(name = "toDoGroup_Id")
     val toDoGroupId: Long
 )

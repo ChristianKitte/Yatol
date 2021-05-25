@@ -2,25 +2,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/miClose"
-        android:icon="@drawable/ic_dump"
+        android:icon="@drawable/ic_close"
         android:title="Schließen" />
 
     <item
         android:id="@+id/miRefresh"
-        android:icon="@drawable/ic_dump"
+        android:icon="@drawable/ic_refresh"
         android:title="Aktualisieren" />
 
     <item
-        android:id="@+id/miPlaceholer"
+        android:id="@+id/miPlaceholer1"
         android:title="" />
 
     <item
-        android:id="@+id/miEdit"
-        android:icon="@drawable/ic_dump"
-        android:title="Ändern" />
+        android:id="@+id/mi_sort_date"
+        android:icon="@drawable/ic_sort"
+        android:title="Datum" />
 
     <item
-        android:id="@+id/miDelete"
-        android:icon="@drawable/ic_dump"
-        android:title="Löschen" />
+        android:id="@+id/mi_sort_favourite"
+        android:icon="@drawable/ic_sort"
+        android:title="Wichtigkeit" />
 </menu>
