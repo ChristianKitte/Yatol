@@ -15,4 +15,6 @@
 
     <color name="isDone">#FF17C31E</color>
     <color name="isLate">#FFF63122</color>
+
+    <color name="infoHint">#FFF63122</color>
 </resources>

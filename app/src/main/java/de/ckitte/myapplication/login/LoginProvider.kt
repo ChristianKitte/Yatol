@@ -7,7 +7,7 @@ class LoginProvider {
 
         data class YATOLCredentials(val user: String, val key: String)
 
-        fun ValidateCredentials(credetials: YATOLCredentials): Boolean {
+        suspend fun ValidateCredentials(credetials: YATOLCredentials): Boolean {
             return credetials.user == user && credetials.key == key
         }
     }
