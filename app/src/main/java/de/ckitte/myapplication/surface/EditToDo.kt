@@ -15,7 +15,7 @@ import android.widget.TimePicker
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
-import de.ckitte.myapplication.Model.EditToDoModel
+import de.ckitte.myapplication.model.EditToDoModel
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.repository.ToDoRepository

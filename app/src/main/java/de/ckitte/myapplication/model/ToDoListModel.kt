@@ -1,7 +1,7 @@
-package de.ckitte.myapplication.Model
+package de.ckitte.myapplication.model
 
 import androidx.lifecycle.*
-import de.ckitte.myapplication.Util.ListSort
+import de.ckitte.myapplication.util.ListSort
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.repository.ToDoRepository
 import kotlinx.coroutines.GlobalScope

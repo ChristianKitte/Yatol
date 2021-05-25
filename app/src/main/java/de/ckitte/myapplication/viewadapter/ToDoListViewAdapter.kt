@@ -9,9 +9,9 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import de.ckitte.myapplication.Model.ToDoListModel
+import de.ckitte.myapplication.model.ToDoListModel
 import de.ckitte.myapplication.R
-import de.ckitte.myapplication.Util.DateTimeUtil.Companion.getTimeString
+import de.ckitte.myapplication.util.DateTimeUtil.Companion.getTimeString
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.databinding.FragmentTodoListitemBinding
 import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter.ToDoViewHolder

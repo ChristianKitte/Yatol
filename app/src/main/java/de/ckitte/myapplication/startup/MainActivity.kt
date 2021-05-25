@@ -18,16 +18,26 @@ import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.ActivityMainBinding
+import de.ckitte.myapplication.util.ConnectionLiveData
 import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityMainBinding
+    private lateinit var connectionLiveData: ConnectionLiveData
     private lateinit var db: ToDoDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         this._binding = ActivityMainBinding.inflate(layoutInflater)
+
+        connectionLiveData = ConnectionLiveData(this)
+        connectionLiveData.observe(this, {
+            if (it) {
+                this.title = "YATOL - Verbunden"
+            } else {
+                this.title = "YATOL - Kein Netzwerk"
+            }
+        })
 
         val view = _binding.root
         setContentView(view)

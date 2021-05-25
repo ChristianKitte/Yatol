@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import de.ckitte.myapplication.Model.ToDoListModel
+import de.ckitte.myapplication.model.ToDoListModel
 import de.ckitte.myapplication.R
-import de.ckitte.myapplication.Util.ListSort
+import de.ckitte.myapplication.util.ListSort
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.FragmentTodoListBinding

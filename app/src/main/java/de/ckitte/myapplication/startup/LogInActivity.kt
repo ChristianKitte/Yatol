@@ -11,21 +11,33 @@ import com.google.android.material.snackbar.Snackbar
 import de.ckitte.myapplication.databinding.ActivityLoginBinding
 import de.ckitte.myapplication.login.LoginProvider
 import de.ckitte.myapplication.login.LoginProvider.Companion.ValidateCredentials
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import de.ckitte.myapplication.util.ConnectionLiveData
+import kotlinx.coroutines.*
 
 class LogInActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityLoginBinding
     private var isValidInput: Boolean = false
 
-    private val user: String = "yattol@hallo.ms"
-    private val key: String = "01234"
+    private lateinit var connectionLiveData: ConnectionLiveData
 
     // https://miromatech.com/android/edittext-inputtype/
+
+    fun test(x: Boolean) {
+        _binding.etEmail.setText(x.toString())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this._binding = ActivityLoginBinding.inflate(layoutInflater)
+
+        connectionLiveData = ConnectionLiveData(this)
+        connectionLiveData.observe(this, {
+            if (it) {
+                this.title = "YATOL - Verbunden"
+            } else {
+                this.title = "YATOL - Kein Netzwerk"
+            }
+        })
 
         val view = _binding.root
         setContentView(view)
@@ -46,9 +58,6 @@ class LogInActivity : AppCompatActivity() {
 
         _binding.btnLogin.setOnClickListener {
             if (isValidInput) {
-                _binding.etEmail.setText("yattol@hallo.ms")
-                _binding.etPassword.setText("01234")
-
                 val myCredentials = LoginProvider.Companion.YATOLCredentials(
                     user = _binding.etEmail.text.toString(),
                     key = _binding.etPassword.text.toString()
@@ -57,22 +66,28 @@ class LogInActivity : AppCompatActivity() {
                 var isValid = false
                 GlobalScope.launch {
                     isValid = ValidateCredentials(myCredentials)
+                    withContext(Dispatchers.Main) {
+                        dorun(isValid)
+                    }
                 }
 
 
-                if (isValid) {
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                } else {
-                    wipeInput()
-
-                    Snackbar.make(
-                        view,
-                        "Der Benutzername oder das Passwort sind falsch",
-                        Snackbar.LENGTH_LONG
-                    ).show()
-                }
             }
+        }
+    }
+
+    private fun dorun(isValid: Boolean) {
+        if (isValid) {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        } else {
+            wipeInput()
+
+            Snackbar.make(
+                _binding.root,
+                "Der Benutzername oder das Passwort sind falsch",
+                Snackbar.LENGTH_LONG
+            ).show()
         }
     }
 

@@ -1,4 +1,4 @@
-package de.ckitte.myapplication.Model
+package de.ckitte.myapplication.model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

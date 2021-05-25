@@ -1,4 +1,4 @@
-package de.ckitte.myapplication.Util
+package de.ckitte.myapplication.util
 
 enum class ListSort {
     DateThenImportance,
