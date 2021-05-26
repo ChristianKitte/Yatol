@@ -1,12 +1,16 @@
 package de.ckitte.myapplication.startup
 
 import android.content.Intent
+import android.graphics.drawable.Animatable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Patterns
+import android.view.View
+import android.view.animation.Animation
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.transition.Visibility
 import com.google.android.material.snackbar.Snackbar
 import de.ckitte.myapplication.databinding.ActivityLoginBinding
 import de.ckitte.myapplication.login.LoginProvider
@@ -16,15 +20,9 @@ import kotlinx.coroutines.*
 
 class LogInActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityLoginBinding
-    private var isValidInput: Boolean = false
-
     private lateinit var connectionLiveData: ConnectionLiveData
 
     // https://miromatech.com/android/edittext-inputtype/
-
-    fun test(x: Boolean) {
-        _binding.etEmail.setText(x.toString())
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +33,9 @@ class LogInActivity : AppCompatActivity() {
             if (it) {
                 this.title = "YATOL - Verbunden"
             } else {
+                _binding.progBar.visibility = View.VISIBLE
                 this.title = "YATOL - Kein Netzwerk"
+                openMainActivity()
             }
         })
 
@@ -47,45 +47,52 @@ class LogInActivity : AppCompatActivity() {
             validateForm()
         }
 
-        _binding.etEmail.setOnFocusChangeListener { v, hasFocus ->
-            if (!hasFocus) {
-                _binding.tvEmailHint.isVisible = isValidEmail(_binding.etEmail.text.toString())
-            }
-        }
         _binding.etPassword.addTextChangedListener {
             validateForm()
         }
 
+        _binding.etEmail.setOnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus) {
+                _binding.tvEmailHint.isVisible = !isValidEmail(_binding.etEmail.text.toString())
+            }
+        }
+
         _binding.btnLogin.setOnClickListener {
-            if (isValidInput) {
-                val myCredentials = LoginProvider.Companion.YATOLCredentials(
-                    user = _binding.etEmail.text.toString(),
-                    key = _binding.etPassword.text.toString()
-                )
+            _binding.progBar.visibility = View.VISIBLE
 
-                var isValid = false
-                GlobalScope.launch {
-                    isValid = ValidateCredentials(myCredentials)
-                    withContext(Dispatchers.Main) {
-                        dorun(isValid)
-                    }
+            val myCredentials = LoginProvider.Companion.YATOLCredentials(
+                user = _binding.etEmail.text.toString(),
+                key = _binding.etPassword.text.toString()
+            )
+
+            var isValid = false
+            GlobalScope.launch {
+                isValid = ValidateCredentials(myCredentials)
+                withContext(Dispatchers.Main) {
+                    _binding.progBar.visibility = View.INVISIBLE
+                    loginResultHandler(isValid)
                 }
-
-
             }
         }
     }
 
-    private fun dorun(isValid: Boolean) {
+    // https://riptutorial.com/android/example/17590/clear-your-current-activity-stack-and-launch-a-new-activity
+    private fun openMainActivity() {
+        val intent = Intent(this, MainActivity::class.java)
+
+        startActivity(intent)
+        finishAffinity()
+    }
+
+    private fun loginResultHandler(isValid: Boolean) {
         if (isValid) {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            openMainActivity()
         } else {
             wipeInput()
 
             Snackbar.make(
                 _binding.root,
-                "Der Benutzername oder das Passwort sind falsch",
+                "Der Benutzername oder das Passwort sind falsch !",
                 Snackbar.LENGTH_LONG
             ).show()
         }
@@ -100,12 +107,14 @@ class LogInActivity : AppCompatActivity() {
 
     private fun isValidEmail(email: String): Boolean {
         val testMail = !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches()
-        return !testMail
+        return testMail
     }
 
     private fun validateForm() {
-        isValidInput = true
-
-        _binding.btnLogin.isEnabled = isValidInput
+        _binding.apply {
+            btnLogin.isEnabled = etPassword.length() > 0
+                    && etEmail.length() > 0
+                    && isValidEmail(etEmail.text.toString()) == true
+        }
     }
 }

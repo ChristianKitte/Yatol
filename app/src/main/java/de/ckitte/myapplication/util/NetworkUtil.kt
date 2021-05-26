@@ -23,6 +23,7 @@ android/rickmortydatabase/utils/networking/ConnectionLiveData.kt
 */
 
 // Weiter überarbeiten
+
 class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private val connectivityManeger =
@@ -35,6 +36,10 @@ class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
             .addCapability(NET_CAPABILITY_INTERNET)
             .build()
         connectivityManeger.registerNetworkCallback(networkRequest, networkCallback)
+
+        if (connectivityManeger.activeNetwork == null) {
+            checkValidNetworks()
+        }
     }
 
     override fun onInactive() {
@@ -74,8 +79,9 @@ class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
     // https://kodlogs.com/93804/cannot-connect-to-server-check-whether-the-network-is-available-or-use-a-proxy-server
     private fun isInternet(socketFactory: SocketFactory): Boolean {
         try {
-            val newSocket = socketFactory.createSocket()
-            newSocket.connect(InetSocketAddress("8.8.8.8", 53), 1500)
+            socketFactory
+                .createSocket()
+                .connect(InetSocketAddress("8.8.8.8", 53), 1500)
             return true
         } catch (e: IOException) {
             return false

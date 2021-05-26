@@ -33,8 +33,9 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_aside,menu)
+        inflater.inflate(R.menu.menu_aside, menu)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -69,7 +70,7 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         _binding.menuBottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.miClose -> {
-                    this.activity?.finish()
+                    this.activity?.finishAndRemoveTask()
                 }
                 R.id.miRefresh -> {
                     GlobalScope.launch {
