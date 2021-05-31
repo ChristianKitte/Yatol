@@ -3,7 +3,7 @@ package de.ckitte.myapplication.model
 import androidx.lifecycle.*
 import de.ckitte.myapplication.util.ListSort
 import de.ckitte.myapplication.database.entities.ToDoItem
-import de.ckitte.myapplication.database.repository.ToDoRepository
+import de.ckitte.myapplication.repository.ToDoRepository
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 

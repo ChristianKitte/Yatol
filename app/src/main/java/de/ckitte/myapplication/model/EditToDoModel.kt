@@ -3,7 +3,7 @@ package de.ckitte.myapplication.model
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.ckitte.myapplication.database.entities.ToDoItem
-import de.ckitte.myapplication.database.repository.ToDoRepository
+import de.ckitte.myapplication.repository.ToDoRepository
 import kotlinx.coroutines.launch
 
 class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {

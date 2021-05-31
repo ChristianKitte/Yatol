@@ -1,22 +1,13 @@
 package de.ckitte.myapplication.startup
 
-import android.content.Context
 import android.os.Bundle
-import android.renderscript.ScriptGroup
-import android.util.AttributeSet
 import android.view.*
-import android.widget.Switch
 import android.widget.Toast
-import androidx.annotation.ContentView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.solver.widgets.analyzer.Dependency
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.daos.ToDoDao
-import de.ckitte.myapplication.database.repository.ToDoRepository
+import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.ActivityMainBinding
 import de.ckitte.myapplication.util.ConnectionLiveData
 import kotlinx.coroutines.*

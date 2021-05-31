@@ -13,7 +13,7 @@ import de.ckitte.myapplication.model.ToDoListModel
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.util.ListSort
 import de.ckitte.myapplication.database.ToDoDatabase
-import de.ckitte.myapplication.database.repository.ToDoRepository
+import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.FragmentTodoListBinding
 import de.ckitte.myapplication.login.LoginProvider
 import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter

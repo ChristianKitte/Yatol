@@ -18,7 +18,7 @@ import com.google.android.material.snackbar.Snackbar
 import de.ckitte.myapplication.model.EditToDoModel
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
-import de.ckitte.myapplication.database.repository.ToDoRepository
+import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.FragmentEditTodoBinding
 import java.time.LocalDateTime
 

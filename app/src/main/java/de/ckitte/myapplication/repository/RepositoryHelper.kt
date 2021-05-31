@@ -1,4 +1,4 @@
-package de.ckitte.myapplication.database.repository
+package de.ckitte.myapplication.repository
 
 import androidx.annotation.WorkerThread
 import de.ckitte.myapplication.database.daos.ToDoDao

@@ -26,8 +26,12 @@ class FirestoreApi {
 
     }
 
-    suspend fun deleteToDoItem() {
+    suspend fun deleteToDoItem(collection: String, vararg firestoreToDoItems: firestoreToDoItem) {
+        val toDoCollection = Firebase.firestore.collection(collection)
 
+        for (firestoreToDoItem in firestoreToDoItems) {
+            toDoCollection.document(firestoreToDoItem.toDoId).delete()
+        }
     }
 
     suspend fun insertToDoItem(collection: String, vararg firestoreToDoItems: firestoreToDoItem) {

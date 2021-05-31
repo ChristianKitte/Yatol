@@ -1,11 +1,6 @@
-package de.ckitte.myapplication.database.repository
+package de.ckitte.myapplication.repository
 
-import android.view.inspector.InspectionCompanion
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
-import androidx.room.Query
 import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.entities.ToDoGroup
@@ -75,6 +70,20 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     @WorkerThread
     suspend fun deleteToDoItem(vararg toDos: ToDoItem) {
         toDoDao.deleteToDoItem(*toDos)
+        val x = de.ckitte.myapplication.firestore.FirestoreApi()
+
+        val z = de.ckitte.myapplication.firestore.firestoreEntities.firestoreToDoItem(
+            toDoId = "V492NDgnClYz8byDtouj",
+            toDoTitle = toDos[0].toDoTitle,
+            toDoDescription = toDos[0].toDoDescription,
+            toDoIsDone = toDos[0].toDoIsDone,
+            toDoIsFavourite = toDos[0].toDoIsFavourite,
+            toDoDoUntil = toDos[0].toDoDoUntil,
+            toDoGroupId = "",
+            user = ""
+        )
+
+        x.deleteToDoItem("ToDoItems", z)
     }
 
     @Suppress("RedundantSuspendModifier")
