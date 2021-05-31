@@ -1,22 +1,21 @@
 package de.ckitte.myapplication.startup
 
 import android.content.Intent
-import android.graphics.drawable.Animatable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Patterns
 import android.view.View
-import android.view.animation.Animation
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
-import androidx.transition.Visibility
 import com.google.android.material.snackbar.Snackbar
 import de.ckitte.myapplication.databinding.ActivityLoginBinding
 import de.ckitte.myapplication.login.LoginProvider
-import de.ckitte.myapplication.login.LoginProvider.Companion.ValidateCredentials
 import de.ckitte.myapplication.util.ConnectionLiveData
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LogInActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityLoginBinding
@@ -60,14 +59,15 @@ class LogInActivity : AppCompatActivity() {
         _binding.btnLogin.setOnClickListener {
             _binding.progBar.visibility = View.VISIBLE
 
-            val myCredentials = LoginProvider.Companion.YATOLCredentials(
+            val myCredentials = LoginProvider.Companion.YATOLMailCredentials(
                 user = _binding.etEmail.text.toString(),
                 key = _binding.etPassword.text.toString()
             )
 
             var isValid = false
             GlobalScope.launch {
-                isValid = ValidateCredentials(myCredentials)
+                isValid = LoginProvider.Companion.LogIn(myCredentials)
+
                 withContext(Dispatchers.Main) {
                     _binding.progBar.visibility = View.INVISIBLE
                     loginResultHandler(isValid)

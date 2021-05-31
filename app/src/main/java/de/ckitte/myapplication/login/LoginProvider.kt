@@ -1,21 +1,18 @@
 package de.ckitte.myapplication.login
 
-import android.os.Handler
-import kotlinx.coroutines.delay
+import de.ckitte.myapplication.firestore.AuthenticationApi
 
 class LoginProvider {
     companion object {
-        private val user: String = "a@a.de"
-        private val key: String = "111111"
+        data class YATOLMailCredentials(val user: String, val key: String)
 
-        data class YATOLCredentials(val user: String, val key: String)
-
-        suspend fun ValidateCredentials(credetials: YATOLCredentials): Boolean {
+        suspend fun LogIn(credentials: YATOLMailCredentials): Boolean {
             Thread.sleep(2000)
+            return AuthenticationApi.logIn(credentials.user, credentials.key)
+        }
 
-            // TODO: 25.05.2021 Implement remote validation
-
-            return credetials.user == user && credetials.key == key
+        suspend fun LogOut() {
+            AuthenticationApi.logOut()
         }
     }
 }

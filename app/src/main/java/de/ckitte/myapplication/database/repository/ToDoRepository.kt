@@ -49,6 +49,20 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     @WorkerThread
     suspend fun addToDoItem(vararg toDos: ToDoItem) {
         toDoDao.addToDoItem(*toDos)
+        val x = de.ckitte.myapplication.firestore.FirestoreApi()
+
+        val z = de.ckitte.myapplication.firestore.firestoreEntities.firestoreToDoItem(
+            toDoId = "",
+            toDoTitle = toDos[0].toDoTitle,
+            toDoDescription = toDos[0].toDoDescription,
+            toDoIsDone = toDos[0].toDoIsDone,
+            toDoIsFavourite = toDos[0].toDoIsFavourite,
+            toDoDoUntil = toDos[0].toDoDoUntil,
+            toDoGroupId = "",
+            user = ""
+        )
+
+        x.insertToDoItem("ToDoItems", z)
     }
 
     @Suppress("RedundantSuspendModifier")

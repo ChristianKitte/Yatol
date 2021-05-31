@@ -10,4 +10,6 @@ class ToDoApplication : Application() {
 
     val database by lazy { ToDoDatabase.getInstance(this, applicationScope) }
     val repository by lazy { database.toToDao }
+
+
 }

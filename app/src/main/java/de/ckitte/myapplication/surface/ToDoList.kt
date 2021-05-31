@@ -15,9 +15,9 @@ import de.ckitte.myapplication.util.ListSort
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.FragmentTodoListBinding
+import de.ckitte.myapplication.login.LoginProvider
 import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class ToDoList : Fragment(R.layout.fragment_todo_list) {
     private lateinit var viewModel: ToDoListModel
@@ -70,7 +70,12 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         _binding.menuBottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.miClose -> {
-                    this.activity?.finishAndRemoveTask()
+                    CoroutineScope(Dispatchers.IO).launch {
+                        LoginProvider.LogOut()
+                        withContext(Dispatchers.Main) {
+                            this@ToDoList.activity?.finishAndRemoveTask()
+                        }
+                    }
                 }
                 R.id.miRefresh -> {
                     GlobalScope.launch {
