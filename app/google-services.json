@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "665894346994",
+    "firebase_url": "https://yatol-291fc-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "yatol-291fc",
+    "storage_bucket": "yatol-291fc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:665894346994:android:25b11f2e6f97bb7c8a706b",
+        "android_client_info": {
+          "package_name": "de.ckitte.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "665894346994-vf0h4e6t8ggvuv06laq0bu58t8n91g71.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUyJbgrhXNNOkI1ea3I5umi-SxXauWhUI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "665894346994-vf0h4e6t8ggvuv06laq0bu58t8n91g71.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
