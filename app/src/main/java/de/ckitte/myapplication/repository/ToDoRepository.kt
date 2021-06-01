@@ -4,7 +4,10 @@ import androidx.annotation.WorkerThread
 import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.entities.ToDoGroup
+import de.ckitte.myapplication.firestore.FirestoreApi
+import de.ckitte.myapplication.firestore.firestoreEntities.firestoreToDoItem
 import kotlinx.coroutines.flow.Flow
+import de.ckitte.myapplication.util.ConnectionLiveData
 import java.time.LocalDateTime
 
 class ToDoRepository(private val toDoDao: ToDoDao) {
@@ -44,20 +47,24 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     @WorkerThread
     suspend fun addToDoItem(vararg toDos: ToDoItem) {
         toDoDao.addToDoItem(*toDos)
-        val x = de.ckitte.myapplication.firestore.FirestoreApi()
 
-        val z = de.ckitte.myapplication.firestore.firestoreEntities.firestoreToDoItem(
-            toDoId = "",
-            toDoTitle = toDos[0].toDoTitle,
-            toDoDescription = toDos[0].toDoDescription,
-            toDoIsDone = toDos[0].toDoIsDone,
-            toDoIsFavourite = toDos[0].toDoIsFavourite,
-            toDoDoUntil = toDos[0].toDoDoUntil,
-            toDoGroupId = "",
-            user = ""
-        )
+        val api = FirestoreApi()
+        if (ConnectionLiveData.isConnected) {
+            for (toDoItem in toDos) {
+                val firestoreToDoItem = firestoreToDoItem(
+                    toDoId = "",
+                    toDoTitle = toDoItem.toDoTitle,
+                    toDoDescription = toDoItem.toDoDescription,
+                    toDoIsDone = toDoItem.toDoIsDone,
+                    toDoIsFavourite = toDoItem.toDoIsFavourite,
+                    toDoDoUntil = toDoItem.toDoDoUntil,
+                    toDoGroupId = FirestoreApi.defaultGroupID,
+                    user = ""
+                )
 
-        x.insertToDoItem("ToDoItems", z)
+                api.insertToDoItem(FirestoreApi.getToDoItemCollection, firestoreToDoItem)
+            }
+        }
     }
 
     @Suppress("RedundantSuspendModifier")
@@ -70,20 +77,24 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     @WorkerThread
     suspend fun deleteToDoItem(vararg toDos: ToDoItem) {
         toDoDao.deleteToDoItem(*toDos)
-        val x = de.ckitte.myapplication.firestore.FirestoreApi()
 
-        val z = de.ckitte.myapplication.firestore.firestoreEntities.firestoreToDoItem(
-            toDoId = "V492NDgnClYz8byDtouj",
-            toDoTitle = toDos[0].toDoTitle,
-            toDoDescription = toDos[0].toDoDescription,
-            toDoIsDone = toDos[0].toDoIsDone,
-            toDoIsFavourite = toDos[0].toDoIsFavourite,
-            toDoDoUntil = toDos[0].toDoDoUntil,
-            toDoGroupId = "",
-            user = ""
-        )
+        val api = FirestoreApi()
+        if (ConnectionLiveData.isConnected) {
+            for (toDoItem in toDos) {
+                val firestoreToDoItem = firestoreToDoItem(
+                    toDoId = "",
+                    toDoTitle = toDoItem.toDoTitle,
+                    toDoDescription = toDoItem.toDoDescription,
+                    toDoIsDone = toDoItem.toDoIsDone,
+                    toDoIsFavourite = toDoItem.toDoIsFavourite,
+                    toDoDoUntil = toDoItem.toDoDoUntil,
+                    toDoGroupId = FirestoreApi.defaultGroupID,
+                    user = ""
+                )
 
-        x.deleteToDoItem("ToDoItems", z)
+                api.deleteToDoItem(FirestoreApi.getToDoItemCollection, firestoreToDoItem)
+            }
+        }
     }
 
     @Suppress("RedundantSuspendModifier")
@@ -159,6 +170,14 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
+    suspend fun emptyRemoteDatabase() {
+        val api = FirestoreApi()
+        api.emptyStore()
+        api.ensureDefaultGroup()
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
     suspend fun RefreshDatabase() {
         emptyLokalDatabase()
         ensureDefaultToDoGroup()
@@ -172,6 +191,9 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         val id = toDoDao.addToDoGroup(todogroup)
 
         ToDoRepository.defaultGroup = id
+
+        val api = FirestoreApi()
+        api.ensureDefaultGroup()
 
         return id
     }

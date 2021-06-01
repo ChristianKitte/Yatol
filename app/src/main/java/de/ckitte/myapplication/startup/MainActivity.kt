@@ -56,6 +56,7 @@ class MainActivity : AppCompatActivity() {
             R.id.miCleanLokal -> {
                 GlobalScope.launch {
                     ToDoRepository(db).emptyLokalDatabase()
+                    ToDoRepository(db).emptyRemoteDatabase()
                 }
 
                 Toast.makeText(

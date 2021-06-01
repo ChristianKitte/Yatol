@@ -25,6 +25,11 @@ android/rickmortydatabase/utils/networking/ConnectionLiveData.kt
 // Weiter überarbeiten
 
 class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
+    companion object {
+        @Volatile
+        var isConnected: Boolean = false
+    }
+
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     private val connectivityManeger =
         context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -73,6 +78,7 @@ class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
     }
 
     private fun checkValidNetworks() {
+        isConnected = networkList.size > 0
         postValue(networkList.size > 0)
     }
 
