@@ -12,6 +12,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
         toDoDao.addToDoItem(
             ToDoItem(
                 0,
+                "",
                 "Sample 1",
                 "toDo Sample 1",
                 false,
@@ -21,6 +22,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
             ),
             ToDoItem(
                 0,
+                "",
                 "Sample 2",
                 "toDo Sample 2wwwwwwwwwwwwwwwwwwwwwwwwwwwwwoooooooooooooooooooooooooooooooooooppppppppppppppppppppppppppp",
                 true,
@@ -30,6 +32,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
             ),
             ToDoItem(
                 0,
+                "",
                 "Sample 3",
                 "toDo Sample 3",
                 false,
@@ -39,6 +42,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
             ),
             ToDoItem(
                 0,
+                "",
                 "Sample 4",
                 "toDo Sample 4",
                 true,
@@ -48,6 +52,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
             ),
             ToDoItem(
                 0,
+                "",
                 "Sample 5",
                 "toDo Sample 5",
                 false,
@@ -57,6 +62,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
             ),
             ToDoItem(
                 0,
+                "",
                 "Sample 6",
                 "toDo Sample 6",
                 true,
@@ -66,6 +72,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
             ),
             ToDoItem(
                 0,
+                "",
                 "Sample 7",
                 "toDo Sample 7",
                 false,

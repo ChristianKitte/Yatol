@@ -1,7 +1,11 @@
 package de.ckitte.myapplication.repository
 
 import androidx.annotation.WorkerThread
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Update
 import de.ckitte.myapplication.database.daos.ToDoDao
+import de.ckitte.myapplication.database.entities.ToDoContacts
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.entities.ToDoGroup
 import de.ckitte.myapplication.firestore.FirestoreApi
@@ -31,6 +35,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         fun getNewToDoItem(): ToDoItem {
             return ToDoItem(
                 0,
+                "",
                 "",
                 "",
                 false,
@@ -111,6 +116,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         return toDoDao.addToDoGroup(toDoGroup)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
     suspend fun addToDoGroup(vararg toDoGroup: ToDoGroup) {
         toDoDao.addToDoGroup(*toDoGroup)
     }
@@ -121,8 +128,28 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         toDoDao.updateToDoGroup(*toDoGroups)
     }
 
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
     suspend fun deleteToDoGroup(vararg toDoGroups: ToDoGroup) {
         toDoDao.deleteToDoGroup(*toDoGroups)
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun addToDoContacts(vararg toDoContacts: ToDoContacts) {
+        toDoDao.addToDoContacts(*toDoContacts)
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun updateToDoContacts(vararg toDoContacts: ToDoContacts) {
+        toDoDao.updateToDoContacts(*toDoContacts)
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun deleteToDoContacts(vararg toDoContacts: ToDoContacts) {
+        toDoDao.deleteToDoContacts(*toDoContacts)
     }
 
     // Abfragen
@@ -165,6 +192,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     suspend fun emptyLokalDatabase() {
         toDoDao.deleteAllToDoItems()
         toDoDao.deleteAllToDoGroups()
+        toDoDao.deleteAllToDoContacts()
+
         ensureDefaultToDoGroup()
     }
 
@@ -187,7 +216,14 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun ensureDefaultToDoGroup(): Long {
-        val todogroup = ToDoGroup(0, true, "Default", "Alle Einträge ohne Gruppe")
+        val todogroup = ToDoGroup(
+            0,
+            "",
+            true,
+            "Default",
+            "Alle Einträge ohne Gruppe"
+        )
+
         val id = toDoDao.addToDoGroup(todogroup)
 
         ToDoRepository.defaultGroup = id

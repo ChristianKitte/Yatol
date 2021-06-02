@@ -26,6 +26,8 @@ data class ToDoItem(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "toDo_Id")
     val toDoId: Int,
+    @ColumnInfo(name = "toDo_RemoteId")
+    val toDoRemoteId: String,
     @ColumnInfo(name = "toDo_Title")
     var toDoTitle: String,
     @ColumnInfo(name = "toDo_Description")

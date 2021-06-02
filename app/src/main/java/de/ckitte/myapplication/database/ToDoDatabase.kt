@@ -9,15 +9,17 @@ import de.ckitte.myapplication.database.converters.DateConverter
 import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.entities.ToDoGroup
+import de.ckitte.myapplication.database.entities.ToDoContacts
 import kotlinx.coroutines.CoroutineScope
 
 @Database(
     entities = [
         ToDoItem::class,
-        ToDoGroup::class
+        ToDoGroup::class,
+        ToDoContacts::class
     ],
     exportSchema = false,
-    version = 2
+    version = 1
 )
 @TypeConverters(DateConverter::class)
 abstract class ToDoDatabase : RoomDatabase() {
@@ -36,8 +38,7 @@ abstract class ToDoDatabase : RoomDatabase() {
                     context.applicationContext,
                     ToDoDatabase::class.java,
                     "toDoDatabase"
-                )
-                    .fallbackToDestructiveMigration()
+                ).fallbackToDestructiveMigration()
                     .build()
                 instance = newInstance
                 return newInstance

@@ -1,6 +1,7 @@
 package de.ckitte.myapplication.database.daos
 
 import androidx.room.*
+import de.ckitte.myapplication.database.entities.ToDoContacts
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.entities.ToDoGroup
 import kotlinx.coroutines.flow.Flow
@@ -36,6 +37,15 @@ interface ToDoDao {
     @Delete
     suspend fun deleteToDoGroup(vararg toDoGroups: ToDoGroup)
 
+    @Insert
+    suspend fun addToDoContacts(vararg toDoContacts: ToDoContacts)
+
+    @Update
+    suspend fun updateToDoContacts(vararg toDoContacts: ToDoContacts)
+
+    @Delete
+    suspend fun deleteToDoContacts(vararg toDoContacts: ToDoContacts)
+
     // Abfragen
 
     @Query("delete from ToDo where toDo_Id = :toDoId")
@@ -43,6 +53,9 @@ interface ToDoDao {
 
     @Query("delete from ToDo_Group")
     suspend fun deleteAllToDoGroups()
+
+    @Query("delete from ToDo_Contacts")
+    suspend fun deleteAllToDoContacts()
 
     // Flow und Observer
 
