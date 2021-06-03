@@ -2,8 +2,11 @@ package de.ckitte.myapplication.surface
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
+import android.graphics.Bitmap
 import android.icu.util.Calendar
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.fragment.app.Fragment
@@ -12,6 +15,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.TimePicker
+import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
@@ -33,6 +41,12 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
     private var currentYear = cal.get(Calendar.YEAR)
     private var currentHour = cal.get(Calendar.HOUR)
     private var currentMinute = cal.get(Calendar.MINUTE)
+
+    val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) {
+          var x=it
+        //bitmap: Bitmap? ->
+        // Do something with the Bitmap, if present
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -146,7 +160,13 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         }
 
         _binding.btnContacts.setOnClickListener {
-            it.findNavController().navigate(R.id.action_editToDo_to_contactsFragment)
+            var i = Intent(Intent.ACTION_PICK)
+            i.type=ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE
+
+
+            val x=takePicture.launch()
+
+            //it.findNavController().navigate(R.id.action_editToDo_to_contactsFragment)
         }
 
         _binding.btnDelete.setOnClickListener {
