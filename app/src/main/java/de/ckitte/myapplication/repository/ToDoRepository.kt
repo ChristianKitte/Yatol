@@ -1,22 +1,17 @@
 package de.ckitte.myapplication.repository
 
 import androidx.annotation.WorkerThread
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Update
 import de.ckitte.myapplication.database.daos.ToDoDao
-import de.ckitte.myapplication.database.entities.ToDoContacts
+import de.ckitte.myapplication.database.entities.ToDoContact
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.entities.ToDoGroup
 import de.ckitte.myapplication.firestore.FirestoreApi
-import de.ckitte.myapplication.firestore.firestoreEntities.firestoreToDoItem
+import de.ckitte.myapplication.firestore.FirestoreBridgeUtil
 import kotlinx.coroutines.flow.Flow
 import de.ckitte.myapplication.util.ConnectionLiveData
 import java.time.LocalDateTime
 
 class ToDoRepository(private val toDoDao: ToDoDao) {
-    // Statische Eigenschaften
-
     companion object StaticMembers {
         var defaultGroup: Long = 0
 
@@ -48,132 +43,160 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
     // CRUD ToDoItem
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun addToDoItem(vararg toDos: ToDoItem) {
-        toDoDao.addToDoItem(*toDos)
-
         val api = FirestoreApi()
-        if (ConnectionLiveData.isConnected) {
-            for (toDoItem in toDos) {
-                val firestoreToDoItem = firestoreToDoItem(
-                    toDoId = "",
-                    toDoTitle = toDoItem.toDoTitle,
-                    toDoDescription = toDoItem.toDoDescription,
-                    toDoIsDone = toDoItem.toDoIsDone,
-                    toDoIsFavourite = toDoItem.toDoIsFavourite,
-                    toDoDoUntil = toDoItem.toDoDoUntil,
-                    toDoGroupId = FirestoreApi.defaultGroupID,
-                    user = ""
+
+        toDos.forEach {
+            val newID = toDoDao.addToDoItem(it)
+
+            if (ConnectionLiveData.isConnected) {
+                val firestoreToDoItem = FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
+
+                val insertedFirestoreToDoItem = api.insertToDoItem(
+                    FirestoreApi.getToDoItemCollection,
+                    firestoreToDoItem
                 )
 
-                api.insertToDoItem(FirestoreApi.getToDoItemCollection, firestoreToDoItem)
+                toDoDao.updateRemoteToDoItemId(insertedFirestoreToDoItem.toDoId, newID)
             }
         }
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun updateToDoItem(vararg toDos: ToDoItem) {
-        toDoDao.updateToDoItem(*toDos)
-    }
-
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    suspend fun deleteToDoItem(vararg toDos: ToDoItem) {
-        toDoDao.deleteToDoItem(*toDos)
-
         val api = FirestoreApi()
-        if (ConnectionLiveData.isConnected) {
-            for (toDoItem in toDos) {
-                val firestoreToDoItem = firestoreToDoItem(
-                    toDoId = "",
-                    toDoTitle = toDoItem.toDoTitle,
-                    toDoDescription = toDoItem.toDoDescription,
-                    toDoIsDone = toDoItem.toDoIsDone,
-                    toDoIsFavourite = toDoItem.toDoIsFavourite,
-                    toDoDoUntil = toDoItem.toDoDoUntil,
-                    toDoGroupId = FirestoreApi.defaultGroupID,
-                    user = ""
-                )
 
-                api.deleteToDoItem(FirestoreApi.getToDoItemCollection, firestoreToDoItem)
+        toDos.forEach {
+            toDoDao.updateToDoItem(it)
+
+            if (ConnectionLiveData.isConnected) {
+                val firestoreToDoItem = FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
+
+                if (!it.toDoRemoteId.isBlank()) {
+                    api.updateToDoItem(
+                        FirestoreApi.getToDoItemCollection,
+                        firestoreToDoItem
+                    )
+                } else if (it.toDoRemoteId.isBlank()) {
+                    val insertedFirestoreToDoItem = api.insertToDoItem(
+                        FirestoreApi.getToDoItemCollection,
+                        firestoreToDoItem
+                    )
+
+                    toDoDao.updateRemoteToDoItemId(
+                        insertedFirestoreToDoItem.toDoId,
+                        it.toDoId.toLong()
+                    )
+                }
             }
         }
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun deleteAllToDoItems() {
-        toDoDao.deleteAllToDoItems()
+    suspend fun deleteToDoItem(vararg toDos: ToDoItem) {
+        val api = FirestoreApi()
+
+        toDos.forEach {
+            toDoDao.deleteToDoItem(it)
+
+            if (ConnectionLiveData.isConnected && !it.toDoRemoteId.isBlank()) {
+                val firestoreToDoItem = FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
+
+                api.deleteToDoItem(
+                    FirestoreApi.getToDoItemCollection,
+                    firestoreToDoItem
+                )
+            }
+        }
     }
 
     // CRUD ToDoGroupItem
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun addToDoGroup(toDoGroup: ToDoGroup): Long {
-        return toDoDao.addToDoGroup(toDoGroup)
+    suspend fun addToDoGroup(vararg toDoGroups: ToDoGroup) {
+        val api = FirestoreApi()
+
+        toDoGroups.forEach {
+            val newID = toDoDao.addToDoGroup(it)
+
+            if (ConnectionLiveData.isConnected) {
+                val firestoreToDoGroup = FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
+
+                val insertedFirestoreToDoGroup = api.insertToDoGroup(
+                    FirestoreApi.getToDoGroupCollection,
+                    firestoreToDoGroup
+                )
+
+                toDoDao.updateRemoteToDoGroupId(insertedFirestoreToDoGroup.toDoGroupId, newID)
+            }
+        }
     }
 
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    suspend fun addToDoGroup(vararg toDoGroup: ToDoGroup) {
-        toDoDao.addToDoGroup(*toDoGroup)
-    }
-
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun updateToDoGroup(vararg toDoGroups: ToDoGroup) {
-        toDoDao.updateToDoGroup(*toDoGroups)
+        val api = FirestoreApi()
+
+        toDoGroups.forEach {
+            toDoDao.updateToDoGroup(it)
+
+            if (ConnectionLiveData.isConnected) {
+                val firestoreToDoGroup = FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
+
+                if (!it.toDoGroupRemoteId.isBlank()) {
+                    api.updateToDoGroup(
+                        FirestoreApi.getToDoGroupCollection,
+                        firestoreToDoGroup
+                    )
+                } else if (it.toDoGroupRemoteId.isBlank()) {
+                    val insertedFirestoreToDoGroup = api.insertToDoGroup(
+                        FirestoreApi.getToDoGroupCollection,
+                        firestoreToDoGroup
+                    )
+
+                    toDoDao.updateRemoteToDoGroupId(
+                        insertedFirestoreToDoGroup.toDoGroupId,
+                        it.toDoGroupId.toLong()
+                    )
+                }
+            }
+        }
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun deleteToDoGroup(vararg toDoGroups: ToDoGroup) {
-        toDoDao.deleteToDoGroup(*toDoGroups)
+        val api = FirestoreApi()
+
+        toDoGroups.forEach {
+            toDoDao.deleteToDoGroup(it)
+
+            if (ConnectionLiveData.isConnected && !it.toDoGroupRemoteId.isBlank()) {
+                val firestoreToDoGroup = FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
+
+                api.deleteToDoGroup(
+                    FirestoreApi.getToDoItemCollection,
+                    firestoreToDoGroup
+                )
+            }
+        }
     }
 
-    @Suppress("RedundantSuspendModifier")
+    // CRUD ToDoContacts
+
     @WorkerThread
-    suspend fun addToDoContacts(vararg toDoContacts: ToDoContacts) {
+    suspend fun addToDoContacts(vararg toDoContacts: ToDoContact) {
         toDoDao.addToDoContacts(*toDoContacts)
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun updateToDoContacts(vararg toDoContacts: ToDoContacts) {
+    suspend fun updateToDoContacts(vararg toDoContacts: ToDoContact) {
         toDoDao.updateToDoContacts(*toDoContacts)
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun deleteToDoContacts(vararg toDoContacts: ToDoContacts) {
+    suspend fun deleteToDoContacts(vararg toDoContacts: ToDoContact) {
         toDoDao.deleteToDoContacts(*toDoContacts)
     }
-
-    // Abfragen
-
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    suspend fun deleteToDo(toDoId: Int) {
-        toDoDao.deleteToDo(toDoId)
-    }
-
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    suspend fun deleteAllToDoGroups() {
-        toDoDao.deleteAllToDoGroups()
-    }
-
-    /*
-    // Eine Abfrage mit Rückgabe von Daten als Liste
-    @Suppress("RedundantSuspendModifier")
-    @WorkerThread
-    suspend fun getAllToDos(): List<ToDoItem> {
-        return toDoDao.getAllToDosAsFlow()
-    }
-    */
 
     // Flow und Observer
 
@@ -187,7 +210,6 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
     // Zusätzliche Funktionalität
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun emptyLokalDatabase() {
         toDoDao.deleteAllToDoItems()
@@ -197,25 +219,23 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         ensureDefaultToDoGroup()
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun emptyRemoteDatabase() {
         val api = FirestoreApi()
         api.emptyStore()
+
         api.ensureDefaultGroup()
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun RefreshDatabase() {
+    suspend fun RefreshLocalDatabase() {
         emptyLokalDatabase()
         ensureDefaultToDoGroup()
         createSampleEntities()
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    suspend fun ensureDefaultToDoGroup(): Long {
+    suspend fun ensureDefaultToDoGroup() {
         val todogroup = ToDoGroup(
             0,
             "",
@@ -225,16 +245,12 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         )
 
         val id = toDoDao.addToDoGroup(todogroup)
-
         ToDoRepository.defaultGroup = id
 
         val api = FirestoreApi()
         api.ensureDefaultGroup()
-
-        return id
     }
 
-    @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun createSampleEntities() {
         RepositoryHelper(toDoDao).createSampleEntities(defaultGroup)

@@ -1,10 +1,9 @@
 package de.ckitte.myapplication.database.entities
 
 import androidx.room.*
-import java.time.LocalDateTime
 
 @Entity(
-    tableName = "ToDo_Contacts",
+    tableName = "ToDo_Contact",
     foreignKeys = [ForeignKey(
         entity = ToDoItem::class,
         parentColumns = arrayOf("toDo_Id"),
@@ -22,14 +21,16 @@ import java.time.LocalDateTime
         )
     )
 )
-data class ToDoContacts(
+data class ToDoContact(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "toDoContact_Id")
     val toDoContactId: Int,
-    @ColumnInfo(name = "toDoContact_Remote_Id")
+    @ColumnInfo(name = "toDoContact_RemoteId")
     val toDoContactRemoteId: String,
     @ColumnInfo(name = "toDoContact_HostId")
     var toDoContactHostId: String,
     @ColumnInfo(name = "toDo_Id")
-    val toDoItemId: Long
+    val toDoItemId: Long,
+    @ColumnInfo(name = "toDo_RemoteId")
+    val toDoItemRemoteId: String
 )

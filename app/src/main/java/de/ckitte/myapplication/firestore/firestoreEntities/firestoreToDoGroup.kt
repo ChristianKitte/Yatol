@@ -1,7 +1,7 @@
 package de.ckitte.myapplication.firestore.firestoreEntities
 
 data class firestoreToDoGroup(
-    val toDoGroupId: String,
+    var toDoGroupId: String,
     val toDoGroupIsDefault: Boolean,
     val toDoGroupTitle: String,
     val toDoGroupDescription: String,

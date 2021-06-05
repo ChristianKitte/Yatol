@@ -1,0 +1,25 @@
+Ensure Default Group in der lokalen DB:
+Test auf vorhandensein umsetzen. In Firestore ist es so.
+ADD vs. INSERT anpassen
+
+
+
+MUSS:
+Synchronisation bei Start implementieren
+
+Kontaktliste anzeigen und Kontakte auswählen lassen
+CRUD für Kontakte zu ToDoItem
+
+Kontakte in Detail anzeigen lassen
+Kontakt anmailen können
+Kontakt anrufen können
+
+
+
+KANN:
+Synchronisation bei NetworkCanage implementieren
+Detail überarbeiten
+
+Texte als Ressourcen
+Fehlerabfangung
+Kommentare

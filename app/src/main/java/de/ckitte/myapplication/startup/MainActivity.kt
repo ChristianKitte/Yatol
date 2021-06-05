@@ -35,10 +35,6 @@ class MainActivity : AppCompatActivity() {
 
         val applicationScope = CoroutineScope(SupervisorJob())
         this.db = ToDoDatabase.getInstance(this, applicationScope).toToDao
-
-        GlobalScope.launch {
-            ToDoRepository(db).RefreshDatabase()
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -56,7 +52,6 @@ class MainActivity : AppCompatActivity() {
             R.id.miCleanLokal -> {
                 GlobalScope.launch {
                     ToDoRepository(db).emptyLokalDatabase()
-                    ToDoRepository(db).emptyRemoteDatabase()
                 }
 
                 Toast.makeText(
@@ -68,10 +63,13 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.miCleanRemote -> {
+                GlobalScope.launch {
+                    ToDoRepository(db).emptyRemoteDatabase()
+                }
 
                 Toast.makeText(
                     applicationContext,
-                    "miCleanRemote - Die Remotedaten werden gleöscht",
+                    "Die Remotedaten werden gleöscht",
                     Toast.LENGTH_SHORT
                 ).show()
 

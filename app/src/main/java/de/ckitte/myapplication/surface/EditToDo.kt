@@ -42,12 +42,6 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
     private var currentHour = cal.get(Calendar.HOUR)
     private var currentMinute = cal.get(Calendar.MINUTE)
 
-    val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) {
-          var x=it
-        //bitmap: Bitmap? ->
-        // Do something with the Bitmap, if present
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -160,13 +154,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         }
 
         _binding.btnContacts.setOnClickListener {
-            var i = Intent(Intent.ACTION_PICK)
-            i.type=ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE
-
-
-            val x=takePicture.launch()
-
-            //it.findNavController().navigate(R.id.action_editToDo_to_contactsFragment)
+            it.findNavController().navigate(R.id.action_editToDo_to_contactsFragment)
         }
 
         _binding.btnDelete.setOnClickListener {

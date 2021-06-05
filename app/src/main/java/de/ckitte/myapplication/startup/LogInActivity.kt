@@ -2,27 +2,26 @@ package de.ckitte.myapplication.startup
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.TextUtils
-import android.util.Patterns
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.snackbar.Snackbar
+import de.ckitte.myapplication.database.ToDoDatabase
+import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.databinding.ActivityLoginBinding
 import de.ckitte.myapplication.login.LoginProvider
+import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.util.ConnectionLiveData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import de.ckitte.myapplication.util.EmailUtil
+import kotlinx.coroutines.*
 
 class LogInActivity : AppCompatActivity() {
     private lateinit var _binding: ActivityLoginBinding
     private lateinit var connectionLiveData: ConnectionLiveData
+    private lateinit var db: ToDoDao
 
     // https://miromatech.com/android/edittext-inputtype/
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this._binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -34,12 +33,15 @@ class LogInActivity : AppCompatActivity() {
             } else {
                 _binding.progBar.visibility = View.VISIBLE
                 this.title = "YATOL - Kein Netzwerk"
-                openMainActivity()
+                startApplication()
             }
         })
 
         val view = _binding.root
         setContentView(view)
+
+        val applicationScope = CoroutineScope(SupervisorJob())
+        this.db = ToDoDatabase.getInstance(this, applicationScope).toToDao
 
         _binding.etEmail.addTextChangedListener {
             _binding.tvEmailHint.isVisible = false
@@ -52,7 +54,8 @@ class LogInActivity : AppCompatActivity() {
 
         _binding.etEmail.setOnFocusChangeListener { v, hasFocus ->
             if (!hasFocus) {
-                _binding.tvEmailHint.isVisible = !isValidEmail(_binding.etEmail.text.toString())
+                _binding.tvEmailHint.isVisible =
+                    !EmailUtil.isValidEmail(_binding.etEmail.text.toString())
             }
         }
 
@@ -65,13 +68,21 @@ class LogInActivity : AppCompatActivity() {
             )
 
             var isValid = false
-            GlobalScope.launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 isValid = LoginProvider.Companion.LogIn(myCredentials)
 
                 withContext(Dispatchers.Main) {
-                    _binding.progBar.visibility = View.INVISIBLE
                     loginResultHandler(isValid)
                 }
+            }
+        }
+    }
+
+    private fun startApplication() {
+        CoroutineScope(Dispatchers.IO).launch {
+            ToDoRepository(db).RefreshLocalDatabase()
+            withContext(Dispatchers.Main) {
+                openMainActivity()
             }
         }
     }
@@ -79,15 +90,18 @@ class LogInActivity : AppCompatActivity() {
     // https://riptutorial.com/android/example/17590/clear-your-current-activity-stack-and-launch-a-new-activity
     private fun openMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
-
         startActivity(intent)
+
+        //_binding.progBar.visibility = View.INVISIBLE
         finishAffinity()
     }
 
     private fun loginResultHandler(isValid: Boolean) {
         if (isValid) {
-            openMainActivity()
+            startApplication()
         } else {
+            _binding.progBar.visibility = View.INVISIBLE
+
             wipeInput()
 
             Snackbar.make(
@@ -105,16 +119,11 @@ class LogInActivity : AppCompatActivity() {
         }
     }
 
-    private fun isValidEmail(email: String): Boolean {
-        val testMail = !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches()
-        return testMail
-    }
-
     private fun validateForm() {
         _binding.apply {
             btnLogin.isEnabled = etPassword.length() > 0
                     && etEmail.length() > 0
-                    && isValidEmail(etEmail.text.toString()) == true
+                    && EmailUtil.isValidEmail(etEmail.text.toString()) == true
         }
     }
 }

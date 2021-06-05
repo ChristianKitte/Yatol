@@ -19,7 +19,10 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
                 true,
                 LocalDateTime.now(),
                 defaultToDoGroupID
-            ),
+            )
+        )
+
+        toDoDao.addToDoItem(
             ToDoItem(
                 0,
                 "",
@@ -29,7 +32,10 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
                 false,
                 LocalDateTime.now().plusDays(1),
                 defaultToDoGroupID
-            ),
+            )
+        )
+
+        toDoDao.addToDoItem(
             ToDoItem(
                 0,
                 "",
@@ -39,7 +45,10 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
                 true,
                 LocalDateTime.now().plusDays(2).plusHours(3),
                 defaultToDoGroupID
-            ),
+            )
+        )
+
+        toDoDao.addToDoItem(
             ToDoItem(
                 0,
                 "",
@@ -49,7 +58,10 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
                 false,
                 LocalDateTime.now().plusDays(3),
                 defaultToDoGroupID
-            ),
+            )
+        )
+
+        toDoDao.addToDoItem(
             ToDoItem(
                 0,
                 "",
@@ -59,7 +71,10 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
                 true,
                 LocalDateTime.now().plusDays(3).plusHours(3),
                 defaultToDoGroupID
-            ),
+            )
+        )
+
+        toDoDao.addToDoItem(
             ToDoItem(
                 0,
                 "",
@@ -69,7 +84,10 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
                 false,
                 LocalDateTime.now().plusDays(2),
                 defaultToDoGroupID
-            ),
+            )
+        )
+
+        toDoDao.addToDoItem(
             ToDoItem(
                 0,
                 "",

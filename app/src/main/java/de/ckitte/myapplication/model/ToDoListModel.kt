@@ -36,7 +36,7 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
 
     fun refreshDatabase() {
         GlobalScope.launch {
-            toDoRepository.RefreshDatabase()
+            toDoRepository.RefreshLocalDatabase()
         }
     }
 

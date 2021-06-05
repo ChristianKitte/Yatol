@@ -1,7 +1,7 @@
 package de.ckitte.myapplication.database.daos
 
 import androidx.room.*
-import de.ckitte.myapplication.database.entities.ToDoContacts
+import de.ckitte.myapplication.database.entities.ToDoContact
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.entities.ToDoGroup
 import kotlinx.coroutines.flow.Flow
@@ -12,13 +12,13 @@ interface ToDoDao {
     // CRUD ToDoItem
 
     @Insert
-    suspend fun addToDoItem(vararg toDos: ToDoItem)
+    suspend fun addToDoItem(toDo: ToDoItem): Long
 
     @Update
-    suspend fun updateToDoItem(vararg toDos: ToDoItem)
+    suspend fun updateToDoItem(toDos: ToDoItem)
 
     @Delete
-    suspend fun deleteToDoItem(vararg toDos: ToDoItem)
+    suspend fun deleteToDoItem(toDo: ToDoItem)
 
     @Query("delete from ToDo")
     suspend fun deleteAllToDoItems()
@@ -37,16 +37,24 @@ interface ToDoDao {
     @Delete
     suspend fun deleteToDoGroup(vararg toDoGroups: ToDoGroup)
 
+    // CRUD ToDoContacts
+
     @Insert
-    suspend fun addToDoContacts(vararg toDoContacts: ToDoContacts)
+    suspend fun addToDoContacts(vararg toDoContacts: ToDoContact)
 
     @Update
-    suspend fun updateToDoContacts(vararg toDoContacts: ToDoContacts)
+    suspend fun updateToDoContacts(vararg toDoContacts: ToDoContact)
 
     @Delete
-    suspend fun deleteToDoContacts(vararg toDoContacts: ToDoContacts)
+    suspend fun deleteToDoContacts(vararg toDoContacts: ToDoContact)
 
     // Abfragen
+
+    @Query("Update ToDo set toDo_RemoteId = :remoteid where toDo_Id = :id")
+    suspend fun updateRemoteToDoItemId(remoteid: String, id: Long)
+
+    @Query("Update ToDo_Group set toDoGroup_RemoteId = :remoteid where toDoGroup_Id = :id")
+    suspend fun updateRemoteToDoGroupId(remoteid: String, id: Long)
 
     @Query("delete from ToDo where toDo_Id = :toDoId")
     suspend fun deleteToDo(toDoId: Int)
@@ -54,10 +62,10 @@ interface ToDoDao {
     @Query("delete from ToDo_Group")
     suspend fun deleteAllToDoGroups()
 
-    @Query("delete from ToDo_Contacts")
+    @Query("delete from ToDo_Contact")
     suspend fun deleteAllToDoContacts()
 
-    // Flow und Observer
+    // Abfragen für Flow und Observer
 
     // Für die Verwendung mit Flow und zur Nutzung mit einem Observer
     // ist dies Pattern notwendig. ACHTUNG: fun ohne suspend!
