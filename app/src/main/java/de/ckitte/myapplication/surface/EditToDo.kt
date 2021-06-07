@@ -1,33 +1,31 @@
 package de.ckitte.myapplication.surface
 
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.graphics.Bitmap
 import android.icu.util.Calendar
+import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.TimePicker
-import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
-import de.ckitte.myapplication.model.EditToDoModel
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
-import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.FragmentEditTodoBinding
+import de.ckitte.myapplication.model.EditToDoModel
+import de.ckitte.myapplication.repository.ToDoRepository
 import java.time.LocalDateTime
 
 class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateSetListener,
@@ -154,7 +152,9 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         }
 
         _binding.btnContacts.setOnClickListener {
-            it.findNavController().navigate(R.id.action_editToDo_to_contactsFragment)
+            selectContact()
+
+            //it.findNavController().navigate(R.id.action_editToDo_to_contactsFragment)
         }
 
         _binding.btnDelete.setOnClickListener {
@@ -172,6 +172,46 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
             it.findNavController().navigate(R.id.action_editToDo_to_toDoListFragment)
         }
+    }
+
+
+    // https://cketti.de/2020/09/03/avoid-intent-resolveactivity/
+    // https://www.tutorialguruji.com/android/onactivityresult-method-is-deprecated-what-is-the-alternative/amp/
+
+    // https://www.programmersought.com/article/97174656608/
+    // https://www.programmersought.com/article/67577517589/
+
+    // https://code.tutsplus.com/tutorials/android-essentials-using-the-contact-picker--mobile-2017
+
+    fun selectContact() {
+        val intent = Intent(Intent.ACTION_PICK).apply {
+            type = ContactsContract.Contacts.CONTENT_TYPE
+        }
+
+        try {
+            //startActivity(intent)
+            resultLauncher.launch(intent)
+            val x = 0
+        } catch (e: ActivityNotFoundException) {
+            // Display some error message
+        }
+    }
+
+    var test: Intent? = null
+    var resultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // There are no request codes
+                var intent: Intent? = result.data
+                if (intent != null) {
+                    test(Uri.parse(intent.dataString))
+                }
+            }
+        }
+
+    fun test(intent: Uri?) {
+        // get the contact id from the Uri
+        val id: String? = intent?.getLastPathSegment()
     }
 
     private fun setUpCalender() {
@@ -216,5 +256,9 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         currentMinute = minute
 
         _binding.tvDoUntil.text = getDoUntilString()
+    }
+
+    companion object {
+        const val REQUEST_SELECT_CONTACT = 1
     }
 }
