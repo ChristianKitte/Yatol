@@ -1,6 +1,8 @@
 package de.ckitte.myapplication.repository
 
 import androidx.annotation.WorkerThread
+import androidx.room.ColumnInfo
+import androidx.room.PrimaryKey
 import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.entities.ToDoContact
 import de.ckitte.myapplication.database.entities.ToDoItem
@@ -37,6 +39,16 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
                 false,
                 LocalDateTime.now(),
                 ToDoRepository.defaultGroup
+            )
+        }
+
+        fun getNewContact(): ToDoContact {
+            return ToDoContact(
+                toDoContactId = 0,
+                toDoContactRemoteId = "",
+                toDoContactHostId = "",
+                toDoItemId = 0,
+                toDoItemRemoteId = ""
             )
         }
     }

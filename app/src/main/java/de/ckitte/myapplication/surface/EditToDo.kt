@@ -5,20 +5,23 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.database.Cursor
 import android.icu.util.Calendar
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.TimePicker
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.loader.app.LoaderManager
 import androidx.navigation.findNavController
 import com.google.android.material.snackbar.Snackbar
 import de.ckitte.myapplication.R
@@ -45,6 +48,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        //LoaderManager.getInstance(this).initLoader(0,null,this)
         return inflater.inflate(R.layout.fragment_edit_todo, container, false)
     }
 
@@ -188,30 +192,77 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
             type = ContactsContract.Contacts.CONTENT_TYPE
         }
 
+        val intent2 = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
+
         try {
-            //startActivity(intent)
             resultLauncher.launch(intent)
-            val x = 0
         } catch (e: ActivityNotFoundException) {
             // Display some error message
         }
     }
 
-    var test: Intent? = null
     var resultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        registerForActivityResult(StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 // There are no request codes
-                var intent: Intent? = result.data
+                val intent: Intent? = result.data
+
                 if (intent != null) {
-                    test(Uri.parse(intent.dataString))
+                    intent.dataString?.let { Log.d("Contact", it) }
+                    processContactData(Uri.parse(intent.dataString))
+
+                    var contactName: String? = null
+                    var uri = intent.data
+
+                    if (uri != null) {
+                        val cr = activity?.contentResolver
+                        cr?.let {
+                            // querying contact data store
+                            val cursor: Cursor? =
+                                it.query(
+                                    uri,
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                                )
+
+                            cursor?.let {
+                                if (it.moveToFirst()) {
+                                    val x =
+                                        cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
+                                    x?.let { Log.d("Contact", x) }
+                                }
+                            }
+                        }
+
+
+                        //contactName?.let { Log.d("Contact", it) }
+                    }
                 }
             }
         }
 
-    fun test(intent: Uri?) {
+
+    fun processContactData(intent: Uri?) {
         // get the contact id from the Uri
         val id: String? = intent?.getLastPathSegment()
+        id?.let { Log.d("Contact", it) }
+
+        val newContact = _viewModel.getNewToDoContact()
+        val currentToDoItem = _viewModel.getCurrentToDoItem()
+
+        if (newContact != null && currentToDoItem != null && id != null) {
+            newContact.apply {
+                toDoContactId = 0
+                toDoContactRemoteId = id
+                toDoContactHostId = "reserve"
+                toDoItemId = currentToDoItem.toDoId.toLong()
+                toDoItemRemoteId = currentToDoItem.toDoRemoteId
+            }
+
+            _viewModel.addToDoContact(newContact)
+        }
     }
 
     private fun setUpCalender() {
@@ -256,9 +307,5 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         currentMinute = minute
 
         _binding.tvDoUntil.text = getDoUntilString()
-    }
-
-    companion object {
-        const val REQUEST_SELECT_CONTACT = 1
     }
 }

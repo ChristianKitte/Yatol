@@ -19,7 +19,7 @@ import kotlinx.coroutines.CoroutineScope
         ToDoContact::class
     ],
     exportSchema = false,
-    version = 2
+    version = 3
 )
 @TypeConverters(DateConverter::class)
 abstract class ToDoDatabase : RoomDatabase() {

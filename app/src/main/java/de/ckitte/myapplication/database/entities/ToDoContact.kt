@@ -24,13 +24,15 @@ import androidx.room.*
 data class ToDoContact(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "toDoContact_Id")
-    val toDoContactId: Int,
+    var toDoContactId: Int,
     @ColumnInfo(name = "toDoContact_RemoteId")
-    val toDoContactRemoteId: String,
+    var toDoContactRemoteId: String,
     @ColumnInfo(name = "toDoContact_HostId")
     var toDoContactHostId: String,
     @ColumnInfo(name = "toDo_Id")
-    val toDoItemId: Long,
+    var toDoItemId: Long,
     @ColumnInfo(name = "toDo_RemoteId")
-    val toDoItemRemoteId: String
+    var toDoItemRemoteId: String,
+    @ColumnInfo(name = "toDoContact_State")
+    var toDoContactState: String
 )
