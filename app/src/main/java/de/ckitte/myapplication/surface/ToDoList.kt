@@ -21,6 +21,7 @@ import kotlinx.coroutines.*
 
 class ToDoList : Fragment(R.layout.fragment_todo_list) {
     private lateinit var viewModel: ToDoListModel
+    private lateinit var toDoListViewAdapter: ToDoListViewAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,7 +51,8 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         this.viewModel = toDoRepository?.let { ToDoListModel(it) }!!
 
         val _binding = FragmentTodoListBinding.bind(view)
-        val toDoListViewAdapter = ToDoListViewAdapter(viewModel)
+        //val toDoListViewAdapter = ToDoListViewAdapter(viewModel)
+        toDoListViewAdapter = ToDoListViewAdapter(viewModel)
 
         _binding.apply {
             rvtodoitems.apply {
@@ -132,5 +134,7 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
             //Sehr böse Falle und nicht leicht aufzuspüren...
             toDoListViewAdapter.submitList(it)
         }
+
+
     }
 }

@@ -11,6 +11,8 @@ import de.ckitte.myapplication.firestore.FirestoreApi
 import de.ckitte.myapplication.firestore.FirestoreBridgeUtil
 import kotlinx.coroutines.flow.Flow
 import de.ckitte.myapplication.util.ConnectionLiveData
+import de.ckitte.myapplication.util.ContactState
+import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDateTime
 
 class ToDoRepository(private val toDoDao: ToDoDao) {
@@ -48,7 +50,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
                 toDoContactRemoteId = "",
                 toDoContactHostId = "",
                 toDoItemId = 0,
-                toDoItemRemoteId = ""
+                toDoItemRemoteId = "",
+                toDoContactState = ContactState.transient.ordinal
             )
         }
     }
@@ -214,6 +217,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
     // Für die Verwendung mit Flow und zur Nutzung mit einem Observer
     // ist dies Pattern notwendig. ACHTUNG: fun ohne suspend!
+    //fun getAllToDosAsFlow_DateThenImportance(): Flow<List<ToDoItem>> =
+    //    toDoDao.getAllToDosAsFlow_DateThenImportance()
     fun getAllToDosAsFlow_DateThenImportance(): Flow<List<ToDoItem>> =
         toDoDao.getAllToDosAsFlow_DateThenImportance()
 

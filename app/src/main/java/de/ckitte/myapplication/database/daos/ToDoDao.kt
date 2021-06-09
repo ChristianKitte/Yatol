@@ -5,6 +5,7 @@ import de.ckitte.myapplication.database.entities.ToDoContact
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.entities.ToDoGroup
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow as StateFlow1
 import kotlin.collections.List as List
 
 @Dao
@@ -69,8 +70,12 @@ interface ToDoDao {
 
     // Für die Verwendung mit Flow und zur Nutzung mit einem Observer
     // ist dies Pattern notwendig. ACHTUNG: fun ohne suspend!
+    // https://stackoverflow.com/questions/59170415/coroutine-flow-not-sure-how-to-convert-a-cursor-to-this-methods-return-type
+
     @Query("select * from todo order by toDo_IsDone, toDo_DoUntil, toDo_IsFavourite desc")
     fun getAllToDosAsFlow_DateThenImportance(): Flow<List<ToDoItem>>
+    //fun getAllToDosAsFlow_DateThenImportance(): kotlinx.coroutines.flow.StateFlow<List<ToDoItem>>
+    //fun getAllToDosAsFlow_DateThenImportance(): Flow<List<ToDoItem>>
 
     @Query("select * from todo order by toDo_IsDone, toDo_IsFavourite, toDo_DoUntil asc")
     fun getAllToDosAsFlow_ImportanceThenDate(): Flow<List<ToDoItem>>

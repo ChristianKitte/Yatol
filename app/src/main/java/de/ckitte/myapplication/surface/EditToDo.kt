@@ -195,7 +195,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         val intent2 = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
 
         try {
-            resultLauncher.launch(intent)
+            resultLauncher.launch(intent2)
         } catch (e: ActivityNotFoundException) {
             // Display some error message
         }

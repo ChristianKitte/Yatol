@@ -1,10 +1,14 @@
 package de.ckitte.myapplication.model
 
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.*
 import de.ckitte.myapplication.util.ListSort
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.repository.ToDoRepository
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 // Es wird abgeraten, ein Context auf die View zu übergeben wegen möglicher
@@ -13,6 +17,7 @@ import kotlinx.coroutines.launch
 class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
     val toDoRepository = toDoDao
     var toDos = toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
+    //var toDos = toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
 
     fun deleteToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
         toDoRepository.deleteToDoItem(toDoItem)
@@ -45,7 +50,6 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
             ListSort.DateThenImportance -> {
                 this.toDos =
                     toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
-                //toDos = toDosa
             }
             ListSort.ImportanceThenDate -> {
                 this.toDos =

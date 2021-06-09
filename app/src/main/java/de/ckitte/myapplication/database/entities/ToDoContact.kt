@@ -34,5 +34,5 @@ data class ToDoContact(
     @ColumnInfo(name = "toDo_RemoteId")
     var toDoItemRemoteId: String,
     @ColumnInfo(name = "toDoContact_State")
-    var toDoContactState: String
+    var toDoContactState: Int
 )
