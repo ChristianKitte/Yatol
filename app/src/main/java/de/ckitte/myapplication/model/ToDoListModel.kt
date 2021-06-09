@@ -2,13 +2,13 @@ package de.ckitte.myapplication.model
 
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.*
+import androidx.lifecycle.switchMap
 import de.ckitte.myapplication.util.ListSort
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.repository.ToDoRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 // Es wird abgeraten, ein Context auf die View zu übergeben wegen möglicher
@@ -16,8 +16,27 @@ import kotlinx.coroutines.launch
 // Status.
 class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
     val toDoRepository = toDoDao
-    var toDos = toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
     //var toDos = toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
+    //var toDos = toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
+
+
+    private val currencyFlow = MutableStateFlow("DateThenImportance");
+
+    var toDos = currencyFlow.flatMapLatest { currentCurrency ->
+        // In case they return different types
+        when (currentCurrency) {
+            // Assuming all of these database calls return a Flow
+            "DateThenImportance" -> toDoRepository.getAllToDosAsFlow_DateThenImportance()
+            "ImportanceThenDate" -> toDoRepository.getAllToDosAsFlow_ImportanceThenDate()
+            else -> toDoRepository.getAllToDosAsFlow_DateThenImportance()
+        }
+
+        // OR in your case just call
+        //serieDao.getStateFlow(currencyCode).map {
+        //    with(stateMapper) { it.fromEntityToDomain() }
+    }
+        .asLiveData(Dispatchers.IO);
+
 
     fun deleteToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
         toDoRepository.deleteToDoItem(toDoItem)
@@ -48,12 +67,14 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
     fun changeSortOrder(newSortOrder: ListSort) {
         when (newSortOrder) {
             ListSort.DateThenImportance -> {
-                this.toDos =
-                    toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
+                currencyFlow.value = "DateThenImportance"
+                //this.toDos =
+                //    toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
             }
             ListSort.ImportanceThenDate -> {
-                this.toDos =
-                    toDoRepository.getAllToDosAsFlow_ImportanceThenDate().asLiveData()
+                currencyFlow.value = "ImportanceThenDate"
+                //this.toDos =
+                //    toDoRepository.getAllToDosAsFlow_ImportanceThenDate().asLiveData()
                 //toDos = toDosb
             }
             else -> return

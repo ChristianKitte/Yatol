@@ -72,11 +72,11 @@ interface ToDoDao {
     // ist dies Pattern notwendig. ACHTUNG: fun ohne suspend!
     // https://stackoverflow.com/questions/59170415/coroutine-flow-not-sure-how-to-convert-a-cursor-to-this-methods-return-type
 
-    @Query("select * from todo order by toDo_IsDone, toDo_DoUntil, toDo_IsFavourite desc")
+    @Query("select * from todo order by toDo_IsDone asc, toDo_DoUntil asc, toDo_IsFavourite asc")
     fun getAllToDosAsFlow_DateThenImportance(): Flow<List<ToDoItem>>
     //fun getAllToDosAsFlow_DateThenImportance(): kotlinx.coroutines.flow.StateFlow<List<ToDoItem>>
     //fun getAllToDosAsFlow_DateThenImportance(): Flow<List<ToDoItem>>
 
-    @Query("select * from todo order by toDo_IsDone, toDo_IsFavourite, toDo_DoUntil asc")
+    @Query("select * from todo order by toDo_IsDone asc, toDo_IsFavourite asc, toDo_DoUntil desc")
     fun getAllToDosAsFlow_ImportanceThenDate(): Flow<List<ToDoItem>>
 }
