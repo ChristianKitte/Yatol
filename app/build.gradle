@@ -72,8 +72,8 @@ dependencies {
     implementation "androidx.room:room-ktx:2.3.0"
 
     // Coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-native-mt'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0-native-mt'
 
     // Coroutine Lifecycle Scopes
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
@@ -81,18 +81,18 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.3.1"
 
     // composer für internet connectivity Support ObserveAsState  ==> Notwenig? Testen!
-    implementation("androidx.compose.runtime:runtime:1.0.0-beta07")
-    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-beta07")
-    implementation("androidx.compose.runtime:runtime-rxjava2:1.0.0-beta07")
+    implementation('androidx.compose.runtime:runtime:1.0.0-beta08')
+    implementation('androidx.compose.runtime:runtime-livedata:1.0.0-beta08')
+    implementation('androidx.compose.runtime:runtime-rxjava2:1.0.0-beta08')
 
     //Firebase Firestore
-    implementation 'com.google.firebase:firebase-firestore-ktx:23.0.0'
+    implementation 'com.google.firebase:firebase-firestore-ktx:23.0.1'
 
     //Firebase Auth
     implementation 'com.google.firebase:firebase-auth-ktx:21.0.1'
 
     //Unterstützung für Firebase Coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.0-native-mt'
 
 
 

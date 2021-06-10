@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.ActivityMainBinding
+import de.ckitte.myapplication.login.LoginProvider
 import de.ckitte.myapplication.util.ConnectionLiveData
 import kotlinx.coroutines.*
 
@@ -24,9 +27,27 @@ class MainActivity : AppCompatActivity() {
         connectionLiveData = ConnectionLiveData(this)
         connectionLiveData.observe(this, {
             if (it) {
-                this.title = "YATOL - Verbunden"
+                //this.title = "YATOL - Verbunden"
+
+                when (LoginProvider.isLoggedIn()) {
+                    true -> {
+                        configureActionBar("YATOL - Verbunden", "Logged In")
+                    }
+                    false -> {
+                        configureActionBar("YATOL - Verbunden", "Logged Out")
+                    }
+                }
             } else {
-                this.title = "YATOL - Kein Netzwerk"
+                //this.title = "YATOL - Kein Netzwerk"
+
+                when (LoginProvider.isLoggedIn()) {
+                    true -> {
+                        configureActionBar("YATOL - Kein Netzwerk", "Logged In")
+                    }
+                    false -> {
+                        configureActionBar("YATOL - Kein Netzwerk", "Logged Out")
+                    }
+                }
             }
         })
 
@@ -35,6 +56,20 @@ class MainActivity : AppCompatActivity() {
 
         val applicationScope = CoroutineScope(SupervisorJob())
         this.db = ToDoDatabase.getInstance(this, applicationScope).toToDao
+    }
+
+    private fun configureActionBar(titel: String, subtitle: String) {
+        val bar = supportActionBar
+
+        bar?.let {
+            it.title = titel
+            it.subtitle = subtitle
+
+            //it.setIcon(R.drawable.ic_edit)
+
+            it.setDisplayUseLogoEnabled(false)
+            it.setDisplayShowHomeEnabled(true)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -50,28 +85,62 @@ class MainActivity : AppCompatActivity() {
 
         return when (item.itemId) {
             R.id.miCleanLokal -> {
-                GlobalScope.launch {
+                CoroutineScope(Dispatchers.IO).launch {
                     ToDoRepository(db).emptyLokalDatabase()
                 }
 
-                Toast.makeText(
-                    applicationContext,
-                    "Die lokalen Daten werden gelöscht",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showToast("Die lokalen Daten werden gelöscht")
 
                 true
             }
             R.id.miCleanRemote -> {
-                GlobalScope.launch {
-                    ToDoRepository(db).emptyRemoteDatabase()
+                if (ConnectionLiveData.isConnected && LoginProvider.isLoggedIn()) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        ToDoRepository(db).emptyRemoteDatabase()
+                    }
+
+                    showToast("Die Remotedaten werden gelöscht")
+                } else {
+                    if (!ConnectionLiveData.isConnected) {
+                        showToast("Kein Netzwerk - Die Remotedaten können nicht gelöscht werden")
+                    } else if (!LoginProvider.isLoggedIn()) {
+                        showToast("Nicht eingelogged - Die Remotedaten können nicht gelöscht werden")
+                    }
                 }
 
-                Toast.makeText(
-                    applicationContext,
-                    "Die Remotedaten werden gleöscht",
-                    Toast.LENGTH_SHORT
-                ).show()
+                true
+            }
+            R.id.miMirrorToRemote -> {
+                if (ConnectionLiveData.isConnected && LoginProvider.isLoggedIn()) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        ToDoRepository(db).mirrorToRemote()
+                    }
+
+                    showToast("Die lokalen Daten werden in Firestore gesichert")
+                } else {
+                    if (!ConnectionLiveData.isConnected) {
+                        showToast("Kein Netzwerk - Die lokalen Daten können nicht in Firestore gesichert werden")
+                    } else if (!LoginProvider.isLoggedIn()) {
+                        showToast("Nicht eingelogged - Die lokalen Daten können nicht in Firestore gesichert werden")
+                    }
+                }
+
+                true
+            }
+            R.id.miMirrorFromRemote -> {
+                if (ConnectionLiveData.isConnected && LoginProvider.isLoggedIn()) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        ToDoRepository(db).mirrorFromRemote()
+                    }
+
+                    showToast("Daten werden aus Firestore geladen")
+                } else {
+                    if (!ConnectionLiveData.isConnected) {
+                        showToast("Kein Netzwerk - Daten können nicht aus Firestore geladen werden")
+                    } else if (!LoginProvider.isLoggedIn()) {
+                        showToast("Nicht eingelogged - Daten können nicht aus Firestore geladen werden")
+                    }
+                }
 
                 true
             }
@@ -79,5 +148,13 @@ class MainActivity : AppCompatActivity() {
                 super.onOptionsItemSelected(item)
             }
         }
+    }
+
+    fun showToast(text: String) {
+        Toast.makeText(
+            applicationContext,
+            text,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }

@@ -29,10 +29,28 @@ class LogInActivity : AppCompatActivity() {
         connectionLiveData = ConnectionLiveData(this)
         connectionLiveData.observe(this, {
             if (it) {
-                this.title = "YATOL - Verbunden"
+                //this.title = "YATOL - Verbunden"
+
+                when (LoginProvider.isLoggedIn()) {
+                    true -> {
+                        configureActionBar("YATOL - Verbunden", "Logged In")
+                    }
+                    false -> {
+                        configureActionBar("YATOL - Verbunden", "Logged Out")
+                    }
+                }
             } else {
-                _binding.progBar.visibility = View.VISIBLE
-                this.title = "YATOL - Kein Netzwerk"
+                //this.title = "YATOL - Kein Netzwerk"
+
+                when (LoginProvider.isLoggedIn()) {
+                    true -> {
+                        configureActionBar("YATOL - Kein Netzwerk", "Logged In")
+                    }
+                    false -> {
+                        configureActionBar("YATOL - Kein Netzwerk", "Logged Out")
+                    }
+                }
+
                 startApplication()
             }
         })
@@ -78,6 +96,20 @@ class LogInActivity : AppCompatActivity() {
         }
     }
 
+    private fun configureActionBar(titel: String, subtitle: String) {
+        val bar = supportActionBar
+
+        bar?.let {
+            it.title = titel
+            it.subtitle = subtitle
+
+            //it.setIcon(R.drawable.ic_edit)
+
+            it.setDisplayUseLogoEnabled(false)
+            it.setDisplayShowHomeEnabled(true)
+        }
+    }
+
     private fun startApplication() {
         CoroutineScope(Dispatchers.IO).launch {
             ToDoRepository(db).RefreshLocalDatabase()
@@ -107,7 +139,7 @@ class LogInActivity : AppCompatActivity() {
             Snackbar.make(
                 _binding.root,
                 "Der Benutzername oder das Passwort sind falsch !",
-                Snackbar.LENGTH_LONG
+                Snackbar.LENGTH_INDEFINITE
             ).show()
         }
     }

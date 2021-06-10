@@ -246,9 +246,12 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
     @WorkerThread
     suspend fun RefreshLocalDatabase() {
-        emptyLokalDatabase()
-        ensureDefaultToDoGroup()
-        createSampleEntities()
+        //emptyLokalDatabase()
+        //ensureDefaultToDoGroup()
+        //createSampleEntities()
+        //lokale ToDos ==> Remote löschen und lokal nach Remote
+        //Keine lokale ToDos ==> Alle Daten aus Remote holen
+        mirrorFromRemote()
     }
 
     @WorkerThread
@@ -271,5 +274,13 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     @WorkerThread
     suspend fun createSampleEntities() {
         RepositoryHelper(toDoDao).createSampleEntities(defaultGroup)
+    }
+
+    suspend fun mirrorFromRemote(){
+        createSampleEntities()
+    }
+
+    suspend fun mirrorToRemote(){
+
     }
 }

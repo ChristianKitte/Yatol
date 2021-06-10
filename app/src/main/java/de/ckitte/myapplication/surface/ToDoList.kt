@@ -2,6 +2,7 @@ package de.ckitte.myapplication.surface
 
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.ActionBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -16,6 +17,7 @@ import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.FragmentTodoListBinding
 import de.ckitte.myapplication.login.LoginProvider
+import de.ckitte.myapplication.util.ConnectionLiveData
 import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter
 import kotlinx.coroutines.*
 
@@ -34,7 +36,29 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_aside, menu)
+        inflater.inflate(R.menu.menu_list, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.mi_sort_date -> {
+                CoroutineScope(Dispatchers.IO).launch {
+                    viewModel.changeSortOrder(ListSort.DateThenImportance)
+                }
+
+                true
+            }
+            R.id.mi_sort_favourite -> {
+                CoroutineScope(Dispatchers.IO).launch {
+                    viewModel.changeSortOrder(ListSort.ImportanceThenDate)
+                }
+
+                true
+            }
+            else -> {
+                super.onOptionsItemSelected(item)
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -80,17 +104,17 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
                     }
                 }
                 R.id.miRefresh -> {
-                    GlobalScope.launch {
+                    CoroutineScope(Dispatchers.IO).launch {
                         viewModel.refreshDatabase()
                     }
                 }
                 R.id.mi_sort_date -> {
-                    GlobalScope.launch {
+                    CoroutineScope(Dispatchers.IO).launch {
                         viewModel.changeSortOrder(ListSort.DateThenImportance)
                     }
                 }
                 R.id.mi_sort_favourite -> {
-                    GlobalScope.launch {
+                    CoroutineScope(Dispatchers.IO).launch {
                         viewModel.changeSortOrder(ListSort.ImportanceThenDate)
                     }
                 }
@@ -134,7 +158,5 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
             //Sehr böse Falle und nicht leicht aufzuspüren...
             toDoListViewAdapter.submitList(it)
         }
-
-
     }
 }

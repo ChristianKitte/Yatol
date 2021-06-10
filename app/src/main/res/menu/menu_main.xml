@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/miCleanLokal"
@@ -8,4 +9,12 @@
     <item
         android:id="@+id/miCleanRemote"
         android:title="Remote Daten löschen" />
+
+    <item
+        android:id="@+id/miMirrorFromRemote"
+        android:title="Daten von Firestore holen" />
+
+    <item
+        android:id="@+id/miMirrorToRemote"
+        android:title="Daten nach Firestore Verschieben" />
 </menu>
