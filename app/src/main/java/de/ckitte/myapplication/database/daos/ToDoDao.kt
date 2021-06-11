@@ -66,6 +66,9 @@ interface ToDoDao {
     @Query("delete from ToDo_Contact")
     suspend fun deleteAllToDoContacts()
 
+    @Query("select count(toDo_Id) from todo")
+    suspend fun getLokalToDosCount(): Long
+
     // Abfragen für Flow und Observer
 
     // Für die Verwendung mit Flow und zur Nutzung mit einem Observer

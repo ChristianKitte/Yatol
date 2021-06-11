@@ -112,7 +112,7 @@ class LogInActivity : AppCompatActivity() {
 
     private fun startApplication() {
         CoroutineScope(Dispatchers.IO).launch {
-            ToDoRepository(db).RefreshLocalDatabase()
+            ToDoRepository(db).refreshLocalDatabase()
             withContext(Dispatchers.Main) {
                 openMainActivity()
             }

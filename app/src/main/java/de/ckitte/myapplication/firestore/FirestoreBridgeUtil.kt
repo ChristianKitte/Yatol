@@ -3,15 +3,15 @@ package de.ckitte.myapplication.firestore
 import de.ckitte.myapplication.database.entities.ToDoContact
 import de.ckitte.myapplication.database.entities.ToDoGroup
 import de.ckitte.myapplication.database.entities.ToDoItem
-import de.ckitte.myapplication.firestore.firestoreEntities.firestoreToDoContact
-import de.ckitte.myapplication.firestore.firestoreEntities.firestoreToDoGroup
-import de.ckitte.myapplication.firestore.firestoreEntities.firestoreToDoItem
+import de.ckitte.myapplication.firestore.firestoreEntities.FirestoreToDoContact
+import de.ckitte.myapplication.firestore.firestoreEntities.FirestoreToDoGroup
+import de.ckitte.myapplication.firestore.firestoreEntities.FirestoreToDoItem
 
 class FirestoreBridgeUtil {
     companion object {
-        fun getFirestoreItemFromDatabaseItem(toDoItem: ToDoItem): firestoreToDoItem {
+        fun getFirestoreItemFromDatabaseItem(toDoItem: ToDoItem): FirestoreToDoItem {
 
-            val firestoreToDoItem = firestoreToDoItem(
+            val firestoreToDoItem = FirestoreToDoItem(
                 toDoId = toDoItem.toDoRemoteId,
                 toDoTitle = toDoItem.toDoTitle,
                 toDoDescription = toDoItem.toDoDescription,
@@ -25,9 +25,9 @@ class FirestoreBridgeUtil {
             return firestoreToDoItem
         }
 
-        fun getFirestoreItemFromDatabaseItem(toDoGroup: ToDoGroup): firestoreToDoGroup {
+        fun getFirestoreItemFromDatabaseItem(toDoGroup: ToDoGroup): FirestoreToDoGroup {
 
-            val firestoreToDoGroup = firestoreToDoGroup(
+            val firestoreToDoGroup = FirestoreToDoGroup(
                 toDoGroupId = toDoGroup.toDoGroupRemoteId,
                 toDoGroupIsDefault = toDoGroup.toDoGroupIsDefault,
                 toDoGroupTitle = toDoGroup.toDoGroupTitle,
@@ -38,9 +38,9 @@ class FirestoreBridgeUtil {
             return firestoreToDoGroup
         }
 
-        fun getFirestoreItemFromDatabaseItem(toDoContact: ToDoContact): firestoreToDoContact {
+        fun getFirestoreItemFromDatabaseItem(toDoContact: ToDoContact): FirestoreToDoContact {
 
-            val firestoreToDoContacts = firestoreToDoContact(
+            val firestoreToDoContacts = FirestoreToDoContact(
                 toDoId = toDoContact.toDoItemRemoteId,
                 toDoContactID = toDoContact.toDoContactRemoteId,
                 toDoHostID = toDoContact.toDoContactHostId,

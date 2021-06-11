@@ -1,8 +1,6 @@
 package de.ckitte.myapplication.model
 
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.*
-import androidx.lifecycle.switchMap
 import de.ckitte.myapplication.util.ListSort
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.repository.ToDoRepository
@@ -60,7 +58,7 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
 
     fun refreshDatabase() {
         GlobalScope.launch {
-            toDoRepository.RefreshLocalDatabase()
+            toDoRepository.refreshLocalDatabase()
         }
     }
 

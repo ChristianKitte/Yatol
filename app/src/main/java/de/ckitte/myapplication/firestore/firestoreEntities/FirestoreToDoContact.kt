@@ -1,8 +1,8 @@
 package de.ckitte.myapplication.firestore.firestoreEntities
 
-data class firestoreToDoContact(
+data class FirestoreToDoContact(
     val toDoId: String,
-    val toDoContactID: String,
+    var toDoContactID: String,
     val toDoHostID: String,
     val user: String
 )

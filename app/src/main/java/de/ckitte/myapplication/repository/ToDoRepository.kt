@@ -1,23 +1,20 @@
 package de.ckitte.myapplication.repository
 
 import androidx.annotation.WorkerThread
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
 import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.entities.ToDoContact
-import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.entities.ToDoGroup
+import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.firestore.FirestoreApi
 import de.ckitte.myapplication.firestore.FirestoreBridgeUtil
-import kotlinx.coroutines.flow.Flow
 import de.ckitte.myapplication.util.ConnectionLiveData
 import de.ckitte.myapplication.util.ContactState
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 
 class ToDoRepository(private val toDoDao: ToDoDao) {
     companion object StaticMembers {
-        var defaultGroup: Long = 0
+        val defaultGroup: Long = 0
 
         @Volatile
         private var currentToDoItem: ToDoItem? = null
@@ -88,7 +85,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
             if (ConnectionLiveData.isConnected) {
                 val firestoreToDoItem = FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
 
-                if (!it.toDoRemoteId.isBlank()) {
+                if (it.toDoRemoteId.isNotBlank()) {
                     api.updateToDoItem(
                         FirestoreApi.getToDoItemCollection,
                         firestoreToDoItem
@@ -115,7 +112,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         toDos.forEach {
             toDoDao.deleteToDoItem(it)
 
-            if (ConnectionLiveData.isConnected && !it.toDoRemoteId.isBlank()) {
+            if (ConnectionLiveData.isConnected && it.toDoRemoteId.isNotBlank()) {
                 val firestoreToDoItem = FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
 
                 api.deleteToDoItem(
@@ -136,7 +133,9 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
             val newID = toDoDao.addToDoGroup(it)
 
             if (ConnectionLiveData.isConnected) {
-                val firestoreToDoGroup = FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
+
+                val firestoreToDoGroup =
+                    FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
 
                 val insertedFirestoreToDoGroup = api.insertToDoGroup(
                     FirestoreApi.getToDoGroupCollection,
@@ -158,7 +157,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
             if (ConnectionLiveData.isConnected) {
                 val firestoreToDoGroup = FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
 
-                if (!it.toDoGroupRemoteId.isBlank()) {
+                if (it.toDoGroupRemoteId.isNotBlank()) {
                     api.updateToDoGroup(
                         FirestoreApi.getToDoGroupCollection,
                         firestoreToDoGroup
@@ -185,7 +184,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         toDoGroups.forEach {
             toDoDao.deleteToDoGroup(it)
 
-            if (ConnectionLiveData.isConnected && !it.toDoGroupRemoteId.isBlank()) {
+            if (ConnectionLiveData.isConnected && it.toDoGroupRemoteId.isNotBlank()) {
                 val firestoreToDoGroup = FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
 
                 api.deleteToDoGroup(
@@ -216,9 +215,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     // Flow und Observer
 
     // Für die Verwendung mit Flow und zur Nutzung mit einem Observer
-    // ist dies Pattern notwendig. ACHTUNG: fun ohne suspend!
-    //fun getAllToDosAsFlow_DateThenImportance(): Flow<List<ToDoItem>> =
-    //    toDoDao.getAllToDosAsFlow_DateThenImportance()
+    // zwei Pattern. Hier: fun ohne suspend!
     fun getAllToDosAsFlow_DateThenImportance(): Flow<List<ToDoItem>> =
         toDoDao.getAllToDosAsFlow_DateThenImportance()
 
@@ -232,55 +229,61 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         toDoDao.deleteAllToDoItems()
         toDoDao.deleteAllToDoGroups()
         toDoDao.deleteAllToDoContacts()
-
-        ensureDefaultToDoGroup()
     }
 
     @WorkerThread
     suspend fun emptyRemoteDatabase() {
         val api = FirestoreApi()
         api.emptyStore()
-
-        api.ensureDefaultGroup()
     }
 
     @WorkerThread
-    suspend fun RefreshLocalDatabase() {
+    suspend fun refreshLocalDatabase() {
         //emptyLokalDatabase()
         //ensureDefaultToDoGroup()
         //createSampleEntities()
         //lokale ToDos ==> Remote löschen und lokal nach Remote
         //Keine lokale ToDos ==> Alle Daten aus Remote holen
-        mirrorFromRemote()
+
+        //emptyLokalDatabase()
+
+        val lokalDs = getLokalToDosCount()
+
+        if (lokalDs > 0) {
+            mirrorToRemote()
+        } else {
+            mirrorFromRemote()
+        }
+
+        // mirrorFromSample()
     }
 
-    @WorkerThread
-    suspend fun ensureDefaultToDoGroup() {
-        val todogroup = ToDoGroup(
-            0,
-            "",
-            true,
-            "Default",
-            "Alle Einträge ohne Gruppe"
-        )
+    private suspend fun getLokalToDosCount(): Long {
+        return toDoDao.getLokalToDosCount()
+    }
 
-        val id = toDoDao.addToDoGroup(todogroup)
-        ToDoRepository.defaultGroup = id
+    suspend fun mirrorFromSample() {
+        createSampleEntities()
+    }
 
-        val api = FirestoreApi()
-        api.ensureDefaultGroup()
+    fun mirrorToRemote() {
+        // delete all from Remote
+        // move all to Remote
+
+        val x = 0
+        val y = 1
+    }
+
+    fun mirrorFromRemote() {
+        // lokal shall be empty
+        // load all from Remote
+
+        val x = 0
+        val y = 1
     }
 
     @WorkerThread
     suspend fun createSampleEntities() {
         RepositoryHelper(toDoDao).createSampleEntities(defaultGroup)
-    }
-
-    suspend fun mirrorFromRemote(){
-        createSampleEntities()
-    }
-
-    suspend fun mirrorToRemote(){
-
     }
 }

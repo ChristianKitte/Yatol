@@ -1,41 +1,32 @@
 package de.ckitte.myapplication.firestore
 
-import androidx.compose.runtime.snapshots.Snapshot
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.model.DocumentKey
 import com.google.firebase.ktx.Firebase
-import com.squareup.okhttp.internal.DiskLruCache
-import de.ckitte.myapplication.firestore.firestoreEntities.firestoreToDoGroup
-import de.ckitte.myapplication.firestore.firestoreEntities.firestoreToDoItem
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import de.ckitte.myapplication.firestore.firestoreEntities.FirestoreToDoContact
+import de.ckitte.myapplication.firestore.firestoreEntities.FirestoreToDoGroup
+import de.ckitte.myapplication.firestore.firestoreEntities.FirestoreToDoItem
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 class FirestoreApi {
     var db = FirebaseFirestore.getInstance()
 
     companion object {
-        @Volatile
-        lateinit var defaultGroupID: String
+        val defaultGroupID: String = "default"
 
         val getToDoItemCollection = "ToDoItems"
         val getToDoGroupCollection = "Groups"
         val getToDoContactCollection = "Contacts"
     }
 
-
     // CRUD ToDoItem
 
     suspend fun insertToDoItem(
         collection: String,
-        firestoreToDoItem: firestoreToDoItem
-    ): firestoreToDoItem {
+        firestoreToDoItem: FirestoreToDoItem
+    ): FirestoreToDoItem {
         val targetCollection = Firebase.firestore.collection(collection)
         var newID: String = ""
 
@@ -49,7 +40,7 @@ class FirestoreApi {
 
     suspend fun updateToDoItem(
         collection: String,
-        firestoreToDoItem: firestoreToDoItem
+        firestoreToDoItem: FirestoreToDoItem
     ) {
         val targetCollection = Firebase.firestore.collection(collection)
 
@@ -57,7 +48,7 @@ class FirestoreApi {
         targetCollection.document(firestoreToDoItem.toDoId).set(map, SetOptions.merge()).await()
     }
 
-    private fun getMutableMapFromToDoItem(firestoreToDoItem: firestoreToDoItem): MutableMap<String, Any> {
+    private fun getMutableMapFromToDoItem(firestoreToDoItem: FirestoreToDoItem): MutableMap<String, Any> {
         val map = mutableMapOf<String, Any>()
 
         map["toDoId"] = firestoreToDoItem.toDoId
@@ -74,7 +65,7 @@ class FirestoreApi {
 
     suspend fun deleteToDoItem(
         collection: String,
-        firestoreToDoItem: firestoreToDoItem
+        firestoreToDoItem: FirestoreToDoItem
     ) {
         val targetCollection = Firebase.firestore.collection(collection)
         targetCollection.document(firestoreToDoItem.toDoId).delete().await()
@@ -82,37 +73,10 @@ class FirestoreApi {
 
     // CRUD ToDoGroupItem
 
-    suspend fun ensureDefaultGroup() {
-        val targetCollection = Firebase.firestore.collection(getToDoGroupCollection)
-        val resultSnapshot = targetCollection.whereEqualTo("toDoGroupId", "default").get()
-
-        resultSnapshot.addOnCompleteListener {
-            if (it.isSuccessful) {
-                defaultGroupID = "default"
-            } else {
-                val newGroup = firestoreToDoGroup(
-                    toDoGroupId = "default",
-                    toDoGroupIsDefault = true,
-                    toDoGroupTitle = "Default",
-                    toDoGroupDescription = "Default Gruppe",
-                    user = ""
-                )
-
-                CoroutineScope(Dispatchers.IO).launch {
-                    insertToDoGroup(getToDoGroupCollection, newGroup)
-
-                    withContext(Dispatchers.Main) {
-                        defaultGroupID = "default"
-                    }
-                }
-            }
-        }
-    }
-
     suspend fun insertToDoGroup(
         collection: String,
-        firestoreToDoGroup: firestoreToDoGroup
-    ): firestoreToDoGroup {
+        firestoreToDoGroup: FirestoreToDoGroup
+    ): FirestoreToDoGroup {
         val targetCollection = Firebase.firestore.collection(collection)
         var newID: String = ""
 
@@ -126,7 +90,7 @@ class FirestoreApi {
 
     suspend fun updateToDoGroup(
         collection: String,
-        firestoreToDoGroup: firestoreToDoGroup
+        firestoreToDoGroup: FirestoreToDoGroup
     ) {
         val targetCollection = Firebase.firestore.collection(collection)
 
@@ -135,7 +99,7 @@ class FirestoreApi {
             .await()
     }
 
-    private fun getMutableMapFromToDoGrup(firestoreToDoGroup: firestoreToDoGroup): MutableMap<String, Any> {
+    private fun getMutableMapFromToDoGrup(firestoreToDoGroup: FirestoreToDoGroup): MutableMap<String, Any> {
         val map = mutableMapOf<String, Any>()
 
         map["toDoGroupId"] = firestoreToDoGroup.toDoGroupId
@@ -149,13 +113,58 @@ class FirestoreApi {
 
     suspend fun deleteToDoGroup(
         collection: String,
-        firestoreToDoGroup: firestoreToDoGroup
+        firestoreToDoGroup: FirestoreToDoGroup
     ) {
         val targetCollection = Firebase.firestore.collection(collection)
         targetCollection.document(firestoreToDoGroup.toDoGroupId).delete().await()
     }
 
     // CRUD ToDoContacts
+
+    suspend fun insertToDoContact(
+        collection: String,
+        firestoreToDoContact: FirestoreToDoContact
+    ): FirestoreToDoContact {
+        val targetCollection = Firebase.firestore.collection(collection)
+        var newID: String = ""
+
+        // soll explizit blocken !
+        targetCollection.add(firestoreToDoContact).addOnSuccessListener {
+            firestoreToDoContact.toDoContactID = it.id
+        }.await()
+
+        return firestoreToDoContact
+    }
+
+    suspend fun updateToDoContact(
+        collection: String,
+        firestoreToDoContact: FirestoreToDoContact
+    ) {
+        val targetCollection = Firebase.firestore.collection(collection)
+
+        val map = getMutableMapFromToDoItemContact(firestoreToDoContact)
+        targetCollection.document(firestoreToDoContact.toDoContactID).set(map, SetOptions.merge())
+            .await()
+    }
+
+    private fun getMutableMapFromToDoItemContact(firestoreToDoContact: FirestoreToDoContact): MutableMap<String, Any> {
+        val map = mutableMapOf<String, Any>()
+
+        map["toDoId"] = firestoreToDoContact.toDoId
+        map["toDoContactID"] = firestoreToDoContact.toDoContactID
+        map["toDoHostID"] = firestoreToDoContact.toDoHostID
+        map["user"] = firestoreToDoContact.user
+
+        return map
+    }
+
+    suspend fun deleteToDoContact(
+        collection: String,
+        firestoreToDoContact: FirestoreToDoContact
+    ) {
+        val targetCollection = Firebase.firestore.collection(collection)
+        targetCollection.document(firestoreToDoContact.toDoContactID).delete().await()
+    }
 
     // Zusätzliche Funktionalität
 
@@ -165,11 +174,11 @@ class FirestoreApi {
         DeleteAllDocumentsFromCollection(getToDoGroupCollection)
     }
 
-    suspend fun DeleteAllDocumentsFromCollection(
+    private suspend fun DeleteAllDocumentsFromCollection(
         collection: String
     ) {
         // Es ist kritisch und wird von Google nicht empfohlen, Sammlungen mit
-        // mobilen Geräten zu lösche. Mobile Function ist leider niht in meinem
+        // mobilen Geräten zu lösche. Mobile Function ist leider nicht in meinem
         // Tarif enthalten. Daher gehe ich vorsichtig vor und nutze explizit await()
 
         val targetCollection = Firebase.firestore.collection(collection)
@@ -179,15 +188,5 @@ class FirestoreApi {
         snapshot.forEach {
             targetCollection.document(it.id).delete().await()
         }
-    }
-
-    // Synchronisierung
-
-    suspend fun syncOnlineStoreWithLocalStore() {
-        //Firestore mit lokalen Daten füllen
-    }
-
-    suspend fun synLocalStoreWithOnlineStore() {
-        //SQLite mit Online Daten füllen
     }
 }

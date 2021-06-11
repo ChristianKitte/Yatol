@@ -2,7 +2,7 @@ package de.ckitte.myapplication.firestore.firestoreEntities
 
 import java.time.LocalDateTime
 
-data class firestoreToDoItem(
+data class FirestoreToDoItem(
     var toDoId: String,
     var toDoTitle: String,
     var toDoDescription: String,
