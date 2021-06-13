@@ -41,13 +41,10 @@ interface ToDoDao {
     // CRUD ToDoContacts
 
     @Insert
-    suspend fun addToDoContacts(vararg toDoContacts: ToDoContact)
-
-    @Update
-    suspend fun updateToDoContacts(vararg toDoContacts: ToDoContact)
+    suspend fun addToDoContact(toDoContact: ToDoContact):Long
 
     @Delete
-    suspend fun deleteToDoContacts(vararg toDoContacts: ToDoContact)
+    suspend fun deleteToDoContact(toDoContact: ToDoContact)
 
     // Abfragen
 
@@ -56,6 +53,9 @@ interface ToDoDao {
 
     @Query("Update ToDo_Group set toDoGroup_RemoteId = :remoteid where toDoGroup_Id = :id")
     suspend fun updateRemoteToDoGroupId(remoteid: String, id: Long)
+
+    @Query("Update ToDo_Contact set toDoContact_RemoteId = :remoteid where toDoContact_Id = :id")
+    suspend fun updateRemoteToDoContactId(remoteid: String, id: Long)
 
     @Query("delete from ToDo where toDo_Id = :toDoId")
     suspend fun deleteToDo(toDoId: Int)
@@ -68,6 +68,15 @@ interface ToDoDao {
 
     @Query("select count(toDo_Id) from todo")
     suspend fun getLokalToDosCount(): Long
+
+    @Query("select * from todo_Group")
+    suspend fun getAllToDoGroups(): List<ToDoGroup>
+
+    @Query("select * from todo")
+    suspend fun getAllLokalToDos(): List<ToDoItem>
+
+    @Query("select * from todo_Contact where toDo_Id = :toDoItemID")
+    suspend fun getAllToDoContacts(toDoItemID: Long): List<ToDoContact>
 
     // Abfragen für Flow und Observer
 

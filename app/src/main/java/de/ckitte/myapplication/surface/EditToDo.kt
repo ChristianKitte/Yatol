@@ -18,6 +18,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.TimePicker
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -188,17 +189,8 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
     // https://code.tutsplus.com/tutorials/android-essentials-using-the-contact-picker--mobile-2017
 
     fun selectContact() {
-        val intent = Intent(Intent.ACTION_PICK).apply {
-            type = ContactsContract.Contacts.CONTENT_TYPE
-        }
-
-        val intent2 = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
-
-        try {
-            resultLauncher.launch(intent2)
-        } catch (e: ActivityNotFoundException) {
-            // Display some error message
-        }
+        val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
+        resultLauncher.launch(intent)
     }
 
     var resultLauncher =
@@ -208,55 +200,59 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
                 val intent: Intent? = result.data
 
                 if (intent != null) {
-                    intent.dataString?.let { Log.d("Contact", it) }
-                    processContactData(Uri.parse(intent.dataString))
+                    //intent.dataString?.let { Log.d("Contact", it) }
+                    //processContactData(Uri.parse(intent.dataString))
+                    //var contactName: String? = null
 
-                    var contactName: String? = null
-                    var uri = intent.data
+                    val uri = intent.data
+                    uri?.let {
+                        addToDoContact(uri)
+                        val displayName = getDisplayNameByUri(uri)
 
-                    if (uri != null) {
-                        val cr = activity?.contentResolver
-                        cr?.let {
-                            // querying contact data store
-                            val cursor: Cursor? =
-                                it.query(
-                                    uri,
-                                    null,
-                                    null,
-                                    null,
-                                    null
-                                )
-
-                            cursor?.let {
-                                if (it.moveToFirst()) {
-                                    val x =
-                                        cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
-                                    x?.let { Log.d("Contact", x) }
-                                }
-                            }
-                        }
-
-
-                        //contactName?.let { Log.d("Contact", it) }
+                        Snackbar.make(
+                            _binding.root,
+                            "$displayName wurde dem Eintrag als Kontakt hinzugefügt !",
+                            Snackbar.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
         }
 
+    fun getDisplayNameByUri(uri: Uri): String {
+        var displayName = ""
+        val cr = activity?.contentResolver
+        cr?.let {
+            // querying contact data store
+            val cursor: Cursor? =
+                it.query(
+                    uri,
+                    null,
+                    null,
+                    null,
+                    null
+                )
 
-    fun processContactData(intent: Uri?) {
-        // get the contact id from the Uri
-        val id: String? = intent?.getLastPathSegment()
-        id?.let { Log.d("Contact", it) }
+            cursor?.let {
+                if (it.moveToFirst()) {
+                    displayName =
+                        it.getString(it.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
+                }
+            }
+        }
 
+        return displayName
+    }
+
+    fun addToDoContact(uri: Uri) {
         val newContact = _viewModel.getNewToDoContact()
         val currentToDoItem = _viewModel.getCurrentToDoItem()
 
-        if (newContact != null && currentToDoItem != null && id != null) {
+        if (newContact != null && currentToDoItem != null) {
             newContact.apply {
                 toDoContactId = 0
-                toDoContactRemoteId = id
-                toDoContactHostId = "reserve"
+                toDoContactRemoteId = ""
+                toDoContactHostId = uri.toString()
                 toDoItemId = currentToDoItem.toDoId.toLong()
                 toDoItemRemoteId = currentToDoItem.toDoRemoteId
             }

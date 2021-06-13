@@ -4,8 +4,8 @@ import androidx.lifecycle.*
 import de.ckitte.myapplication.util.ListSort
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.repository.ToDoRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -14,9 +14,6 @@ import kotlinx.coroutines.launch
 // Status.
 class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
     val toDoRepository = toDoDao
-    //var toDos = toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
-    //var toDos = toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
-
 
     private val currencyFlow = MutableStateFlow("DateThenImportance");
 
@@ -28,10 +25,6 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
             "ImportanceThenDate" -> toDoRepository.getAllToDosAsFlow_ImportanceThenDate()
             else -> toDoRepository.getAllToDosAsFlow_DateThenImportance()
         }
-
-        // OR in your case just call
-        //serieDao.getStateFlow(currencyCode).map {
-        //    with(stateMapper) { it.fromEntityToDomain() }
     }
         .asLiveData(Dispatchers.IO);
 
@@ -57,7 +50,7 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
     }
 
     fun refreshDatabase() {
-        GlobalScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             toDoRepository.refreshLocalDatabase()
         }
     }
@@ -66,14 +59,9 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
         when (newSortOrder) {
             ListSort.DateThenImportance -> {
                 currencyFlow.value = "DateThenImportance"
-                //this.toDos =
-                //    toDoRepository.getAllToDosAsFlow_DateThenImportance().asLiveData()
             }
             ListSort.ImportanceThenDate -> {
                 currencyFlow.value = "ImportanceThenDate"
-                //this.toDos =
-                //    toDoRepository.getAllToDosAsFlow_ImportanceThenDate().asLiveData()
-                //toDos = toDosb
             }
             else -> return
         }
