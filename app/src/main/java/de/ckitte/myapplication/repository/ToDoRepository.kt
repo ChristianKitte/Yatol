@@ -249,6 +249,9 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     fun getAllToDosAsFlow_ImportanceThenDate(): Flow<List<ToDoItem>> =
         toDoDao.getAllToDosAsFlow_ImportanceThenDate()
 
+    fun getAllContacts(): Flow<List<ToDoContact>> =
+        toDoDao.getAllContacts()
+
     // Zusätzliche Funktionalität
 
     @WorkerThread

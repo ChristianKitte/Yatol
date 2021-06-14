@@ -24,17 +24,21 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.loader.app.LoaderManager
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.databinding.FragmentEditTodoBinding
 import de.ckitte.myapplication.model.EditToDoModel
 import de.ckitte.myapplication.repository.ToDoRepository
+import de.ckitte.myapplication.viewadapter.ContactListViewAdapter
+import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter
 import java.time.LocalDateTime
 
 class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener {
     private lateinit var _viewModel: EditToDoModel
+    private lateinit var contactListViewAdapter: ContactListViewAdapter
     private lateinit var _binding: FragmentEditTodoBinding
 
     private val cal = Calendar.getInstance()
@@ -67,6 +71,17 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
         _viewModel = toDoRepository?.let { EditToDoModel(it) }!!
         _binding = FragmentEditTodoBinding.bind(view)
+
+        //val toDoListViewAdapter = ToDoListViewAdapter(viewModel)
+        contactListViewAdapter = ContactListViewAdapter(_viewModel)
+
+        _binding.apply {
+            rvContacts.apply {
+                adapter = contactListViewAdapter
+                layoutManager = LinearLayoutManager(requireContext())
+                setHasFixedSize(true) //optimierung
+            }
+        }
 
         val currentToDoItem = _viewModel.getCurrentToDoItem()
 
@@ -176,6 +191,13 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
             }.show()
 
             it.findNavController().navigate(R.id.action_editToDo_to_toDoListFragment)
+        }
+
+        this._viewModel.toDoContacts.observe(viewLifecycleOwner) {
+            //Achtung: Ich habe lange gesucht. Problem: Zunächst TextView Höhe auf 0 gewesen
+            //dann das Fragment selbst nicht auf den Inhalt angepasst.
+            //Sehr böse Falle und nicht leicht aufzuspüren...
+            contactListViewAdapter.submitList(it)
         }
     }
 

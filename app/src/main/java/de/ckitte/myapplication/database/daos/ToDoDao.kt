@@ -41,7 +41,7 @@ interface ToDoDao {
     // CRUD ToDoContacts
 
     @Insert
-    suspend fun addToDoContact(toDoContact: ToDoContact):Long
+    suspend fun addToDoContact(toDoContact: ToDoContact): Long
 
     @Delete
     suspend fun deleteToDoContact(toDoContact: ToDoContact)
@@ -95,4 +95,7 @@ interface ToDoDao {
     // Sortierung: Datum aufsteigend ==> asc
     @Query("select * from todo order by toDo_IsDone asc, toDo_IsFavourite desc, toDo_DoUntil asc")
     fun getAllToDosAsFlow_ImportanceThenDate(): Flow<List<ToDoItem>>
+
+    @Query("select * from todo_Contact")
+    fun getAllContacts(): Flow<List<ToDoContact>>
 }
