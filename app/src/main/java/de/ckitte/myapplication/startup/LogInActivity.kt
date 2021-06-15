@@ -1,5 +1,6 @@
 package de.ckitte.myapplication.startup
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.View

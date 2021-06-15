@@ -6,48 +6,40 @@
     android:layout_margin="5sp"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tvContact"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5sp"
-        android:drawablePadding="5sp"
-        android:paddingStart="2sp"
-        android:text="TextView"
-        android:textSize="20sp" />
-
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_height="wrap_content">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabCall"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:layout_margin="2dp"
-            android:contentDescription="Edit Button"
-            android:src="@drawable/ic_edit" />
+        <TextView
+            android:id="@+id/tvContact"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:drawablePadding="5sp"
+            android:text="DisplayName"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@+id/btnMail"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabMail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|left"
-            android:layout_margin="2dp"
-            android:contentDescription="Edit Button"
-            android:src="@drawable/ic_edit" />
+        <ImageButton
+            android:id="@+id/btnCall"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/material_on_surface_stroke"
+            android:src="@drawable/ic_phone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <ImageButton
+            android:id="@+id/btnMail"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/material_on_surface_stroke"
+            android:src="@drawable/ic_mail"
+            app:layout_constraintEnd_toStartOf="@+id/btnCall"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider" />
-
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

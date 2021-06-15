@@ -14,6 +14,7 @@ import de.ckitte.myapplication.model.ToDoListModel
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.util.ListSort
 import de.ckitte.myapplication.database.ToDoDatabase
+import de.ckitte.myapplication.databinding.FragmentEditTodoBinding
 import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.FragmentTodoListBinding
 import de.ckitte.myapplication.login.LoginProvider
@@ -24,6 +25,7 @@ import kotlinx.coroutines.*
 class ToDoList : Fragment(R.layout.fragment_todo_list) {
     private lateinit var viewModel: ToDoListModel
     private lateinit var toDoListViewAdapter: ToDoListViewAdapter
+    private lateinit var _binding: FragmentTodoListBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -74,7 +76,7 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         val toDoRepository = dao?.let { ToDoRepository(it) }
         this.viewModel = toDoRepository?.let { ToDoListModel(it) }!!
 
-        val _binding = FragmentTodoListBinding.bind(view)
+        _binding = FragmentTodoListBinding.bind(view)
         //val toDoListViewAdapter = ToDoListViewAdapter(viewModel)
         toDoListViewAdapter = ToDoListViewAdapter(viewModel)
 
@@ -123,31 +125,6 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
             true
         }
 
-        val ItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-        ) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                return true
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val currentItemIndex = viewHolder.adapterPosition
-                val currentItem = toDoListViewAdapter.currentList[currentItemIndex]
-                viewModel.deleteToDoItem(currentItem)
-
-                Snackbar.make(view, "Der Eintrag wurde gelöscht", Snackbar.LENGTH_LONG).apply {
-                    setAction("Abbruch") {
-                        viewModel.addToDoItem(currentItem)
-                    }
-                }.show()
-            }
-        }
-
         ItemTouchHelper(ItemTouchHelperCallback).apply {
             attachToRecyclerView(_binding.rvtodoitems)
         }
@@ -157,6 +134,31 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
             //dann das Fragment selbst nicht auf den Inhalt angepasst.
             //Sehr böse Falle und nicht leicht aufzuspüren...
             toDoListViewAdapter.submitList(it)
+        }
+    }
+
+    val ItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+    ) {
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            val currentItemIndex = viewHolder.adapterPosition
+            val currentItem = toDoListViewAdapter.currentList[currentItemIndex]
+            viewModel.deleteToDoItem(currentItem)
+
+            Snackbar.make(_binding.root, "Der Eintrag wurde gelöscht", Snackbar.LENGTH_LONG).apply {
+                setAction("Abbruch") {
+                    viewModel.addToDoItem(currentItem)
+                }
+            }.show()
         }
     }
 }

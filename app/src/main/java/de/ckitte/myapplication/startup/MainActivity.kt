@@ -1,9 +1,13 @@
 package de.ckitte.myapplication.startup
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import de.ckitte.myapplication.R
@@ -56,6 +60,8 @@ class MainActivity : AppCompatActivity() {
 
         val applicationScope = CoroutineScope(SupervisorJob())
         this.db = ToDoDatabase.getInstance(this, applicationScope).toToDao
+
+        checkPermission(Manifest.permission.READ_CONTACTS,100)
     }
 
     private fun configureActionBar(titel: String, subtitle: String) {
@@ -156,5 +162,16 @@ class MainActivity : AppCompatActivity() {
             text,
             Toast.LENGTH_SHORT
         ).show()
+    }
+
+    // Function to check and request permission.
+    private fun checkPermission(permission: String, requestCode: Int) {
+        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_DENIED) {
+
+            // Requesting the permission
+            ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
+        } else {
+            Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show()
+        }
     }
 }

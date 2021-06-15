@@ -1,5 +1,6 @@
 package de.ckitte.myapplication.surface
 
+import android.Manifest
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -20,17 +21,21 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.loader.app.LoaderManager
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.databinding.FragmentEditTodoBinding
 import de.ckitte.myapplication.model.EditToDoModel
 import de.ckitte.myapplication.repository.ToDoRepository
+import de.ckitte.myapplication.util.getDisplayNameByUri
 import de.ckitte.myapplication.viewadapter.ContactListViewAdapter
 import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter
 import java.time.LocalDateTime
@@ -72,8 +77,9 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         _viewModel = toDoRepository?.let { EditToDoModel(it) }!!
         _binding = FragmentEditTodoBinding.bind(view)
 
+        //val granded= ContextCompat.checkSelfPermission(this.requireContext() ,Manifest.permission.READ_CONTACTS)
         //val toDoListViewAdapter = ToDoListViewAdapter(viewModel)
-        contactListViewAdapter = ContactListViewAdapter(_viewModel)
+        contactListViewAdapter = ContactListViewAdapter(_viewModel,activity?.contentResolver )
 
         _binding.apply {
             rvContacts.apply {
@@ -193,6 +199,10 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
             it.findNavController().navigate(R.id.action_editToDo_to_toDoListFragment)
         }
 
+        ItemTouchHelper(ItemTouchHelperCallback).apply {
+            attachToRecyclerView(_binding.rvContacts)
+        }
+
         this._viewModel.toDoContacts.observe(viewLifecycleOwner) {
             //Achtung: Ich habe lange gesucht. Problem: Zunächst TextView Höhe auf 0 gewesen
             //dann das Fragment selbst nicht auf den Inhalt angepasst.
@@ -200,7 +210,6 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
             contactListViewAdapter.submitList(it)
         }
     }
-
 
     // https://cketti.de/2020/09/03/avoid-intent-resolveactivity/
     // https://www.tutorialguruji.com/android/onactivityresult-method-is-deprecated-what-is-the-alternative/amp/
@@ -229,42 +238,22 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
                     val uri = intent.data
                     uri?.let {
                         addToDoContact(uri)
-                        val displayName = getDisplayNameByUri(uri)
 
-                        Snackbar.make(
-                            _binding.root,
-                            "$displayName wurde dem Eintrag als Kontakt hinzugefügt !",
-                            Snackbar.LENGTH_SHORT
-                        ).show()
+                        activity?.contentResolver.let {
+                            it?.let {
+                                val displayName = getDisplayNameByUri(uri, it)
+
+                                Snackbar.make(
+                                    _binding.root,
+                                    "$displayName wurde dem Eintrag als Kontakt hinzugefügt !",
+                                    Snackbar.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                     }
                 }
             }
         }
-
-    fun getDisplayNameByUri(uri: Uri): String {
-        var displayName = ""
-        val cr = activity?.contentResolver
-        cr?.let {
-            // querying contact data store
-            val cursor: Cursor? =
-                it.query(
-                    uri,
-                    null,
-                    null,
-                    null,
-                    null
-                )
-
-            cursor?.let {
-                if (it.moveToFirst()) {
-                    displayName =
-                        it.getString(it.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
-                }
-            }
-        }
-
-        return displayName
-    }
 
     fun addToDoContact(uri: Uri) {
         val newContact = _viewModel.getNewToDoContact()
@@ -280,6 +269,31 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
             }
 
             _viewModel.addToDoContact(newContact)
+        }
+    }
+
+    val ItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+    ) {
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            return true
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            val currentItemIndex = viewHolder.adapterPosition
+            val currentItem = contactListViewAdapter.currentList[currentItemIndex]
+            _viewModel.deleteToDoContact(currentItem)
+
+            Snackbar.make(_binding.root, "Der Eintrag wurde gelöscht", Snackbar.LENGTH_LONG).apply {
+                setAction("Abbruch") {
+                    _viewModel.addToDoContact(currentItem)
+                }
+            }.show()
         }
     }
 

@@ -1,7 +1,11 @@
 package de.ckitte.myapplication.viewadapter
 
+import android.app.Activity
+import android.content.ContentResolver
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -10,8 +14,13 @@ import de.ckitte.myapplication.database.entities.ToDoContact
 import de.ckitte.myapplication.databinding.FragmentContactListitemBinding
 import de.ckitte.myapplication.model.EditToDoModel
 import de.ckitte.myapplication.model.ToDoListModel
+import de.ckitte.myapplication.util.getDisplayNameByUri
+import java.util.jar.Manifest
 
-class ContactListViewAdapter(private val viewModel: EditToDoModel) :
+class ContactListViewAdapter(
+    private val viewModel: EditToDoModel,
+    private val contentResolver: ContentResolver?
+) :
     ListAdapter<ToDoContact, ContactListViewAdapter.ContactViewHolder>(ContactComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
@@ -21,7 +30,8 @@ class ContactListViewAdapter(private val viewModel: EditToDoModel) :
                 parent,
                 false
             )
-        return ContactViewHolder(binding, viewModel)
+
+        return ContactViewHolder(binding, viewModel, contentResolver)
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
@@ -31,15 +41,24 @@ class ContactListViewAdapter(private val viewModel: EditToDoModel) :
 
     class ContactViewHolder(
         private val binding: FragmentContactListitemBinding,
-        private var viewModel: EditToDoModel
+        private var viewModel: EditToDoModel,
+        private var contentResolver: ContentResolver?
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(contact: ToDoContact) {
             binding.apply {
-                tvContact.text = contact.toDoContactHostId
 
-                fabCall.setOnClickListener {
+                if (contentResolver != null) {
+                    val uri: Uri = Uri.parse(contact.toDoContactHostId)
+
+                    tvContact.text = viewModel.getDisplayName(uri, contentResolver!!)
+                    //tvContact.text = getDisplayNameByUri(uri, contentResolver!!)
+                } else {
+                    tvContact.text = contact.toDoContactHostId
+                }
+
+                btnCall.setOnClickListener {
                     Snackbar.make(
                         root,
                         "Call !",
@@ -47,7 +66,7 @@ class ContactListViewAdapter(private val viewModel: EditToDoModel) :
                     ).show()
                 }
 
-                fabMail.setOnClickListener {
+                btnMail.setOnClickListener {
                     Snackbar.make(
                         root,
                         "Mail !",

@@ -6,6 +6,11 @@
     android:layout_margin="5sp"
     android:orientation="vertical">
 
+    <!--
+    Achtung! ListViewAdapter benötigt scheinbar LinearLayout auf der obersten
+    Ebene...
+    -->
+
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
