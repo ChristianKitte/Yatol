@@ -1,5 +1,6 @@
 package de.ckitte.myapplication.repository
 
+import android.util.Log
 import androidx.annotation.WorkerThread
 import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.entities.ToDoContact
@@ -11,6 +12,7 @@ import de.ckitte.myapplication.util.ConnectionLiveData
 import de.ckitte.myapplication.util.ContactState
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
+import kotlin.math.log
 
 class ToDoRepository(private val toDoDao: ToDoDao) {
     companion object StaticMembers {
@@ -197,6 +199,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
     // CRUD ToDoContacts
 
+
     @WorkerThread
     suspend fun addToDoContacts(vararg toDoContacts: ToDoContact) {
         val api = FirestoreApi()
@@ -222,6 +225,41 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     }
 
     @WorkerThread
+    suspend fun updateToDoContact(vararg toDoContacts: ToDoContact) {
+        val api = FirestoreApi()
+
+        try {
+            toDoContacts.forEach {
+                toDoDao.updateToDoContact(it)
+
+                if (ConnectionLiveData.isConnected) {
+                    val firestoreToDoContact =
+                        FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
+
+                    if (it.toDoContactRemoteId.isNotBlank()) {
+                        api.updateToDoContact(
+                            FirestoreApi.getToDoContactCollection,
+                            firestoreToDoContact
+                        )
+                    } else if (it.toDoContactRemoteId.isBlank()) {
+                        val insertedFirestoreToDoContact = api.insertToDoContact(
+                            FirestoreApi.getToDoContactCollection,
+                            firestoreToDoContact
+                        )
+
+                        toDoDao.updateRemoteToDoGroupId(
+                            insertedFirestoreToDoContact.toDoContactID,
+                            it.toDoContactId.toLong()
+                        )
+                    }
+                }
+            }
+        } catch (d: Exception){
+            Log.println(Log.DEBUG,"Scheiße",d.toString())
+        }
+    }
+
+    @WorkerThread
     suspend fun deleteToDoContacts(vararg toDoContacts: ToDoContact) {
         val api = FirestoreApi()
 
@@ -238,7 +276,39 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
             }
         }
     }
+/*
+    @WorkerThread
+    suspend fun markContactForAdd(vararg toDoContacts: ToDoContact) {
+        toDoContacts.forEach {
+            it.toDoContactState = ContactState.Added.ordinal
+            this.addToDoContacts(it)
+        }
+    }
 
+    @WorkerThread
+    suspend fun markContactForDelete(vararg toDoContacts: ToDoContact) {
+        toDoContacts.forEach {
+            it.toDoContactState = ContactState.Deleted.ordinal
+            this.updateToDoContact(it)
+        }
+    }
+
+    @WorkerThread
+    suspend fun commitContacts() {
+        val contactsToDelete = toDoDao.getAllDeletedToDoContacts()
+
+        contactsToDelete.forEach {
+            deleteToDoContacts(it)
+        }
+
+        toDoDao.commitContacts()
+    }
+
+    @WorkerThread
+    suspend fun rollbackContacts() {
+        toDoDao.rollbackContacts()
+    }
+*/
     // Flow und Observer
 
     // Für die Verwendung mit Flow und zur Nutzung mit einem Observer
@@ -249,8 +319,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     fun getAllToDosAsFlow_ImportanceThenDate(): Flow<List<ToDoItem>> =
         toDoDao.getAllToDosAsFlow_ImportanceThenDate()
 
-    fun getAllContacts(): Flow<List<ToDoContact>> =
-        toDoDao.getAllContacts()
+    fun getAllContacts(toDoItemID: Long): Flow<List<ToDoContact>> =
+        toDoDao.getAllContacts(toDoItemID)
 
     // Zusätzliche Funktionalität
 
@@ -314,10 +384,10 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
                 // Das Item wurde neu eingefügt und hat eine neue ID erhalten. Daher müssen bei
                 // der Spiegelung der Kontakte diese ebenfalls angepasst werden!
-                mirrorToDoContactsToRemoteByToDo(
-                    it.toDoId.toLong(),
-                    insertedFirestoreToDoItem.toDoId
-                )
+                //mirrorToDoContactsToRemoteByToDo(
+                //    it.toDoId.toLong(),
+                //    insertedFirestoreToDoItem.toDoId
+                //)
             }
         }
     }

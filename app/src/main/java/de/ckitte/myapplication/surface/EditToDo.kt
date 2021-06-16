@@ -79,7 +79,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
         //val granded= ContextCompat.checkSelfPermission(this.requireContext() ,Manifest.permission.READ_CONTACTS)
         //val toDoListViewAdapter = ToDoListViewAdapter(viewModel)
-        contactListViewAdapter = ContactListViewAdapter(_viewModel,activity?.contentResolver )
+        contactListViewAdapter = ContactListViewAdapter(_viewModel, activity?.contentResolver)
 
         _binding.apply {
             rvContacts.apply {
@@ -174,13 +174,15 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         }
 
         _binding.btnBack.setOnClickListener {
+            if (currentToDoItem != null) {
+                _viewModel.rollbackContacts(currentToDoItem)
+            }
+
             it.findNavController().navigate(R.id.action_editToDo_to_toDoListFragment)
         }
 
         _binding.btnContacts.setOnClickListener {
             selectContact()
-
-            //it.findNavController().navigate(R.id.action_editToDo_to_contactsFragment)
         }
 
         _binding.btnDelete.setOnClickListener {

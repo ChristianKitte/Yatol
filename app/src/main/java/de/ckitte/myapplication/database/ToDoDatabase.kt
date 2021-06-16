@@ -19,7 +19,7 @@ import kotlinx.coroutines.CoroutineScope
         ToDoContact::class
     ],
     exportSchema = false,
-    version = 1
+    version = 6
 )
 @TypeConverters(DateConverter::class)
 abstract class ToDoDatabase : RoomDatabase() {
@@ -38,7 +38,7 @@ abstract class ToDoDatabase : RoomDatabase() {
                     context.applicationContext,
                     ToDoDatabase::class.java,
                     "toDoDatabase"
-                ).fallbackToDestructiveMigrationOnDowngrade().fallbackToDestructiveMigration()
+                ).fallbackToDestructiveMigration()
                     .build()
                 instance = newInstance
                 return newInstance
