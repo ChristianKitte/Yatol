@@ -6,6 +6,7 @@ import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.repository.ToDoRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -13,11 +14,12 @@ import kotlinx.coroutines.launch
 // Memory Leaks wegen unterschiedlicher Laufzeiten. Flow hingegen achtet den
 // Status.
 class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
-    val toDoRepository = toDoDao
+    private val toDoRepository = toDoDao
 
-    private val currencyFlow = MutableStateFlow("DateThenImportance");
+    private val sortOrder = MutableStateFlow("DateThenImportance")
 
-    var toDos = currencyFlow.flatMapLatest { currentCurrency ->
+    @ExperimentalCoroutinesApi
+    var toDos = sortOrder.flatMapLatest { currentCurrency ->
         // In case they return different types
         when (currentCurrency) {
             // Assuming all of these database calls return a Flow
@@ -26,7 +28,7 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
             else -> toDoRepository.getAllToDosAsFlow_DateThenImportance()
         }
     }
-        .asLiveData(Dispatchers.IO);
+        .asLiveData(Dispatchers.IO)
 
 
     fun deleteToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
@@ -58,12 +60,11 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
     fun changeSortOrder(newSortOrder: ListSort) {
         when (newSortOrder) {
             ListSort.DateThenImportance -> {
-                currencyFlow.value = "DateThenImportance"
+                sortOrder.value = "DateThenImportance"
             }
             ListSort.ImportanceThenDate -> {
-                currencyFlow.value = "ImportanceThenDate"
+                sortOrder.value = "ImportanceThenDate"
             }
-            else -> return
         }
     }
 }

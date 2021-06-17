@@ -2,15 +2,10 @@ package de.ckitte.myapplication.database.daos
 
 import androidx.room.*
 import de.ckitte.myapplication.database.entities.ToDoContact
-import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.entities.ToDoGroup
+import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.util.ContactState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.StateFlow as StateFlow1
-import kotlin.collections.List as List
 
 @Dao
 interface ToDoDao {
@@ -47,8 +42,8 @@ interface ToDoDao {
     @Insert
     suspend fun addToDoContact(toDoContact: ToDoContact): Long
 
-    @Insert
-    suspend fun updateToDoContact(toDoContact: ToDoContact): Long
+    @Update
+    suspend fun updateToDoContact(toDoContact: ToDoContact)
 
     @Delete
     suspend fun deleteToDoContact(toDoContact: ToDoContact)
@@ -63,26 +58,6 @@ interface ToDoDao {
 
     @Query("Update ToDo_Contact set toDoContact_RemoteId = :remoteid where toDoContact_Id = :id")
     suspend fun updateRemoteToDoContactId(remoteid: String, id: Long)
-
-    suspend fun commitContacts() {
-        CoroutineScope(Dispatchers.IO).launch {
-            commitDeleteActionForContacts()
-        }.join()
-
-        commitAddActionForContacts()
-    }
-
-    @Query("Update ToDo_Contact set toDoContact_State = :targetAction where toDoContact_State = :selectAction")
-    suspend fun commitAddActionForContacts(
-        targetAction: Long = ContactState.Save.ordinal.toLong(),
-        selectAction: Long = ContactState.Added.ordinal.toLong()
-    )
-
-    @Query("Delete from ToDo_Contact where toDoContact_State = :action")
-    suspend fun commitDeleteActionForContacts(action: Long = ContactState.Deleted.ordinal.toLong())
-
-    @Query("Update ToDo_Contact set toDoContact_State = :action")
-    suspend fun rollbackContacts(action: Long = ContactState.Save.ordinal.toLong())
 
     @Query("delete from ToDo where toDo_Id = :toDoId")
     suspend fun deleteToDo(toDoId: Int)
@@ -106,7 +81,13 @@ interface ToDoDao {
     suspend fun getAllToDoContacts(toDoItemID: Long): List<ToDoContact>
 
     @Query("select * from ToDo_Contact where toDoContact_State = :action")
-    suspend fun getAllDeletedToDoContacts(action: Long = ContactState.Deleted.ordinal.toLong()): List<ToDoContact>
+    suspend fun getAllDeletedToDoContacts(action: Int = ContactState.Deleted.ordinal): List<ToDoContact>
+
+    @Query("select * from ToDo_Contact where toDoContact_State = :action")
+    suspend fun getAllAddedToDoContacts(action: Int = ContactState.Added.ordinal): List<ToDoContact>
+
+    @Query("select * from ToDo_Contact where toDoContact_State != :action")
+    suspend fun getAllTouchedToDoContacts(action: Int = ContactState.Save.ordinal): List<ToDoContact>
 
     // Abfragen für Flow und Observer
 
@@ -118,14 +99,18 @@ interface ToDoDao {
     // Sortierung: Datum aufsteigend ==> asc
     // Sortierung: Important (1) am Anfang ==> desc
     @Query("select * from ToDo order by toDo_IsDone asc, toDo_DoUntil asc, toDo_IsFavourite desc")
-    fun getAllToDosAsFlow_DateThenImportance(): Flow<List<ToDoItem>>
+    fun getAllToDosAsFlowByDateThenImportance(): Flow<List<ToDoItem>>
 
     // Sortierung: Erledigt (1) am Ende ==> asc
     // Sortierung: Important (1) am Anfang ==> desc
     // Sortierung: Datum aufsteigend ==> asc
     @Query("select * from ToDo order by toDo_IsDone asc, toDo_IsFavourite desc, toDo_DoUntil asc")
-    fun getAllToDosAsFlow_ImportanceThenDate(): Flow<List<ToDoItem>>
+    fun getAllToDosAsFlowByImportanceThenDate(): Flow<List<ToDoItem>>
 
-    @Query("select * from ToDo_Contact where toDo_Id = :toDoItemID")
-    fun getAllContacts(toDoItemID: Long): Flow<List<ToDoContact>>
+    // Es scheint zu einem Problem zu kommen, wenn ich keine Klammern verwende ==> Abstürze !
+    @Query("select * from ToDo_Contact where (toDo_Id = :toDoItemID) AND (toDoContact_State <> :action)")
+    fun getAllContacts(
+        toDoItemID: Long,
+        action: Int = ContactState.Deleted.ordinal
+    ): Flow<List<ToDoContact>>
 }

@@ -8,8 +8,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.daos.ToDoDao
@@ -59,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
 
         val applicationScope = CoroutineScope(SupervisorJob())
-        this.db = ToDoDatabase.getInstance(this, applicationScope).toToDao
+        this.db = ToDoDatabase.getInstance(this).toToDao
 
         checkPermission(Manifest.permission.READ_CONTACTS,100)
     }

@@ -18,13 +18,13 @@ data class ToDoGroupWithToDos(
     )
     val toDos: List<ToDoItem>
 )
+*/
 
-
-data class ToDosWithToDoContacts(
+data class ToDosItemsWithContacts(
     @Embedded val toDoItem: ToDoItem,
     @Relation(
         parentColumn = "toDo_Id",
         entityColumn = "toDo_Id"
     )
     val toDoContacts: List<ToDoContact>
-)*/
+)

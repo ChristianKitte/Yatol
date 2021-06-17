@@ -4,12 +4,6 @@ import androidx.room.*
 
 @Entity(
     tableName = "ToDo_Contact",
-    foreignKeys = [ForeignKey(
-        entity = ToDoItem::class,
-        parentColumns = arrayOf("toDo_Id"),
-        childColumns = arrayOf("toDo_Id"),
-        onDelete = ForeignKey.CASCADE
-    )],
     indices = arrayOf(
         Index(
             value = ["toDoContact_Id"],

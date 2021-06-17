@@ -1,6 +1,5 @@
 package de.ckitte.myapplication.startup
 
-import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -60,7 +59,7 @@ class LogInActivity : AppCompatActivity() {
         setContentView(view)
 
         val applicationScope = CoroutineScope(SupervisorJob())
-        this.db = ToDoDatabase.getInstance(this, applicationScope).toToDao
+        this.db = ToDoDatabase.getInstance(this).toToDao
 
         _binding.etEmail.addTextChangedListener {
             _binding.tvEmailHint.isVisible = false
@@ -71,7 +70,7 @@ class LogInActivity : AppCompatActivity() {
             validateForm()
         }
 
-        _binding.etEmail.setOnFocusChangeListener { v, hasFocus ->
+        _binding.etEmail.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                 _binding.tvEmailHint.isVisible =
                     !EmailUtil.isValidEmail(_binding.etEmail.text.toString())
@@ -88,7 +87,7 @@ class LogInActivity : AppCompatActivity() {
 
             var isValid = false
             CoroutineScope(Dispatchers.IO).launch {
-                isValid = LoginProvider.Companion.LogIn(myCredentials)
+                isValid = LoginProvider.LogIn(myCredentials)
 
                 withContext(Dispatchers.Main) {
                     loginResultHandler(isValid)

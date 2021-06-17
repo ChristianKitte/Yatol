@@ -29,7 +29,7 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility "1.8"
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
@@ -93,4 +93,7 @@ dependencies {
 
     //Unterstützung für Firebase Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.0-native-mt'
+
+    //Coroutine Debugging
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-debug:1.4.0'
 }

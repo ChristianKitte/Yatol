@@ -10,7 +10,6 @@ import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.database.entities.ToDoGroup
 import de.ckitte.myapplication.database.entities.ToDoContact
-import kotlinx.coroutines.CoroutineScope
 
 @Database(
     entities = [
@@ -19,7 +18,7 @@ import kotlinx.coroutines.CoroutineScope
         ToDoContact::class
     ],
     exportSchema = false,
-    version = 6
+    version = 16
 )
 @TypeConverters(DateConverter::class)
 abstract class ToDoDatabase : RoomDatabase() {
@@ -30,8 +29,7 @@ abstract class ToDoDatabase : RoomDatabase() {
         private var instance: ToDoDatabase? = null
 
         fun getInstance(
-            context: Context,
-            scope: CoroutineScope
+            context: Context
         ): ToDoDatabase {
             return instance ?: synchronized(this) {
                 val newInstance = Room.databaseBuilder(

@@ -2,9 +2,13 @@ package de.ckitte.myapplication.viewadapter
 
 import android.app.Activity
 import android.content.ContentResolver
+import android.content.Intent
 import android.net.Uri
+import android.provider.ContactsContract
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -16,6 +20,7 @@ import de.ckitte.myapplication.model.EditToDoModel
 import de.ckitte.myapplication.model.ToDoListModel
 import de.ckitte.myapplication.util.getDisplayNameByUri
 import java.util.jar.Manifest
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 
 class ContactListViewAdapter(
     private val viewModel: EditToDoModel,

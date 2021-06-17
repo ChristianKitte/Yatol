@@ -12,7 +12,6 @@ import de.ckitte.myapplication.util.ConnectionLiveData
 import de.ckitte.myapplication.util.ContactState
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
-import kotlin.math.log
 
 class ToDoRepository(private val toDoDao: ToDoDao) {
     companion object StaticMembers {
@@ -199,21 +198,20 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
     // CRUD ToDoContacts
 
-
     @WorkerThread
     suspend fun addToDoContacts(vararg toDoContacts: ToDoContact) {
         val api = FirestoreApi()
 
         toDoContacts.forEach {
-            if (ConnectionLiveData.isConnected) {
-                val newID = toDoDao.addToDoContact(it)
+            toDoDao.addToDoContact(it)
 
-                val firestoreToDoGroup =
+            if (ConnectionLiveData.isConnected) {
+                val firestoreToDoContact =
                     FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
 
                 val insertedFirestoreToDoContact = api.insertToDoContact(
                     FirestoreApi.getToDoContactCollection,
-                    firestoreToDoGroup
+                    firestoreToDoContact
                 )
 
                 toDoDao.updateRemoteToDoContactId(
@@ -247,15 +245,15 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
                             firestoreToDoContact
                         )
 
-                        toDoDao.updateRemoteToDoGroupId(
+                        toDoDao.updateRemoteToDoContactId(
                             insertedFirestoreToDoContact.toDoContactID,
                             it.toDoContactId.toLong()
                         )
                     }
                 }
             }
-        } catch (d: Exception){
-            Log.println(Log.DEBUG,"Scheiße",d.toString())
+        } catch (d: Exception) {
+            Log.println(Log.DEBUG, "updateToDoContact", d.toString())
         }
     }
 
@@ -276,48 +274,48 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
             }
         }
     }
-/*
-    @WorkerThread
-    suspend fun markContactForAdd(vararg toDoContacts: ToDoContact) {
-        toDoContacts.forEach {
-            it.toDoContactState = ContactState.Added.ordinal
-            this.addToDoContacts(it)
-        }
-    }
-
-    @WorkerThread
-    suspend fun markContactForDelete(vararg toDoContacts: ToDoContact) {
-        toDoContacts.forEach {
-            it.toDoContactState = ContactState.Deleted.ordinal
-            this.updateToDoContact(it)
-        }
-    }
 
     @WorkerThread
     suspend fun commitContacts() {
         val contactsToDelete = toDoDao.getAllDeletedToDoContacts()
+        val contactsToAdd = toDoDao.getAllAddedToDoContacts()
 
         contactsToDelete.forEach {
             deleteToDoContacts(it)
         }
 
-        toDoDao.commitContacts()
+        contactsToAdd.forEach {
+            it.toDoContactState = ContactState.Save.ordinal
+            updateToDoContact(it)
+        }
     }
 
     @WorkerThread
     suspend fun rollbackContacts() {
-        toDoDao.rollbackContacts()
+        val contactsTouched = toDoDao.getAllTouchedToDoContacts()
+
+        contactsTouched.forEach {
+            when(it.toDoContactState){
+                ContactState.Added.ordinal -> {
+                    deleteToDoContacts(it)
+                }
+                ContactState.Deleted.ordinal -> {
+                    it.toDoContactState = ContactState.Save.ordinal
+                    updateToDoContact(it)
+                }
+            }
+        }
     }
-*/
+
     // Flow und Observer
 
     // Für die Verwendung mit Flow und zur Nutzung mit einem Observer
     // zwei Pattern. Hier: fun ohne suspend!
     fun getAllToDosAsFlow_DateThenImportance(): Flow<List<ToDoItem>> =
-        toDoDao.getAllToDosAsFlow_DateThenImportance()
+        toDoDao.getAllToDosAsFlowByDateThenImportance()
 
     fun getAllToDosAsFlow_ImportanceThenDate(): Flow<List<ToDoItem>> =
-        toDoDao.getAllToDosAsFlow_ImportanceThenDate()
+        toDoDao.getAllToDosAsFlowByImportanceThenDate()
 
     fun getAllContacts(toDoItemID: Long): Flow<List<ToDoContact>> =
         toDoDao.getAllContacts(toDoItemID)
@@ -345,10 +343,10 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         val lokalDs = getLokalToDosCount()
 
         if (lokalDs > 0) {
-            mirrorToRemote()
+            //mirrorToRemote()
         } else {
             // mirrorFromSample()
-            mirrorFromRemote()
+            //mirrorFromRemote()
         }
     }
 
@@ -360,6 +358,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         createSampleEntities()
     }
 
+    //mehr Zeit?
     suspend fun mirrorToRemote() {
         if (ConnectionLiveData.isConnected) {
             val api = FirestoreApi()

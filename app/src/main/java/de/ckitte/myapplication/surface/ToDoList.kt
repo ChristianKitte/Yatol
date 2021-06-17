@@ -2,9 +2,7 @@ package de.ckitte.myapplication.surface
 
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.app.ActionBar
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,11 +12,9 @@ import de.ckitte.myapplication.model.ToDoListModel
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.util.ListSort
 import de.ckitte.myapplication.database.ToDoDatabase
-import de.ckitte.myapplication.databinding.FragmentEditTodoBinding
 import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.FragmentTodoListBinding
 import de.ckitte.myapplication.login.LoginProvider
-import de.ckitte.myapplication.util.ConnectionLiveData
 import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter
 import kotlinx.coroutines.*
 
@@ -68,8 +64,7 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
 
         val dao = parentFragment?.let {
             ToDoDatabase.getInstance(
-                view.context,
-                it.lifecycleScope
+                view.context
             ).toToDao
         }
 

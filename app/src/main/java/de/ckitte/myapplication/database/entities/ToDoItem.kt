@@ -5,16 +5,6 @@ import java.time.LocalDateTime
 
 @Entity(
     tableName = "ToDo",
-    /*
-     Gruppen sind vorbereitet, werden aber aktuell in dieser Version
-     noch nicht unterstützt wegen Detailfragen
-
-    foreignKeys = [ForeignKey(
-        entity = ToDoGroup::class,
-        parentColumns = arrayOf("toDoGroup_Id"),
-        childColumns = arrayOf("toDoGroup_Id"),
-        onDelete = ForeignKey.CASCADE
-    )],*/
     indices = arrayOf(
         Index(
             value = ["toDo_Id"],

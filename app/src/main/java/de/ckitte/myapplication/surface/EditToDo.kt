@@ -1,30 +1,22 @@
 package de.ckitte.myapplication.surface
 
-import android.Manifest
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.database.Cursor
 import android.icu.util.Calendar
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.TimePicker
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.loader.app.LoaderManager
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -37,7 +29,6 @@ import de.ckitte.myapplication.model.EditToDoModel
 import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.util.getDisplayNameByUri
 import de.ckitte.myapplication.viewadapter.ContactListViewAdapter
-import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter
 import java.time.LocalDateTime
 
 class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateSetListener,
@@ -67,8 +58,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
         val dao = parentFragment?.let {
             ToDoDatabase.getInstance(
-                view.context,
-                it.lifecycleScope
+                view.context
             ).toToDao
         }
 
@@ -77,8 +67,6 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         _viewModel = toDoRepository?.let { EditToDoModel(it) }!!
         _binding = FragmentEditTodoBinding.bind(view)
 
-        //val granded= ContextCompat.checkSelfPermission(this.requireContext() ,Manifest.permission.READ_CONTACTS)
-        //val toDoListViewAdapter = ToDoListViewAdapter(viewModel)
         contactListViewAdapter = ContactListViewAdapter(_viewModel, activity?.contentResolver)
 
         _binding.apply {
@@ -193,7 +181,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
             Snackbar.make(view, "Der Eintrag wurde gelöscht", Snackbar.LENGTH_LONG).apply {
                 setAction("Abbruch") {
                     if (currentToDoItem != null) {
-                        _viewModel.addToDoItem(currentToDoItem)
+                        val addToDoItem = _viewModel.addToDoItem(currentToDoItem)
                     }
                 }
             }.show()
@@ -206,20 +194,9 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         }
 
         this._viewModel.toDoContacts.observe(viewLifecycleOwner) {
-            //Achtung: Ich habe lange gesucht. Problem: Zunächst TextView Höhe auf 0 gewesen
-            //dann das Fragment selbst nicht auf den Inhalt angepasst.
-            //Sehr böse Falle und nicht leicht aufzuspüren...
             contactListViewAdapter.submitList(it)
         }
     }
-
-    // https://cketti.de/2020/09/03/avoid-intent-resolveactivity/
-    // https://www.tutorialguruji.com/android/onactivityresult-method-is-deprecated-what-is-the-alternative/amp/
-
-    // https://www.programmersought.com/article/97174656608/
-    // https://www.programmersought.com/article/67577517589/
-
-    // https://code.tutsplus.com/tutorials/android-essentials-using-the-contact-picker--mobile-2017
 
     fun selectContact() {
         val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
@@ -229,14 +206,9 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
     var resultLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                // There are no request codes
                 val intent: Intent? = result.data
 
                 if (intent != null) {
-                    //intent.dataString?.let { Log.d("Contact", it) }
-                    //processContactData(Uri.parse(intent.dataString))
-                    //var contactName: String? = null
-
                     val uri = intent.data
                     uri?.let {
                         addToDoContact(uri)
@@ -289,6 +261,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val currentItemIndex = viewHolder.adapterPosition
             val currentItem = contactListViewAdapter.currentList[currentItemIndex]
+
             _viewModel.deleteToDoContact(currentItem)
 
             Snackbar.make(_binding.root, "Der Eintrag wurde gelöscht", Snackbar.LENGTH_LONG).apply {

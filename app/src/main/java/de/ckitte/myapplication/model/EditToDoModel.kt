@@ -8,19 +8,19 @@ import androidx.lifecycle.viewModelScope
 import de.ckitte.myapplication.database.entities.ToDoContact
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.repository.ToDoRepository
+import de.ckitte.myapplication.util.ContactState
 import de.ckitte.myapplication.util.getDisplayNameByUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
-    val toDoRepository = toDoDao
+    private val toDoRepository = toDoDao
 
-    private val currencyFlow = MutableStateFlow(0);
+    private val contactFilter = MutableStateFlow(0);
 
-    var toDoContacts = currencyFlow.flatMapLatest { currentCurrency ->
+    var toDoContacts = contactFilter.flatMapLatest { currentCurrency ->
         // In case they return different types
         when (currentCurrency) {
             // Assuming all of these database calls return a Flow
@@ -50,7 +50,6 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
     }
 
     fun getCurrentToDoItem(): ToDoItem? {
-        //currencyFlow.value=ToDoRepository.getCurrentToDoItem()?.toDoId!!
         return ToDoRepository.getCurrentToDoItem()
     }
 
@@ -59,19 +58,21 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
     }
 
     fun addToDoContact(toDoContact: ToDoContact) = viewModelScope.launch {
-        //toDoDao.markContactForAdd(toDoContact)
+        toDoContact.toDoContactState = ContactState.Added.ordinal
+        toDoDao.addToDoContacts(toDoContact)
     }
 
     fun deleteToDoContact(toDoContact: ToDoContact) = viewModelScope.launch {
-        //toDoDao.markContactForDelete(toDoContact)
+        toDoContact.toDoContactState = ContactState.Deleted.ordinal
+        toDoDao.updateToDoContact(toDoContact)
     }
 
     fun commitContacts(toDoItem: ToDoItem) = viewModelScope.launch {
-        //toDoDao.commitContacts()
+        toDoDao.commitContacts()
     }
 
     fun rollbackContacts(toDoItem: ToDoItem) = viewModelScope.launch {
-        //toDoDao.rollbackContacts()
+        toDoDao.rollbackContacts()
     }
 
     fun getDisplayName(uri: Uri, contentResolver: ContentResolver?): String {
