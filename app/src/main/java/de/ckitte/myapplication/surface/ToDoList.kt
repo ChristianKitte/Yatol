@@ -32,11 +32,6 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_list, menu)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.mi_sort_date -> {

@@ -62,6 +62,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
         toDos.forEach {
             val newID = toDoDao.addToDoItem(it)
+            it.toDoId=newID.toInt()
+            setCurrentToDoItem(it)
 
             if (ConnectionLiveData.isConnected) {
                 val firestoreToDoItem = FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
@@ -82,6 +84,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
         toDos.forEach {
             toDoDao.updateToDoItem(it)
+            setCurrentToDoItem(it)
 
             if (ConnectionLiveData.isConnected) {
                 val firestoreToDoItem = FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
@@ -109,6 +112,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     @WorkerThread
     suspend fun deleteToDoItem(vararg toDos: ToDoItem) {
         val api = FirestoreApi()
+        setCurrentToDoItem(getNewToDoItem())
 
         toDos.forEach {
             toDoDao.deleteToDoItem(it)
@@ -295,7 +299,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         val contactsTouched = toDoDao.getAllTouchedToDoContacts()
 
         contactsTouched.forEach {
-            when(it.toDoContactState){
+            when (it.toDoContactState) {
                 ContactState.Added.ordinal -> {
                     deleteToDoContacts(it)
                 }

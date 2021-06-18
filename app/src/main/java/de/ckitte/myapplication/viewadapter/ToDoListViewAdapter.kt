@@ -50,7 +50,7 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
                 setTitleColor(toDo)
                 setFavouriteIcon()
 
-                fabEdit.setOnClickListener {
+                btnEdit.setOnClickListener {
                     viewModel.setCurrentToDoItem(toDo)
                     it.findNavController().navigate(R.id.action_toDoList_to_editToDo)
                 }

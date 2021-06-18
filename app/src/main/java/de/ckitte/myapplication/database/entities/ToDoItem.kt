@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 data class ToDoItem(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "toDo_Id")
-    val toDoId: Int,
+    var toDoId: Int,
     @ColumnInfo(name = "toDo_RemoteId")
     var toDoRemoteId: String,
     @ColumnInfo(name = "toDo_Title")

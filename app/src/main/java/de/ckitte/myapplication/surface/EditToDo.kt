@@ -15,21 +15,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.TimePicker
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
+import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.databinding.FragmentEditTodoBinding
 import de.ckitte.myapplication.model.EditToDoModel
 import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.util.getDisplayNameByUri
 import de.ckitte.myapplication.viewadapter.ContactListViewAdapter
 import java.time.LocalDateTime
+import kotlin.time.Duration
 
 class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener {
@@ -136,29 +140,9 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         setUpCalender()
 
         _binding.btnSave.setOnClickListener {
-            if (currentToDoItem != null) {
-                _binding.apply {
-                    currentToDoItem.apply {
-                        toDoTitle = etTitle.text.toString()
-                        toDoDescription = etDescription.text.toString()
-
-                        toDoDoUntil = LocalDateTime.of(
-                            currentYear,
-                            currentMonth,
-                            currentDay,
-                            currentHour,
-                            currentMinute
-                        )
-
-                        toDoIsDone = checkIsDone.isChecked
-                        toDoIsFavourite = checkIsFavourite.isChecked
-
-                        _viewModel.updateToDoItem(currentToDoItem)
-                    }
-                }
+            currentToDoItem?.let {
+                saveCurrentToDo(it)
             }
-
-            it.findNavController().navigate(R.id.action_editToDo_to_toDoListFragment)
         }
 
         _binding.btnBack.setOnClickListener {
@@ -170,23 +154,18 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         }
 
         _binding.btnContacts.setOnClickListener {
-            selectContact()
+            currentToDoItem?.let {
+                when (it.toDoId) {
+                    0 -> confirmSaveBeforeAddContact(it)
+                    else -> selectContact()
+                }
+            }
         }
 
         _binding.btnDelete.setOnClickListener {
-            if (currentToDoItem != null) {
-                _viewModel.deleteToDoItem(currentToDoItem)
+            currentToDoItem?.let {
+                confirmToDoDelete(it)
             }
-
-            Snackbar.make(view, "Der Eintrag wurde gelöscht", Snackbar.LENGTH_LONG).apply {
-                setAction("Abbruch") {
-                    if (currentToDoItem != null) {
-                        val addToDoItem = _viewModel.addToDoItem(currentToDoItem)
-                    }
-                }
-            }.show()
-
-            it.findNavController().navigate(R.id.action_editToDo_to_toDoListFragment)
         }
 
         ItemTouchHelper(ItemTouchHelperCallback).apply {
@@ -195,6 +174,67 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
         this._viewModel.toDoContacts.observe(viewLifecycleOwner) {
             contactListViewAdapter.submitList(it)
+        }
+    }
+
+    fun confirmSaveBeforeAddContact(currentToDoItem: ToDoItem) {
+        this.context?.let {
+            MaterialAlertDialogBuilder(it)
+                .setTitle("Eintrag speichern?")
+                .setMessage("Bevor ein Kontakt hinzugefügt werden kann, muss der Eintrag gespeichert werden.")
+
+                .setNegativeButton("Abbrechen") { _, _ ->
+                    // Respond to negative button press
+                }
+                .setPositiveButton("Speichern") { _, _ ->
+                    saveCurrentToDo(currentToDoItem)
+                    selectContact()
+                }
+                .show()
+        }
+    }
+
+    fun confirmToDoDelete(currentToDoItem: ToDoItem) {
+        this.context?.let {
+            MaterialAlertDialogBuilder(it)
+                .setTitle("Eintrag löschen?")
+                .setMessage("Soll der Eintrag wirklich gelöscht werden?")
+
+                .setNegativeButton("Abbrechen") { _, _ ->
+                    // Respond to negative button press
+                }
+                .setPositiveButton("Löschen") { _, _ ->
+                    _viewModel.deleteToDoItem(currentToDoItem)
+                    _binding.root.findNavController()
+                        .navigate(R.id.action_editToDo_to_toDoListFragment)
+                }
+                .show()
+        }
+    }
+
+    fun saveCurrentToDo(currentToDoItem: ToDoItem) {
+        currentToDoItem?.let {
+            _binding.apply {
+                currentToDoItem.apply {
+                    toDoTitle = etTitle.text.toString()
+                    toDoDescription = etDescription.text.toString()
+
+                    toDoDoUntil = LocalDateTime.of(
+                        currentYear,
+                        currentMonth,
+                        currentDay,
+                        currentHour,
+                        currentMinute
+                    )
+
+                    toDoIsDone = checkIsDone.isChecked
+                    toDoIsFavourite = checkIsFavourite.isChecked
+
+                    _viewModel.updateToDoItem(it)
+
+                    Toast.makeText(context, "Eintrag wurde gespeichert", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -212,18 +252,6 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
                     val uri = intent.data
                     uri?.let {
                         addToDoContact(uri)
-
-                        activity?.contentResolver.let {
-                            it?.let {
-                                val displayName = getDisplayNameByUri(uri, it)
-
-                                Snackbar.make(
-                                    _binding.root,
-                                    "$displayName wurde dem Eintrag als Kontakt hinzugefügt !",
-                                    Snackbar.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
                     }
                 }
             }
