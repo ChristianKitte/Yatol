@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         this.db = ToDoDatabase.getInstance(this).toToDao
 
         checkPermission(Manifest.permission.READ_CONTACTS,100)
+        checkPermission(Manifest.permission.CALL_PHONE,110)
     }
 
     private fun configureActionBar(titel: String, subtitle: String) {

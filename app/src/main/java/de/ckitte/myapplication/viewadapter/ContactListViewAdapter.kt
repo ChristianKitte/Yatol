@@ -1,30 +1,25 @@
 package de.ckitte.myapplication.viewadapter
 
-import android.app.Activity
 import android.content.ContentResolver
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
-import android.provider.ContactsContract
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import de.ckitte.myapplication.database.entities.ToDoContact
 import de.ckitte.myapplication.databinding.FragmentContactListitemBinding
 import de.ckitte.myapplication.model.EditToDoModel
-import de.ckitte.myapplication.model.ToDoListModel
-import de.ckitte.myapplication.util.getDisplayNameByUri
-import java.util.jar.Manifest
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import okio.Options
 
 class ContactListViewAdapter(
     private val viewModel: EditToDoModel,
-    private val contentResolver: ContentResolver?
+    private val contentResolver: ContentResolver?,
+    private val packageManager: PackageManager?,
+    private val parentFragment: Fragment
 ) :
     ListAdapter<ToDoContact, ContactListViewAdapter.ContactViewHolder>(ContactComparator()) {
 
@@ -36,7 +31,13 @@ class ContactListViewAdapter(
                 false
             )
 
-        return ContactViewHolder(binding, viewModel, contentResolver)
+        return ContactViewHolder(
+            binding,
+            viewModel,
+            contentResolver,
+            packageManager,
+            parentFragment
+        )
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
@@ -46,8 +47,10 @@ class ContactListViewAdapter(
 
     class ContactViewHolder(
         private val binding: FragmentContactListitemBinding,
-        private var viewModel: EditToDoModel,
-        private var contentResolver: ContentResolver?
+        private val viewModel: EditToDoModel,
+        private val contentResolver: ContentResolver?,
+        private val packageManager: PackageManager?,
+        private val parentFragment: Fragment
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -59,25 +62,58 @@ class ContactListViewAdapter(
 
                     tvContact.text = viewModel.getDisplayName(uri, contentResolver!!)
                     //tvContact.text = getDisplayNameByUri(uri, contentResolver!!)
+
+
+
+
                 } else {
                     tvContact.text = contact.toDoContactHostId
                 }
 
                 btnCall.setOnClickListener {
-                    Snackbar.make(
-                        root,
-                        "Call !",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    callContact("05418603498", "Der Titel")
                 }
 
                 btnMail.setOnClickListener {
-                    Snackbar.make(
-                        root,
-                        "Mail !",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    var title = "Kein Titel"
+                    var anrede = "Hallo ${tvContact.text.toString()}"
+
+                    viewModel.getCurrentToDoItem()?.let {
+                        title = "${it.toDoTitle} am ${it.toDoDoUntil.toLocalDate()}"
+                    }
+
+                    sendEmail(
+                        arrayOf<String>("chkitte@web.de"),
+                        title, anrede, title
+                    )
                 }
+            }
+        }
+
+        fun callContact(number: String, title: String) {
+            val intent = Intent(Intent.ACTION_DIAL).apply {
+                data = Uri.parse("tel:${number}")
+                putExtra(Intent.EXTRA_TITLE, title)
+            }
+
+            if (packageManager?.let { intent.resolveActivity(it) } != null) {
+                parentFragment.startActivity(intent)
+            }
+        }
+
+        fun sendEmail(addresses: Array<String>, subject: String, text: String, title: String) {
+            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:") // only email apps should handle this
+                //z.B. "chkitte@web.de"
+                //arrayOf<String>("chkitte@web.de")
+                putExtra(Intent.EXTRA_EMAIL, addresses)
+                putExtra(Intent.EXTRA_SUBJECT, subject)
+                putExtra(Intent.EXTRA_TEXT, text)
+                putExtra(Intent.EXTRA_TITLE, title)
+            }
+
+            if (packageManager?.let { intent.resolveActivity(it) } != null) {
+                parentFragment.startActivity(intent)
             }
         }
     }

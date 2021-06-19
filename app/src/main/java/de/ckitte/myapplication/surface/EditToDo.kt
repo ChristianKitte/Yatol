@@ -17,6 +17,7 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -71,7 +72,10 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         _viewModel = toDoRepository?.let { EditToDoModel(it) }!!
         _binding = FragmentEditTodoBinding.bind(view)
 
-        contactListViewAdapter = ContactListViewAdapter(_viewModel, activity?.contentResolver)
+        contactListViewAdapter = ContactListViewAdapter(
+            _viewModel, activity?.contentResolver,
+            this.activity?.packageManager, this
+        )
 
         _binding.apply {
             rvContacts.apply {
@@ -261,7 +265,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         val newContact = _viewModel.getNewToDoContact()
         val currentToDoItem = _viewModel.getCurrentToDoItem()
 
-        if (newContact != null && currentToDoItem != null) {
+        if (currentToDoItem != null) {
             newContact.apply {
                 toDoContactId = 0
                 toDoContactRemoteId = ""
