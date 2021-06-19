@@ -8,8 +8,7 @@ import androidx.lifecycle.viewModelScope
 import de.ckitte.myapplication.database.entities.ToDoContact
 import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.repository.ToDoRepository
-import de.ckitte.myapplication.util.ContactState
-import de.ckitte.myapplication.util.getDisplayNameByUri
+import de.ckitte.myapplication.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -77,5 +76,13 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
 
     fun getDisplayName(uri: Uri, contentResolver: ContentResolver?): String {
         return getDisplayNameByUri(uri, contentResolver!!)
+    }
+
+    fun getPhoneNumber(uri: Uri, contentResolver: ContentResolver?): String {
+        return getPhoneNumberByUri(uri, contentResolver!!)
+    }
+
+    fun getEmailAdress(uri: Uri, contentResolver: ContentResolver?): String {
+        return getEmailAdressByUri(uri, contentResolver!!)
     }
 }

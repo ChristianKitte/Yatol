@@ -53,6 +53,8 @@ class ContactListViewAdapter(
         private val parentFragment: Fragment
     ) :
         RecyclerView.ViewHolder(binding.root) {
+        private lateinit var currentPhoneNumber: String
+        private lateinit var currentEmail: String
 
         fun bind(contact: ToDoContact) {
             binding.apply {
@@ -63,28 +65,42 @@ class ContactListViewAdapter(
                     tvContact.text = viewModel.getDisplayName(uri, contentResolver!!)
                     //tvContact.text = getDisplayNameByUri(uri, contentResolver!!)
 
+                    currentPhoneNumber = viewModel.getPhoneNumber(uri, contentResolver!!)
+                    if (currentPhoneNumber.isEmpty()) {
+                        this.btnCall.isEnabled = false
+                    }
 
-
-
+                    currentEmail = viewModel.getEmailAdress(uri, contentResolver!!)
+                    if (currentEmail.isEmpty()) {
+                        this.btnMail.isEnabled = false
+                    }
                 } else {
                     tvContact.text = contact.toDoContactHostId
                 }
 
                 btnCall.setOnClickListener {
-                    callContact("05418603498", "Der Titel")
+                    var title = "Kein Titel"
+
+                    viewModel.getCurrentToDoItem()?.let {
+                        title = "${it.toDoTitle} am ${it.toDoDoUntil.toLocalDate()}"
+                    }
+
+                    callContact(currentPhoneNumber, title)
                 }
 
                 btnMail.setOnClickListener {
                     var title = "Kein Titel"
-                    var anrede = "Hallo ${tvContact.text.toString()}"
+                    val anrede = "Hallo ${tvContact.text.toString()}"
 
                     viewModel.getCurrentToDoItem()?.let {
                         title = "${it.toDoTitle} am ${it.toDoDoUntil.toLocalDate()}"
                     }
 
                     sendEmail(
-                        arrayOf<String>("chkitte@web.de"),
-                        title, anrede, title
+                        arrayOf<String>(currentEmail),
+                        title,
+                        anrede,
+                        title
                     )
                 }
             }
