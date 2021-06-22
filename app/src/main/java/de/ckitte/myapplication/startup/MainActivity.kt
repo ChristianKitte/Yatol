@@ -59,8 +59,8 @@ class MainActivity : AppCompatActivity() {
         val applicationScope = CoroutineScope(SupervisorJob())
         this.db = ToDoDatabase.getInstance(this).toToDao
 
-        checkPermission(Manifest.permission.READ_CONTACTS,100)
-        checkPermission(Manifest.permission.CALL_PHONE,110)
+        checkPermission(Manifest.permission.READ_CONTACTS, 100)
+        checkPermission(Manifest.permission.CALL_PHONE, 110)
     }
 
     private fun configureActionBar(titel: String, subtitle: String) {
@@ -90,21 +90,28 @@ class MainActivity : AppCompatActivity() {
 
         return when (item.itemId) {
             R.id.miCleanLokal -> {
+                showToast("Starte das Löschen der lokalen Daten")
+
                 CoroutineScope(Dispatchers.IO).launch {
                     ToDoRepository(db).emptyLokalDatabase()
+                    withContext(Dispatchers.Main) {
+                        showToast("Die lokalen Daten wurden gelöscht")
+                    }
                 }
-
-                showToast("Die lokalen Daten werden gelöscht")
 
                 true
             }
             R.id.miCleanRemote -> {
                 if (ConnectionLiveData.isConnected && LoginProvider.isLoggedIn()) {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        ToDoRepository(db).emptyRemoteDatabase()
-                    }
+                    showToast("Starte das Löschen der Remotedaten")
 
-                    showToast("Die Remotedaten werden gelöscht")
+                    CoroutineScope(Dispatchers.IO).launch {
+
+                        ToDoRepository(db).emptyRemoteDatabase()
+                        withContext(Dispatchers.Main) {
+                            showToast("Die Remotedaten wurden gelöscht")
+                        }
+                    }
                 } else {
                     if (!ConnectionLiveData.isConnected) {
                         showToast("Kein Netzwerk - Die Remotedaten können nicht gelöscht werden")
@@ -117,11 +124,16 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.miMirrorToRemote -> {
                 if (ConnectionLiveData.isConnected && LoginProvider.isLoggedIn()) {
+                    showToast("Die lokalen Daten werden in Firestore gesichert")
+
                     CoroutineScope(Dispatchers.IO).launch {
                         ToDoRepository(db).mirrorToRemote()
+                        withContext(Dispatchers.Main) {
+                            showToast("Die lokalen Daten wurden in Firestore gesichert")
+                        }
                     }
 
-                    showToast("Die lokalen Daten werden in Firestore gesichert")
+
                 } else {
                     if (!ConnectionLiveData.isConnected) {
                         showToast("Kein Netzwerk - Die lokalen Daten können nicht in Firestore gesichert werden")
@@ -134,11 +146,16 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.miMirrorFromRemote -> {
                 if (ConnectionLiveData.isConnected && LoginProvider.isLoggedIn()) {
+                    showToast("Daten werden aus Firestore geladen")
+
                     CoroutineScope(Dispatchers.IO).launch {
                         ToDoRepository(db).mirrorFromRemote()
+                        withContext(Dispatchers.Main) {
+                            showToast("Die Daten wurden aus Firestore geladen")
+                        }
                     }
 
-                    showToast("Daten werden aus Firestore geladen")
+
                 } else {
                     if (!ConnectionLiveData.isConnected) {
                         showToast("Kein Netzwerk - Daten können nicht aus Firestore geladen werden")
@@ -155,7 +172,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun showToast(text: String) {
+    private fun showToast(text: String) {
         Toast.makeText(
             applicationContext,
             text,
@@ -165,7 +182,11 @@ class MainActivity : AppCompatActivity() {
 
     // Function to check and request permission.
     private fun checkPermission(permission: String, requestCode: Int) {
-        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_DENIED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                permission
+            ) == PackageManager.PERMISSION_DENIED
+        ) {
 
             // Requesting the permission
             ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)

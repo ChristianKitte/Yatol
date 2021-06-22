@@ -13,7 +13,9 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8sp"
         android:drawablePadding="5sp"
+        android:hint="Titel"
         android:paddingStart="2sp"
+        android:paddingTop="20dp"
         android:text="TextView"
         android:textSize="15sp" />
 
@@ -22,6 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5sp"
+        android:hint="Beschreibung"
         android:paddingStart="12sp"
         android:text="TextView"
         android:textSize="13sp" />

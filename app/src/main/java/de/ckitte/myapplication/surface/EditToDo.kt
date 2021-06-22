@@ -181,6 +181,8 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         }
     }
 
+    //region Confirm Dialogs
+
     fun confirmSaveBeforeAddContact(currentToDoItem: ToDoItem) {
         this.context?.let {
             MaterialAlertDialogBuilder(it)
@@ -215,6 +217,8 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
                 .show()
         }
     }
+
+    //endregion
 
     fun saveCurrentToDo(currentToDoItem: ToDoItem) {
         currentToDoItem?.let {
@@ -280,7 +284,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
     val ItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
         ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ItemTouchHelper.LEFT
     ) {
         override fun onMove(
             recyclerView: RecyclerView,
@@ -294,15 +298,14 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
             val currentItemIndex = viewHolder.adapterPosition
             val currentItem = contactListViewAdapter.currentList[currentItemIndex]
 
-            _viewModel.deleteToDoContact(currentItem)
+            if (direction == ItemTouchHelper.LEFT) {
+                _viewModel.deleteToDoContact(currentItem)
+            }
 
-            Snackbar.make(_binding.root, "Der Eintrag wurde gelöscht", Snackbar.LENGTH_LONG).apply {
-                setAction("Abbruch") {
-                    _viewModel.addToDoContact(currentItem)
-                }
-            }.show()
         }
     }
+
+    //region Edit Date and Time
 
     private fun setUpCalender() {
         _binding.tvDoUntil.setOnClickListener {
@@ -347,4 +350,6 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
         _binding.tvDoUntil.text = getDoUntilString()
     }
+
+    //endregion
 }

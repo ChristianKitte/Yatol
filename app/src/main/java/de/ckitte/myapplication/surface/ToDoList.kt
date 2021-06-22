@@ -7,11 +7,13 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import de.ckitte.myapplication.model.ToDoListModel
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.util.ListSort
 import de.ckitte.myapplication.database.ToDoDatabase
+import de.ckitte.myapplication.database.entities.ToDoItem
 import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.FragmentTodoListBinding
 import de.ckitte.myapplication.login.LoginProvider
@@ -127,9 +129,9 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         }
     }
 
-    val ItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+    private val ItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
         ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-        ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ItemTouchHelper.LEFT
     ) {
         override fun onMove(
             recyclerView: RecyclerView,
@@ -142,13 +144,10 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val currentItemIndex = viewHolder.adapterPosition
             val currentItem = toDoListViewAdapter.currentList[currentItemIndex]
-            viewModel.deleteToDoItem(currentItem)
 
-            Snackbar.make(_binding.root, "Der Eintrag wurde gelöscht", Snackbar.LENGTH_LONG).apply {
-                setAction("Abbruch") {
-                    viewModel.addToDoItem(currentItem)
-                }
-            }.show()
+            if (direction == ItemTouchHelper.LEFT) {
+                viewModel.deleteToDoItem(currentItem)
+            }
         }
     }
 }

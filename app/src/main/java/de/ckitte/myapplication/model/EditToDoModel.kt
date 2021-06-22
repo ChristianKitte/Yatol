@@ -12,6 +12,7 @@ import de.ckitte.myapplication.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 
 class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {

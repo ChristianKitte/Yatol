@@ -62,7 +62,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
 
         toDos.forEach {
             val newID = toDoDao.addToDoItem(it)
-            it.toDoId=newID.toInt()
+            it.toDoId = newID.toInt()
             setCurrentToDoItem(it)
 
             if (ConnectionLiveData.isConnected) {
@@ -207,7 +207,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         val api = FirestoreApi()
 
         toDoContacts.forEach {
-            toDoDao.addToDoContact(it)
+            val newID = toDoDao.addToDoContact(it)
+            it.toDoContactId = newID.toInt()
 
             if (ConnectionLiveData.isConnected) {
                 val firestoreToDoContact =

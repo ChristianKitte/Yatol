@@ -18,7 +18,7 @@ import de.ckitte.myapplication.database.entities.ToDoContact
         ToDoContact::class
     ],
     exportSchema = false,
-    version = 16
+    version = 17
 )
 @TypeConverters(DateConverter::class)
 abstract class ToDoDatabase : RoomDatabase() {
