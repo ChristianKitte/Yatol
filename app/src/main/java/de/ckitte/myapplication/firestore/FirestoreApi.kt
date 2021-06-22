@@ -5,176 +5,123 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import de.ckitte.myapplication.firestore.firestoreEntities.FirestoreToDoContact
-import de.ckitte.myapplication.firestore.firestoreEntities.FirestoreToDoGroup
-import de.ckitte.myapplication.firestore.firestoreEntities.FirestoreToDoItem
+import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDoContact
+import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDo
 import kotlinx.coroutines.tasks.await
 
 class FirestoreApi {
     var db = FirebaseFirestore.getInstance()
 
     companion object {
-        val defaultGroupID: String = "default"
-
-        val getToDoItemCollection = "ToDoItems"
-        val getToDoGroupCollection = "Groups"
-        val getToDoContactCollection = "Contacts"
+        val getToDoRemoteCollection = "ToDoItems"
+        val getToDoContactRemoteCollection = "Contacts"
     }
 
     // CRUD ToDoItem
 
-    suspend fun insertToDoItem(
+    suspend fun insertToDoRemoteItem(
         collection: String,
-        firestoreToDoItem: FirestoreToDoItem
-    ): FirestoreToDoItem {
+        remoteToDo: RemoteToDo
+    ): RemoteToDo {
         val targetCollection = Firebase.firestore.collection(collection)
         var newID: String = ""
 
         // soll explizit blocken !
-        targetCollection.add(firestoreToDoItem).addOnSuccessListener {
-            firestoreToDoItem.toDoId = it.id
+        targetCollection.add(remoteToDo).addOnSuccessListener {
+            remoteToDo.toDoRemoteId = it.id
         }.await()
 
-        return firestoreToDoItem
+        return remoteToDo
     }
 
-    suspend fun updateToDoItem(
+    suspend fun updateToDoRemoteItem(
         collection: String,
-        firestoreToDoItem: FirestoreToDoItem
+        remoteToDo: RemoteToDo
     ) {
         val targetCollection = Firebase.firestore.collection(collection)
 
-        val map = getMutableMapFromToDoItem(firestoreToDoItem)
-        targetCollection.document(firestoreToDoItem.toDoId).set(map, SetOptions.merge()).await()
-    }
-
-    private fun getMutableMapFromToDoItem(firestoreToDoItem: FirestoreToDoItem): MutableMap<String, Any> {
-        val map = mutableMapOf<String, Any>()
-
-        map["toDoId"] = firestoreToDoItem.toDoId
-        map["toDoTitle"] = firestoreToDoItem.toDoTitle
-        map["toDoDescription"] = firestoreToDoItem.toDoDescription
-        map["toDoIsDone"] = firestoreToDoItem.toDoIsDone
-        map["toDoIsFavourite"] = firestoreToDoItem.toDoIsFavourite
-        map["toDoDoUntil"] = firestoreToDoItem.toDoDoUntil
-        map["toDoGroupId"] = defaultGroupID
-        map["user"] = firestoreToDoItem.user
-
-        return map
-    }
-
-    suspend fun deleteToDoItem(
-        collection: String,
-        firestoreToDoItem: FirestoreToDoItem
-    ) {
-        val targetCollection = Firebase.firestore.collection(collection)
-        targetCollection.document(firestoreToDoItem.toDoId).delete().await()
-    }
-
-    // CRUD ToDoGroupItem
-
-    suspend fun insertToDoGroup(
-        collection: String,
-        firestoreToDoGroup: FirestoreToDoGroup
-    ): FirestoreToDoGroup {
-        val targetCollection = Firebase.firestore.collection(collection)
-        var newID: String = ""
-
-        // soll explizit blocken !
-        targetCollection.add(firestoreToDoGroup).addOnSuccessListener {
-            firestoreToDoGroup.toDoGroupId = it.id
-        }.await()
-
-        return firestoreToDoGroup
-    }
-
-    suspend fun updateToDoGroup(
-        collection: String,
-        firestoreToDoGroup: FirestoreToDoGroup
-    ) {
-        val targetCollection = Firebase.firestore.collection(collection)
-
-        val map = getMutableMapFromToDoGrup(firestoreToDoGroup)
-        targetCollection.document(firestoreToDoGroup.toDoGroupId).set(map, SetOptions.merge())
+        val map = getMutableMapFromToDoRemoteItem(remoteToDo)
+        targetCollection.document(remoteToDo.toDoRemoteId).set(map, SetOptions.merge())
             .await()
     }
 
-    private fun getMutableMapFromToDoGrup(firestoreToDoGroup: FirestoreToDoGroup): MutableMap<String, Any> {
+    private fun getMutableMapFromToDoRemoteItem(remoteToDo: RemoteToDo): MutableMap<String, Any> {
         val map = mutableMapOf<String, Any>()
 
-        map["toDoGroupId"] = firestoreToDoGroup.toDoGroupId
-        map["toDoGroupIsDefault"] = firestoreToDoGroup.toDoGroupIsDefault
-        map["toDoGroupTitle"] = firestoreToDoGroup.toDoGroupTitle
-        map["toDoGroupDescription"] = firestoreToDoGroup.toDoGroupDescription
-        map["user"] = firestoreToDoGroup.user
+        map["toDoRemoteId"] = remoteToDo.toDoRemoteId
+        map["toDoRemoteTitle"] = remoteToDo.toDoRemoteTitle
+        map["toDoRemoteDescription"] = remoteToDo.toDoRemoteDescription
+        map["toDoRemoteIsDone"] = remoteToDo.toDoRemoteIsDone
+        map["toDoRemoteIsFavourite"] = remoteToDo.toDoRemoteIsFavourite
+        map["toDoRemoteDoUntil"] = remoteToDo.toDoRemoteDoUntil
+        map["toDoRemoteUser"] = remoteToDo.toDoRemoteUser
 
         return map
     }
 
-    suspend fun deleteToDoGroup(
+    suspend fun deleteToDoRemoteItem(
         collection: String,
-        firestoreToDoGroup: FirestoreToDoGroup
+        remoteToDo: RemoteToDo
     ) {
         val targetCollection = Firebase.firestore.collection(collection)
-        targetCollection.document(firestoreToDoGroup.toDoGroupId).delete().await()
+        targetCollection.document(remoteToDo.toDoRemoteId).delete().await()
     }
 
     // CRUD ToDoContacts
 
     suspend fun insertToDoContact(
         collection: String,
-        firestoreToDoContact: FirestoreToDoContact
-    ): FirestoreToDoContact {
+        remoteToDoContact: RemoteToDoContact
+    ): RemoteToDoContact {
         val targetCollection = Firebase.firestore.collection(collection)
         var newID: String = ""
 
         // soll explizit blocken !
-        targetCollection.add(firestoreToDoContact).addOnSuccessListener {
-            firestoreToDoContact.toDoContactID = it.id
+        targetCollection.add(remoteToDoContact).addOnSuccessListener {
+            remoteToDoContact.toDoContactRemoteID = it.id
         }.await()
 
-        return firestoreToDoContact
+        return remoteToDoContact
     }
 
     suspend fun updateToDoContact(
         collection: String,
-        firestoreToDoContact: FirestoreToDoContact
+        remoteToDoContact: RemoteToDoContact
     ) {
         val targetCollection = Firebase.firestore.collection(collection)
 
-        val map = getMutableMapFromToDoItemContact(firestoreToDoContact)
-        targetCollection.document(firestoreToDoContact.toDoContactID).set(map, SetOptions.merge())
+        val map = getMutableMapFromToDoItemContact(remoteToDoContact)
+        targetCollection.document(remoteToDoContact.toDoContactRemoteID)
+            .set(map, SetOptions.merge())
             .await()
     }
 
-    private fun getMutableMapFromToDoItemContact(firestoreToDoContact: FirestoreToDoContact): MutableMap<String, Any> {
+    private fun getMutableMapFromToDoItemContact(remoteToDoContact: RemoteToDoContact): MutableMap<String, Any> {
         val map = mutableMapOf<String, Any>()
 
-        map["toDoId"] = firestoreToDoContact.toDoId
-        map["toDoContactID"] = firestoreToDoContact.toDoContactID
-        map["toDoHostID"] = firestoreToDoContact.toDoHostID
-        map["user"] = firestoreToDoContact.user
+        map["toDoRemoteId"] = remoteToDoContact.toDoRemoteId
+        map["toDoContactRemoteID"] = remoteToDoContact.toDoContactRemoteID
+        map["toDoLocalUri"] = remoteToDoContact.toDoRemoteUri
 
         return map
     }
 
     suspend fun deleteToDoContact(
         collection: String,
-        firestoreToDoContact: FirestoreToDoContact
+        remoteToDoContact: RemoteToDoContact
     ) {
         val targetCollection = Firebase.firestore.collection(collection)
-        targetCollection.document(firestoreToDoContact.toDoContactID).delete().await()
+        targetCollection.document(remoteToDoContact.toDoContactRemoteID).delete().await()
     }
 
     // Zusätzliche Funktionalität
 
-    suspend fun emptyStore() {
-        DeleteAllDocumentsFromCollection(getToDoContactCollection)
-        DeleteAllDocumentsFromCollection(getToDoItemCollection)
-        DeleteAllDocumentsFromCollection(getToDoGroupCollection)
+    suspend fun deleteAllRemoteItems() {
+        DeleteAllRemoteDocumentsFromCollection(getToDoContactRemoteCollection)
+        DeleteAllRemoteDocumentsFromCollection(getToDoRemoteCollection)
     }
 
-    private suspend fun DeleteAllDocumentsFromCollection(
+    private suspend fun DeleteAllRemoteDocumentsFromCollection(
         collection: String
     ) {
         // Es ist kritisch und wird von Google nicht empfohlen, Sammlungen mit

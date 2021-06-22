@@ -9,29 +9,23 @@ import java.time.LocalDateTime
         Index(
             value = ["toDo_Id"],
             unique = true
-        ),
-        Index(
-            value = ["toDoGroup_Id"],
-            unique = false
         )
     )
 )
-data class ToDoItem(
+data class LokalToDo(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "toDo_Id")
-    var toDoId: Int,
+    var toDoLocalId: Int,
     @ColumnInfo(name = "toDo_RemoteId")
     var toDoRemoteId: String,
     @ColumnInfo(name = "toDo_Title")
-    var toDoTitle: String,
+    var toDoLocalTitle: String,
     @ColumnInfo(name = "toDo_Description")
-    var toDoDescription: String,
+    var toDoLocalDescription: String,
     @ColumnInfo(name = "toDo_IsDone")
-    var toDoIsDone: Boolean,
+    var toDoLocalIsDone: Boolean,
     @ColumnInfo(name = "toDo_IsFavourite")
-    var toDoIsFavourite: Boolean,
+    var toDoLocalIsFavourite: Boolean,
     @ColumnInfo(name = "toDo_DoUntil")
-    var toDoDoUntil: LocalDateTime,
-    @ColumnInfo(name = "toDoGroup_Id")
-    val toDoGroupId: Long
+    var toDoLocalDoUntil: LocalDateTime
 )

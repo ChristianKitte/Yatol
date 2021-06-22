@@ -12,14 +12,14 @@ import androidx.recyclerview.widget.RecyclerView
 import de.ckitte.myapplication.model.ToDoListModel
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.util.DateTimeUtil.Companion.getTimeString
-import de.ckitte.myapplication.database.entities.ToDoItem
+import de.ckitte.myapplication.database.entities.LokalToDo
 import de.ckitte.myapplication.databinding.FragmentTodoListitemBinding
 import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter.ToDoViewHolder
 import java.time.LocalDateTime
 
 
 class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
-    ListAdapter<ToDoItem, ToDoViewHolder>(ToDoComparator()) {
+    ListAdapter<LokalToDo, ToDoViewHolder>(ToDoComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
         val binding =
@@ -38,33 +38,33 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(toDo: ToDoItem) {
+        fun bind(lokalToDo: LokalToDo) {
             binding.apply {
-                tvTitle.text = toDo.toDoTitle
-                tvDescription.text = toDo.toDoDescription
+                tvTitle.text = lokalToDo.toDoLocalTitle
+                tvDescription.text = lokalToDo.toDoLocalDescription
 
-                checkIsDone.isChecked = toDo.toDoIsDone
-                checkIsFavourite.isChecked = toDo.toDoIsFavourite
+                checkIsDone.isChecked = lokalToDo.toDoLocalIsDone
+                checkIsFavourite.isChecked = lokalToDo.toDoLocalIsFavourite
 
-                tvDoUntil.text = getTimeString(toDo.toDoDoUntil)
-                setTitleColor(toDo)
+                tvDoUntil.text = getTimeString(lokalToDo.toDoLocalDoUntil)
+                setTitleColor(lokalToDo)
                 setFavouriteIcon()
 
                 btnEdit.setOnClickListener {
-                    viewModel.setCurrentToDoItem(toDo)
+                    viewModel.setCurrentToDoItem(lokalToDo)
                     it.findNavController().navigate(R.id.action_toDoList_to_editToDo)
                 }
 
                 checkIsDone.setOnClickListener {
-                    toDo.toDoIsDone = checkIsDone.isChecked
-                    viewModel.updateToDoItem(toDo)
+                    lokalToDo.toDoLocalIsDone = checkIsDone.isChecked
+                    viewModel.updateToDoItem(lokalToDo)
 
-                    setTitleColor(toDo)
+                    setTitleColor(lokalToDo)
                 }
 
                 checkIsFavourite.setOnClickListener {
-                    toDo.toDoIsFavourite = checkIsFavourite.isChecked
-                    viewModel.updateToDoItem(toDo)
+                    lokalToDo.toDoLocalIsFavourite = checkIsFavourite.isChecked
+                    viewModel.updateToDoItem(lokalToDo)
 
                     setFavouriteIcon()
                 }
@@ -115,9 +115,9 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
             return image
         }
 
-        private fun FragmentTodoListitemBinding.setTitleColor(toDo: ToDoItem) {
-            if (toDo.toDoDoUntil.isBefore(LocalDateTime.now())) {
-                if (toDo.toDoDoUntil.isBefore(LocalDateTime.now())) {
+        private fun FragmentTodoListitemBinding.setTitleColor(lokalToDo: LokalToDo) {
+            if (lokalToDo.toDoLocalDoUntil.isBefore(LocalDateTime.now())) {
+                if (lokalToDo.toDoLocalDoUntil.isBefore(LocalDateTime.now())) {
                     if (checkIsDone.isChecked == false) {
                         tvTitle.setTextColor(
                             ContextCompat.getColor(
@@ -133,7 +133,7 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
                             )
                         )
                     }
-                } else if (toDo.toDoDoUntil.isAfter(LocalDateTime.now())) {
+                } else if (lokalToDo.toDoLocalDoUntil.isAfter(LocalDateTime.now())) {
                     if (checkIsDone.isChecked == false) {
                         tvTitle.setTextColor(
                             ContextCompat.getColor(
@@ -154,13 +154,13 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
         }
     }
 
-    class ToDoComparator : DiffUtil.ItemCallback<ToDoItem>() {
-        override fun areItemsTheSame(oldItem: ToDoItem, newItem: ToDoItem): Boolean {
-            return oldItem === newItem
+    class ToDoComparator : DiffUtil.ItemCallback<LokalToDo>() {
+        override fun areItemsTheSame(oldItemLokal: LokalToDo, newItemLokal: LokalToDo): Boolean {
+            return oldItemLokal === newItemLokal
         }
 
-        override fun areContentsTheSame(oldItem: ToDoItem, newItem: ToDoItem): Boolean {
-            return oldItem.toDoId == newItem.toDoId
+        override fun areContentsTheSame(oldItemLokal: LokalToDo, newItemLokal: LokalToDo): Boolean {
+            return oldItemLokal.toDoLocalId == newItemLokal.toDoLocalId
         }
     }
 }

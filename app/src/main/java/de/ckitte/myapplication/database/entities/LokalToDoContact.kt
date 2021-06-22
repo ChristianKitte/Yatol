@@ -15,18 +15,18 @@ import androidx.room.*
         )
     )
 )
-data class ToDoContact(
+data class LokalToDoContact(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "toDoContact_Id")
-    var toDoContactId: Int,
+    var toDoContactLocalId: Int,
     @ColumnInfo(name = "toDoContact_RemoteId")
     var toDoContactRemoteId: String,
-    @ColumnInfo(name = "toDoContact_HostId")
-    var toDoContactHostId: String,
+    @ColumnInfo(name = "toDoContact_Uri")
+    var toDoContactLocalUri: String,
     @ColumnInfo(name = "toDo_Id")
-    var toDoItemId: Long,
+    var toDoLocalId: Long,
     @ColumnInfo(name = "toDo_RemoteId")
-    var toDoItemRemoteId: String,
+    var toDoRemoteId: String,
     @ColumnInfo(name = "toDoContact_State")
-    var toDoContactState: Int
+    var toDoContactLocalState: Int
 )

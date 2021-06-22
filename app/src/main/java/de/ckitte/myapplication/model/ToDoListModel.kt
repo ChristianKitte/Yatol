@@ -2,7 +2,7 @@ package de.ckitte.myapplication.model
 
 import androidx.lifecycle.*
 import de.ckitte.myapplication.util.ListSort
-import de.ckitte.myapplication.database.entities.ToDoItem
+import de.ckitte.myapplication.database.entities.LokalToDo
 import de.ckitte.myapplication.repository.ToDoRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,20 +31,20 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
         .asLiveData(Dispatchers.IO)
 
 
-    fun deleteToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
-        toDoRepository.deleteToDoItem(toDoItem)
+    fun deleteToDoItem(lokalToDo: LokalToDo) = viewModelScope.launch {
+        toDoRepository.deleteToDoItem(lokalToDo)
     }
 
-    fun addToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
-        toDoRepository.addToDoItem(toDoItem)
+    fun addToDoItem(lokalToDo: LokalToDo) = viewModelScope.launch {
+        toDoRepository.addToDoItem(lokalToDo)
     }
 
-    fun updateToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
-        toDoRepository.updateToDoItem(toDoItem)
+    fun updateToDoItem(lokalToDo: LokalToDo) = viewModelScope.launch {
+        toDoRepository.updateToDoItem(lokalToDo)
     }
 
-    fun setCurrentToDoItem(toDoItem: ToDoItem) = viewModelScope.launch {
-        ToDoRepository.setCurrentToDoItem(toDoItem)
+    fun setCurrentToDoItem(lokalToDo: LokalToDo) = viewModelScope.launch {
+        ToDoRepository.setCurrentToDoItem(lokalToDo)
     }
 
     fun iniNewToDoItem() {

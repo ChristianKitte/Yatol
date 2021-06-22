@@ -17,24 +17,20 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
-import de.ckitte.myapplication.database.entities.ToDoItem
+import de.ckitte.myapplication.database.entities.LokalToDo
 import de.ckitte.myapplication.databinding.FragmentEditTodoBinding
 import de.ckitte.myapplication.model.EditToDoModel
 import de.ckitte.myapplication.repository.ToDoRepository
-import de.ckitte.myapplication.util.getDisplayNameByUri
 import de.ckitte.myapplication.viewadapter.ContactListViewAdapter
 import java.time.LocalDateTime
-import kotlin.time.Duration
 
 class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener {
@@ -89,13 +85,13 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
         _binding.apply {
             currentToDoItem?.apply {
-                setCalender(toDoDoUntil)
+                setCalender(toDoLocalDoUntil)
 
-                etTitle.setText(toDoTitle)
-                etDescription.setText(toDoDescription)
+                etTitle.setText(toDoLocalTitle)
+                etDescription.setText(toDoLocalDescription)
                 tvDoUntil.text = getDoUntilString()
-                checkIsDone.isChecked = toDoIsDone
-                checkIsFavourite.isChecked = toDoIsFavourite
+                checkIsDone.isChecked = toDoLocalIsDone
+                checkIsFavourite.isChecked = toDoLocalIsFavourite
             }
         }
 
@@ -151,7 +147,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
         _binding.btnBack.setOnClickListener {
             if (currentToDoItem != null) {
-                _viewModel.rollbackContacts(currentToDoItem)
+                _viewModel.rollbackToDoContacts(currentToDoItem)
             }
 
             it.findNavController().navigate(R.id.action_editToDo_to_toDoListFragment)
@@ -159,7 +155,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
         _binding.btnContacts.setOnClickListener {
             currentToDoItem?.let {
-                when (it.toDoId) {
+                when (it.toDoLocalId) {
                     0 -> confirmSaveBeforeAddContact(it)
                     else -> selectContact()
                 }
@@ -183,7 +179,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
     //region Confirm Dialogs
 
-    fun confirmSaveBeforeAddContact(currentToDoItem: ToDoItem) {
+    fun confirmSaveBeforeAddContact(currentLokalToDo: LokalToDo) {
         this.context?.let {
             MaterialAlertDialogBuilder(it)
                 .setTitle("Eintrag speichern?")
@@ -193,14 +189,14 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
                     // Respond to negative button press
                 }
                 .setPositiveButton("Speichern") { _, _ ->
-                    saveCurrentToDo(currentToDoItem)
+                    saveCurrentToDo(currentLokalToDo)
                     selectContact()
                 }
                 .show()
         }
     }
 
-    fun confirmToDoDelete(currentToDoItem: ToDoItem) {
+    fun confirmToDoDelete(currentLokalToDo: LokalToDo) {
         this.context?.let {
             MaterialAlertDialogBuilder(it)
                 .setTitle("Eintrag löschen?")
@@ -210,7 +206,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
                     // Respond to negative button press
                 }
                 .setPositiveButton("Löschen") { _, _ ->
-                    _viewModel.deleteToDoItem(currentToDoItem)
+                    _viewModel.deleteToDoItem(currentLokalToDo)
                     _binding.root.findNavController()
                         .navigate(R.id.action_editToDo_to_toDoListFragment)
                 }
@@ -220,14 +216,14 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
     //endregion
 
-    fun saveCurrentToDo(currentToDoItem: ToDoItem) {
-        currentToDoItem?.let {
+    fun saveCurrentToDo(currentLokalToDo: LokalToDo) {
+        currentLokalToDo?.let {
             _binding.apply {
-                currentToDoItem.apply {
-                    toDoTitle = etTitle.text.toString()
-                    toDoDescription = etDescription.text.toString()
+                currentLokalToDo.apply {
+                    toDoLocalTitle = etTitle.text.toString()
+                    toDoLocalDescription = etDescription.text.toString()
 
-                    toDoDoUntil = LocalDateTime.of(
+                    toDoLocalDoUntil = LocalDateTime.of(
                         currentYear,
                         currentMonth,
                         currentDay,
@@ -235,8 +231,8 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
                         currentMinute
                     )
 
-                    toDoIsDone = checkIsDone.isChecked
-                    toDoIsFavourite = checkIsFavourite.isChecked
+                    toDoLocalIsDone = checkIsDone.isChecked
+                    toDoLocalIsFavourite = checkIsFavourite.isChecked
 
                     _viewModel.updateToDoItem(it)
 
@@ -271,11 +267,11 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
         if (currentToDoItem != null) {
             newContact.apply {
-                toDoContactId = 0
+                toDoContactLocalId = 0
                 toDoContactRemoteId = ""
-                toDoContactHostId = uri.toString()
-                toDoItemId = currentToDoItem.toDoId.toLong()
-                toDoItemRemoteId = currentToDoItem.toDoRemoteId
+                toDoContactLocalUri = uri.toString()
+                toDoLocalId = currentToDoItem.toDoLocalId.toLong()
+                toDoRemoteId = currentToDoItem.toDoRemoteId
             }
 
             _viewModel.addToDoContact(newContact)

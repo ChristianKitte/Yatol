@@ -1,50 +1,33 @@
 package de.ckitte.myapplication.firestore
 
-import de.ckitte.myapplication.database.entities.ToDoContact
-import de.ckitte.myapplication.database.entities.ToDoGroup
-import de.ckitte.myapplication.database.entities.ToDoItem
-import de.ckitte.myapplication.firestore.firestoreEntities.FirestoreToDoContact
-import de.ckitte.myapplication.firestore.firestoreEntities.FirestoreToDoGroup
-import de.ckitte.myapplication.firestore.firestoreEntities.FirestoreToDoItem
+import de.ckitte.myapplication.database.entities.LokalToDoContact
+import de.ckitte.myapplication.database.entities.LokalToDo
+import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDoContact
+import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDo
 
 class FirestoreBridgeUtil {
     companion object {
-        fun getFirestoreItemFromDatabaseItem(toDoItem: ToDoItem): FirestoreToDoItem {
+        fun getRemoteToDoTemplateFromLokalToDo(lokalToDo: LokalToDo): RemoteToDo {
 
-            val firestoreToDoItem = FirestoreToDoItem(
-                toDoId = toDoItem.toDoRemoteId,
-                toDoTitle = toDoItem.toDoTitle,
-                toDoDescription = toDoItem.toDoDescription,
-                toDoIsDone = toDoItem.toDoIsDone,
-                toDoIsFavourite = toDoItem.toDoIsFavourite,
-                toDoDoUntil = toDoItem.toDoDoUntil,
-                toDoGroupId = FirestoreApi.defaultGroupID,
-                user = "Nutzer"
+            val firestoreToDoItem = RemoteToDo(
+                toDoRemoteId = lokalToDo.toDoRemoteId,
+                toDoRemoteTitle = lokalToDo.toDoLocalTitle,
+                toDoRemoteDescription = lokalToDo.toDoLocalDescription,
+                toDoRemoteIsDone = lokalToDo.toDoLocalIsDone,
+                toDoRemoteIsFavourite = lokalToDo.toDoLocalIsFavourite,
+                toDoRemoteDoUntil = lokalToDo.toDoLocalDoUntil,
+                toDoRemoteUser = "Nutzer"
             )
 
             return firestoreToDoItem
         }
 
-        fun getFirestoreItemFromDatabaseItem(toDoGroup: ToDoGroup): FirestoreToDoGroup {
+        fun getRemoteToDoContactTemplateFromLokalToDoContact(localToDoContact: LokalToDoContact): RemoteToDoContact {
 
-            val firestoreToDoGroup = FirestoreToDoGroup(
-                toDoGroupId = toDoGroup.toDoGroupRemoteId,
-                toDoGroupIsDefault = toDoGroup.toDoGroupIsDefault,
-                toDoGroupTitle = toDoGroup.toDoGroupTitle,
-                toDoGroupDescription = toDoGroup.toDoGroupDescription,
-                user = "Nutzer"
-            )
-
-            return firestoreToDoGroup
-        }
-
-        fun getFirestoreItemFromDatabaseItem(toDoContact: ToDoContact): FirestoreToDoContact {
-
-            val firestoreToDoContacts = FirestoreToDoContact(
-                toDoId = toDoContact.toDoItemRemoteId,
-                toDoContactID = toDoContact.toDoContactRemoteId,
-                toDoHostID = toDoContact.toDoContactHostId,
-                user = "Nutzer"
+            val firestoreToDoContacts = RemoteToDoContact(
+                toDoRemoteId = localToDoContact.toDoRemoteId,
+                toDoContactRemoteID = localToDoContact.toDoContactRemoteId,
+                toDoRemoteUri = localToDoContact.toDoContactLocalUri
             )
 
             return firestoreToDoContacts

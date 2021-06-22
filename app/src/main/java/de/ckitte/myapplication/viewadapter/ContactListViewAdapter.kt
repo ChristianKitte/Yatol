@@ -10,10 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import de.ckitte.myapplication.database.entities.ToDoContact
+import de.ckitte.myapplication.database.entities.LokalToDoContact
 import de.ckitte.myapplication.databinding.FragmentContactListitemBinding
 import de.ckitte.myapplication.model.EditToDoModel
-import okio.Options
 
 class ContactListViewAdapter(
     private val viewModel: EditToDoModel,
@@ -21,7 +20,7 @@ class ContactListViewAdapter(
     private val packageManager: PackageManager?,
     private val parentFragment: Fragment
 ) :
-    ListAdapter<ToDoContact, ContactListViewAdapter.ContactViewHolder>(ContactComparator()) {
+    ListAdapter<LokalToDoContact, ContactListViewAdapter.ContactViewHolder>(ContactComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         val binding =
@@ -56,11 +55,11 @@ class ContactListViewAdapter(
         private lateinit var currentPhoneNumber: String
         private lateinit var currentEmail: String
 
-        fun bind(contact: ToDoContact) {
+        fun bind(contact: LokalToDoContact) {
             binding.apply {
 
                 if (contentResolver != null) {
-                    val uri: Uri = Uri.parse(contact.toDoContactHostId)
+                    val uri: Uri = Uri.parse(contact.toDoContactLocalUri)
 
                     tvContact.text = viewModel.getDisplayName(uri, contentResolver!!)
                     //tvContact.text = getDisplayNameByUri(uri, contentResolver!!)
@@ -75,14 +74,14 @@ class ContactListViewAdapter(
                         this.btnMail.isEnabled = false
                     }
                 } else {
-                    tvContact.text = contact.toDoContactHostId
+                    tvContact.text = contact.toDoContactLocalUri
                 }
 
                 btnCall.setOnClickListener {
                     var title = "Kein Titel"
 
                     viewModel.getCurrentToDoItem()?.let {
-                        title = "${it.toDoTitle} am ${it.toDoDoUntil.toLocalDate()}"
+                        title = "${it.toDoLocalTitle} am ${it.toDoLocalDoUntil.toLocalDate()}"
                     }
 
                     callContact(currentPhoneNumber, title)
@@ -93,7 +92,7 @@ class ContactListViewAdapter(
                     val anrede = "Hallo ${tvContact.text.toString()}"
 
                     viewModel.getCurrentToDoItem()?.let {
-                        title = "${it.toDoTitle} am ${it.toDoDoUntil.toLocalDate()}"
+                        title = "${it.toDoLocalTitle} am ${it.toDoLocalDoUntil.toLocalDate()}"
                     }
 
                     sendEmail(
@@ -134,13 +133,13 @@ class ContactListViewAdapter(
         }
     }
 
-    class ContactComparator : DiffUtil.ItemCallback<ToDoContact>() {
-        override fun areItemsTheSame(oldItem: ToDoContact, newItem: ToDoContact): Boolean {
+    class ContactComparator : DiffUtil.ItemCallback<LokalToDoContact>() {
+        override fun areItemsTheSame(oldItem: LokalToDoContact, newItem: LokalToDoContact): Boolean {
             return oldItem === newItem
         }
 
-        override fun areContentsTheSame(oldItem: ToDoContact, newItem: ToDoContact): Boolean {
-            return oldItem.toDoContactId == newItem.toDoContactId
+        override fun areContentsTheSame(oldItem: LokalToDoContact, newItem: LokalToDoContact): Boolean {
+            return oldItem.toDoContactLocalId == newItem.toDoContactLocalId
         }
     }
 }

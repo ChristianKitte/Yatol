@@ -7,18 +7,16 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import de.ckitte.myapplication.database.converters.DateConverter
 import de.ckitte.myapplication.database.daos.ToDoDao
-import de.ckitte.myapplication.database.entities.ToDoItem
-import de.ckitte.myapplication.database.entities.ToDoGroup
-import de.ckitte.myapplication.database.entities.ToDoContact
+import de.ckitte.myapplication.database.entities.LokalToDo
+import de.ckitte.myapplication.database.entities.LokalToDoContact
 
 @Database(
     entities = [
-        ToDoItem::class,
-        ToDoGroup::class,
-        ToDoContact::class
+        LokalToDo::class,
+        LokalToDoContact::class
     ],
     exportSchema = false,
-    version = 17
+    version = 18
 )
 @TypeConverters(DateConverter::class)
 abstract class ToDoDatabase : RoomDatabase() {

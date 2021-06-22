@@ -8,7 +8,7 @@ import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds.Email.DISPLAY_NAME
 
 
-enum class ContactState {
+enum class ToDoContactState {
     Save,
     Added,
     Deleted
