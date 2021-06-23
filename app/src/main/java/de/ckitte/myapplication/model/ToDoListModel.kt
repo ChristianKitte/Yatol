@@ -53,7 +53,7 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
 
     fun refreshDatabase() {
         CoroutineScope(Dispatchers.IO).launch {
-            toDoRepository.refreshLocalDatabase()
+            toDoRepository.refreshDatabase()
         }
     }
 

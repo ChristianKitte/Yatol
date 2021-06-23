@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 
 class ToDoRepository(private val toDoDao: ToDoDao) {
+
     companion object StaticMembers {
         @Volatile
         private var currentLokalToDo: LokalToDo? = null
@@ -50,7 +51,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         }
     }
 
-    // CRUD ToDoItem
+    //region CRUD ToDoItem
 
     @WorkerThread
     suspend fun addToDoItem(vararg lokalToDos: LokalToDo) {
@@ -124,7 +125,9 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         }
     }
 
-    // CRUD ToDoContacts
+    //endregion
+
+    //region CRUD ToDoContact
 
     @WorkerThread
     suspend fun addToDoContacts(vararg toDoContacts: LokalToDoContact) {
@@ -187,7 +190,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     }
 
     @WorkerThread
-    suspend fun deleteAllToDoContacts(vararg localToDoContacts: LokalToDoContact) {
+    suspend fun deleteToDoContacts(vararg localToDoContacts: LokalToDoContact) {
         val api = FirestoreApi()
 
         localToDoContacts.forEach {
@@ -205,13 +208,17 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         }
     }
 
+    //endregion
+
+    //region Commit and rollback contacts in transient
+
     @WorkerThread
     suspend fun commitTransientToDoContacts() {
         val contactsToDelete = toDoDao.getAllLocalDeletedToDoContacts()
         val contactsToAdd = toDoDao.getAllLocalAddedToDoContacts()
 
         contactsToDelete.forEach {
-            deleteAllToDoContacts(it)
+            deleteToDoContacts(it)
         }
 
         contactsToAdd.forEach {
@@ -227,7 +234,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         contactsTouched.forEach {
             when (it.toDoContactLocalState) {
                 ToDoContactState.Added.ordinal -> {
-                    deleteAllToDoContacts(it)
+                    deleteToDoContacts(it)
                 }
                 ToDoContactState.Deleted.ordinal -> {
                     it.toDoContactLocalState = ToDoContactState.Save.ordinal
@@ -237,10 +244,11 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         }
     }
 
-    // Flow und Observer
+    //endregion
 
-    // Für die Verwendung mit Flow und zur Nutzung mit einem Observer
-    // zwei Pattern. Hier: fun ohne suspend!
+    //region Flow and Observer
+    //Es existieren zwei Pattern. Hier: fun ohne suspend!
+
     fun getAllToDosAsFlow_DateThenImportance(): Flow<List<LokalToDo>> =
         toDoDao.getAllLocalToDosAsFlowByDateThenImportance()
 
@@ -250,60 +258,54 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     fun getAllContacts(toDoItemID: Long): Flow<List<LokalToDoContact>> =
         toDoDao.getAllLocalValidToDoContactsByToDo(toDoItemID)
 
-    // Zusätzliche Funktionalität
+    //endregion
+
+    //region Synchronization of local and remote data store
 
     @WorkerThread
-    suspend fun emptyLokalDatabase() {
-        toDoDao.deleteAllLocalToDos()
-        toDoDao.deleteAllLocalToDoContacts()
-    }
-
-    @WorkerThread
-    suspend fun emptyRemoteDatabase() {
-        val api = FirestoreApi()
-        api.deleteAllRemoteItems()
-    }
-
-    @WorkerThread
-    suspend fun refreshLocalDatabase() {
+    suspend fun refreshDatabase() {
         val numberOfLokalToDos = toDoDao.getLocalToDosCount()
 
         if (numberOfLokalToDos > 0) {
-            mirrorToRemote()
+            mirrorRemoteToLocal()
+            //mirrorLocalToRemote()
         } else {
-            // mirrorFromSample()
-            //mirrorFromRemote()
+            // mirrorSampleToLocal()
+            mirrorRemoteToLocal()
         }
     }
 
-    suspend fun mirrorFromSample() {
-        createSampleEntities()
+    @WorkerThread
+    suspend fun mirrorSampleToLocal() {
+        RepositoryHelper(toDoDao).createSampleEntities()
     }
 
     //Transaction? In Scope?
-    suspend fun mirrorToRemote() {
+    @WorkerThread
+    suspend fun mirrorLocalToRemote() {
         if (ConnectionLiveData.isConnected) {
             val api = FirestoreApi()
 
             emptyRemoteDatabase()
 
-            val toDoItems = toDoDao.getAllLocalToDos()
-            toDoItems.forEach { it1 ->
+            val localToDos = toDoDao.getAllLocalToDos()
+            localToDos.forEach { it1 ->
                 // wird bei Update übertragen, da keine Remote ID und erhält seine RemoteID
-                it1.toDoRemoteId=""
+                it1.toDoRemoteId = ""
                 updateToDoItem(it1)
 
                 // aktualisiertes ToDoItem undd alle Kontakte des aktuelle ToDos abfragen
                 val actCurrentToDo = toDoDao.getLocalToDoById(it1.toDoLocalId)
-                val currentLocalToDoContacts=toDoDao.getAllLocalToDoContactsByToDo(it1.toDoLocalId.toLong())
+                val currentLocalToDoContacts =
+                    toDoDao.getAllLocalToDoContactsByToDo(it1.toDoLocalId.toLong())
 
                 // für jeden Kontakt
                 currentLocalToDoContacts.forEach { it2 ->
                     // ToDoRemoteID setzen
                     // wird bei Update übertragen, da keine Remote ID und erhält seine RemoteID
 
-                    it2.toDoContactRemoteId=""
-                    it2.toDoRemoteId =  actCurrentToDo[0].toDoRemoteId
+                    it2.toDoContactRemoteId = ""
+                    it2.toDoRemoteId = actCurrentToDo[0].toDoRemoteId
 
                     updateToDoContact(it2)
                 }
@@ -311,14 +313,18 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         }
     }
 
-    /*private suspend fun mirrorToDoContactsToRemoteByToDo(
-        toDoItemId: Long,
-        toDoItemRemoteId: String
-    ) {
+    @WorkerThread
+    suspend fun mirrorRemoteToLocal() {
         if (ConnectionLiveData.isConnected) {
             val api = FirestoreApi()
 
-            val toDoItemContacts = toDoDao.getAllToDoContacts(toDoItemId)
+            emptyLokalDatabase()
+
+            val remoteToDos = api.getAllRemoteToDos()
+            //val remoteToDoContacts = api.getAllRemoteToDoContactsByRemoteToDo("xyEjHUrEQdTW5BtfyAWH")
+            val x = 0
+            /*
+
             toDoItemContacts.forEach {
                 val firestoreToDoContact = FirestoreBridgeUtil.getFirestoreItemFromDatabaseItem(it)
                 firestoreToDoContact.toDoRemoteId = toDoItemRemoteId
@@ -333,16 +339,22 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
                     it.toDoContactLocalId.toLong()
                 )
             }
-        }
-    }*/
 
-    fun mirrorFromRemote() {
-        // lokal shall be empty
-        // load all from Remote
+             */
+        }
     }
 
     @WorkerThread
-    suspend fun createSampleEntities() {
-        RepositoryHelper(toDoDao).createSampleEntities()
+    suspend fun emptyLokalDatabase() {
+        toDoDao.deleteAllLocalToDos()
+        toDoDao.deleteAllLocalToDoContacts()
     }
+
+    @WorkerThread
+    suspend fun emptyRemoteDatabase() {
+        val api = FirestoreApi()
+        api.deleteAllRemoteItems()
+    }
+
+    //endregion
 }

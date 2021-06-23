@@ -9,5 +9,5 @@ data class RemoteToDo(
     var toDoRemoteIsDone: Boolean,
     var toDoRemoteIsFavourite: Boolean,
     var toDoRemoteDoUntil: LocalDateTime,
-    val toDoRemoteUser: String
+    val toDoRemoteUser: String,
 )

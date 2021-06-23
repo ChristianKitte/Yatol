@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                     showToast("Die lokalen Daten werden in Firestore gesichert")
 
                     CoroutineScope(Dispatchers.IO).launch {
-                        ToDoRepository(db).mirrorToRemote()
+                        ToDoRepository(db).mirrorLocalToRemote()
                         withContext(Dispatchers.Main) {
                             showToast("Die lokalen Daten wurden in Firestore gesichert")
                         }
@@ -149,7 +149,7 @@ class MainActivity : AppCompatActivity() {
                     showToast("Daten werden aus Firestore geladen")
 
                     CoroutineScope(Dispatchers.IO).launch {
-                        ToDoRepository(db).mirrorFromRemote()
+                        ToDoRepository(db).mirrorRemoteToLocal()
                         withContext(Dispatchers.Main) {
                             showToast("Die Daten wurden aus Firestore geladen")
                         }

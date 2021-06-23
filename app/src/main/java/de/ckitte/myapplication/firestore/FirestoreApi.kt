@@ -1,13 +1,22 @@
 package de.ckitte.myapplication.firestore
 
+import androidx.compose.runtime.internal.updateLiveLiteralValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDoContact
 import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDo
+import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDoFacette
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.lang.Exception
+import java.time.LocalDateTime
 
 class FirestoreApi {
     var db = FirebaseFirestore.getInstance()
@@ -18,6 +27,55 @@ class FirestoreApi {
     }
 
     // CRUD ToDoItem
+
+    suspend fun getAllRemoteToDos(): List<RemoteToDoFacette> {
+        var remoteToDo: List<RemoteToDoFacette> = emptyList()
+
+        try {
+            val targetCollection = Firebase.firestore.collection(getToDoRemoteCollection)
+            val querySnapshot = targetCollection.get().await()
+
+            querySnapshot.documents.forEach {
+                val x = it.data
+                val newToDo = it.toObject<RemoteToDoFacette>()
+
+                if (newToDo != null) {
+                    newToDo.toDoRemoteId = it.id // ==> in ?.let{} ist id nicht verfügbar....
+                    remoteToDo = remoteToDo.plus(newToDo)
+                }
+            }
+
+            return remoteToDo
+        } catch (e: Exception) {
+            remoteToDo = emptyList()
+            return remoteToDo
+        }
+    }
+
+    suspend fun getAllRemoteToDoContactsByRemoteToDo(toDoRemoteId: String): List<RemoteToDoContact> {
+        var remoteToDoContacts: List<RemoteToDoContact> = emptyList()
+
+        try {
+            val targetCollection = Firebase.firestore.collection(getToDoContactRemoteCollection)
+            val querySnapshot =
+                targetCollection.whereEqualTo("toDoRemoteId", toDoRemoteId).get().await()
+
+            querySnapshot.documents.forEach {
+                val newContact = it.toObject<RemoteToDoContact>()
+
+                if (newContact != null) {
+                    newContact.toDoContactRemoteID =
+                        it.id // ==> in ?.let{} ist id nicht verfügbar....
+                    remoteToDoContacts = remoteToDoContacts.plus(newContact)
+                }
+            }
+
+            return remoteToDoContacts
+        } catch (e: Exception) {
+            remoteToDoContacts = emptyList()
+            return remoteToDoContacts
+        }
+    }
 
     suspend fun insertToDoRemoteItem(
         collection: String,
@@ -67,7 +125,7 @@ class FirestoreApi {
         targetCollection.document(remoteToDo.toDoRemoteId).delete().await()
     }
 
-    // CRUD ToDoContacts
+// CRUD ToDoContacts
 
     suspend fun insertToDoContact(
         collection: String,
@@ -114,7 +172,7 @@ class FirestoreApi {
         targetCollection.document(remoteToDoContact.toDoContactRemoteID).delete().await()
     }
 
-    // Zusätzliche Funktionalität
+// Zusätzliche Funktionalität
 
     suspend fun deleteAllRemoteItems() {
         DeleteAllRemoteDocumentsFromCollection(getToDoContactRemoteCollection)
