@@ -15,7 +15,7 @@ import androidx.room.*
         )
     )
 )
-data class LokalToDoContact(
+data class LocalToDoContact(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "toDoContact_Id")
     var toDoContactLocalId: Int,

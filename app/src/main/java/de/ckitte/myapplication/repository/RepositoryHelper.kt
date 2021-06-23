@@ -2,7 +2,7 @@ package de.ckitte.myapplication.repository
 
 import androidx.annotation.WorkerThread
 import de.ckitte.myapplication.database.daos.ToDoDao
-import de.ckitte.myapplication.database.entities.LokalToDo
+import de.ckitte.myapplication.database.entities.LocalToDo
 import java.time.LocalDateTime
 
 class RepositoryHelper(private val toDoDao: ToDoDao) {
@@ -10,7 +10,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
     @WorkerThread
     suspend fun createSampleEntities() {
         toDoDao.addLocalToDo(
-            LokalToDo(
+            LocalToDo(
                 0,
                 "",
                 "Sample 1",
@@ -22,7 +22,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
         )
 
         toDoDao.addLocalToDo(
-            LokalToDo(
+            LocalToDo(
                 0,
                 "",
                 "Sample 2",
@@ -34,7 +34,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
         )
 
         toDoDao.addLocalToDo(
-            LokalToDo(
+            LocalToDo(
                 0,
                 "",
                 "Sample 3",
@@ -46,7 +46,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
         )
 
         toDoDao.addLocalToDo(
-            LokalToDo(
+            LocalToDo(
                 0,
                 "",
                 "Sample 4",
@@ -58,7 +58,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
         )
 
         toDoDao.addLocalToDo(
-            LokalToDo(
+            LocalToDo(
                 0,
                 "",
                 "Sample 5",
@@ -70,7 +70,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
         )
 
         toDoDao.addLocalToDo(
-            LokalToDo(
+            LocalToDo(
                 0,
                 "",
                 "Sample 6",
@@ -82,7 +82,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
         )
 
         toDoDao.addLocalToDo(
-            LokalToDo(
+            LocalToDo(
                 0,
                 "",
                 "Sample 7",

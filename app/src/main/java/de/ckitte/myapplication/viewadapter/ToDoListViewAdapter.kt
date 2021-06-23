@@ -12,14 +12,14 @@ import androidx.recyclerview.widget.RecyclerView
 import de.ckitte.myapplication.model.ToDoListModel
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.util.DateTimeUtil.Companion.getTimeString
-import de.ckitte.myapplication.database.entities.LokalToDo
+import de.ckitte.myapplication.database.entities.LocalToDo
 import de.ckitte.myapplication.databinding.FragmentTodoListitemBinding
 import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter.ToDoViewHolder
 import java.time.LocalDateTime
 
 
 class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
-    ListAdapter<LokalToDo, ToDoViewHolder>(ToDoComparator()) {
+    ListAdapter<LocalToDo, ToDoViewHolder>(ToDoComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
         val binding =
@@ -38,7 +38,7 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(lokalToDo: LokalToDo) {
+        fun bind(lokalToDo: LocalToDo) {
             binding.apply {
                 tvTitle.text = lokalToDo.toDoLocalTitle
                 tvDescription.text = lokalToDo.toDoLocalDescription
@@ -115,7 +115,7 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
             return image
         }
 
-        private fun FragmentTodoListitemBinding.setTitleColor(lokalToDo: LokalToDo) {
+        private fun FragmentTodoListitemBinding.setTitleColor(lokalToDo: LocalToDo) {
             if (lokalToDo.toDoLocalDoUntil.isBefore(LocalDateTime.now())) {
                 if (lokalToDo.toDoLocalDoUntil.isBefore(LocalDateTime.now())) {
                     if (checkIsDone.isChecked == false) {
@@ -154,12 +154,12 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
         }
     }
 
-    class ToDoComparator : DiffUtil.ItemCallback<LokalToDo>() {
-        override fun areItemsTheSame(oldItemLokal: LokalToDo, newItemLokal: LokalToDo): Boolean {
+    class ToDoComparator : DiffUtil.ItemCallback<LocalToDo>() {
+        override fun areItemsTheSame(oldItemLokal: LocalToDo, newItemLokal: LocalToDo): Boolean {
             return oldItemLokal === newItemLokal
         }
 
-        override fun areContentsTheSame(oldItemLokal: LokalToDo, newItemLokal: LokalToDo): Boolean {
+        override fun areContentsTheSame(oldItemLokal: LocalToDo, newItemLokal: LocalToDo): Boolean {
             return oldItemLokal.toDoLocalId == newItemLokal.toDoLocalId
         }
     }

@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
-import de.ckitte.myapplication.database.entities.LokalToDo
+import de.ckitte.myapplication.database.entities.LocalToDo
 import de.ckitte.myapplication.databinding.FragmentEditTodoBinding
 import de.ckitte.myapplication.model.EditToDoModel
 import de.ckitte.myapplication.repository.ToDoRepository
@@ -179,7 +179,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
     //region Confirm Dialogs
 
-    fun confirmSaveBeforeAddContact(currentLokalToDo: LokalToDo) {
+    fun confirmSaveBeforeAddContact(currentLokalToDo: LocalToDo) {
         this.context?.let {
             MaterialAlertDialogBuilder(it)
                 .setTitle("Eintrag speichern?")
@@ -196,7 +196,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         }
     }
 
-    fun confirmToDoDelete(currentLokalToDo: LokalToDo) {
+    fun confirmToDoDelete(currentLokalToDo: LocalToDo) {
         this.context?.let {
             MaterialAlertDialogBuilder(it)
                 .setTitle("Eintrag löschen?")
@@ -216,7 +216,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
     //endregion
 
-    fun saveCurrentToDo(currentLokalToDo: LokalToDo) {
+    fun saveCurrentToDo(currentLokalToDo: LocalToDo) {
         currentLokalToDo?.let {
             _binding.apply {
                 currentLokalToDo.apply {

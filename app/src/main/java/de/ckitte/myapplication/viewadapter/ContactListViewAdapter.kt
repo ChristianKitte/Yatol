@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import de.ckitte.myapplication.database.entities.LokalToDoContact
+import de.ckitte.myapplication.database.entities.LocalToDoContact
 import de.ckitte.myapplication.databinding.FragmentContactListitemBinding
 import de.ckitte.myapplication.model.EditToDoModel
 
@@ -20,7 +20,7 @@ class ContactListViewAdapter(
     private val packageManager: PackageManager?,
     private val parentFragment: Fragment
 ) :
-    ListAdapter<LokalToDoContact, ContactListViewAdapter.ContactViewHolder>(ContactComparator()) {
+    ListAdapter<LocalToDoContact, ContactListViewAdapter.ContactViewHolder>(ContactComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         val binding =
@@ -55,7 +55,7 @@ class ContactListViewAdapter(
         private lateinit var currentPhoneNumber: String
         private lateinit var currentEmail: String
 
-        fun bind(contact: LokalToDoContact) {
+        fun bind(contact: LocalToDoContact) {
             binding.apply {
 
                 if (contentResolver != null) {
@@ -133,12 +133,12 @@ class ContactListViewAdapter(
         }
     }
 
-    class ContactComparator : DiffUtil.ItemCallback<LokalToDoContact>() {
-        override fun areItemsTheSame(oldItem: LokalToDoContact, newItem: LokalToDoContact): Boolean {
+    class ContactComparator : DiffUtil.ItemCallback<LocalToDoContact>() {
+        override fun areItemsTheSame(oldItem: LocalToDoContact, newItem: LocalToDoContact): Boolean {
             return oldItem === newItem
         }
 
-        override fun areContentsTheSame(oldItem: LokalToDoContact, newItem: LokalToDoContact): Boolean {
+        override fun areContentsTheSame(oldItem: LocalToDoContact, newItem: LocalToDoContact): Boolean {
             return oldItem.toDoContactLocalId == newItem.toDoContactLocalId
         }
     }

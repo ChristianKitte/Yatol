@@ -1,22 +1,14 @@
 package de.ckitte.myapplication.firestore
 
-import androidx.compose.runtime.internal.updateLiveLiteralValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
-import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDoContact
 import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDo
-import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDoFacette
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDoContact
 import kotlinx.coroutines.tasks.await
-import java.lang.Exception
-import java.time.LocalDateTime
 
 class FirestoreApi {
     var db = FirebaseFirestore.getInstance()
@@ -28,8 +20,8 @@ class FirestoreApi {
 
     // CRUD ToDoItem
 
-    suspend fun getAllRemoteToDos(): List<RemoteToDoFacette> {
-        var remoteToDo: List<RemoteToDoFacette> = emptyList()
+    suspend fun getAllRemoteToDos(): List<RemoteToDo> {
+        var remoteToDo: List<RemoteToDo> = emptyList()
 
         try {
             val targetCollection = Firebase.firestore.collection(getToDoRemoteCollection)
@@ -37,7 +29,7 @@ class FirestoreApi {
 
             querySnapshot.documents.forEach {
                 val x = it.data
-                val newToDo = it.toObject<RemoteToDoFacette>()
+                val newToDo = it.toObject<RemoteToDo>()
 
                 if (newToDo != null) {
                     newToDo.toDoRemoteId = it.id // ==> in ?.let{} ist id nicht verfügbar....

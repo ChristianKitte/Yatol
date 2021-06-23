@@ -7,13 +7,13 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import de.ckitte.myapplication.database.converters.DateConverter
 import de.ckitte.myapplication.database.daos.ToDoDao
-import de.ckitte.myapplication.database.entities.LokalToDo
-import de.ckitte.myapplication.database.entities.LokalToDoContact
+import de.ckitte.myapplication.database.entities.LocalToDo
+import de.ckitte.myapplication.database.entities.LocalToDoContact
 
 @Database(
     entities = [
-        LokalToDo::class,
-        LokalToDoContact::class
+        LocalToDo::class,
+        LocalToDoContact::class
     ],
     exportSchema = false,
     version = 18

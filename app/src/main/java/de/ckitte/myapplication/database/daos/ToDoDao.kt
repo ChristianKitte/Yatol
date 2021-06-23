@@ -1,8 +1,8 @@
 package de.ckitte.myapplication.database.daos
 
 import androidx.room.*
-import de.ckitte.myapplication.database.entities.LokalToDoContact
-import de.ckitte.myapplication.database.entities.LokalToDo
+import de.ckitte.myapplication.database.entities.LocalToDoContact
+import de.ckitte.myapplication.database.entities.LocalToDo
 import de.ckitte.myapplication.util.ToDoContactState
 import kotlinx.coroutines.flow.Flow
 
@@ -11,24 +11,24 @@ interface ToDoDao {
     // CRUD ToDoItem
 
     @Insert
-    suspend fun addLocalToDo(lokalToDo: LokalToDo): Long
+    suspend fun addLocalToDo(lokalToDo: LocalToDo): Long
 
     @Update
-    suspend fun updateLokalToDo(lokalToDos: LokalToDo)
+    suspend fun updateLokalToDo(lokalToDos: LocalToDo)
 
     @Delete
-    suspend fun deleteLokalToDo(lokalToDo: LokalToDo)
+    suspend fun deleteLokalToDo(lokalToDo: LocalToDo)
 
     // CRUD ToDoContacts
 
     @Insert
-    suspend fun addLocalToDoContact(toDoContact: LokalToDoContact): Long
+    suspend fun addLocalToDoContact(toDoContact: LocalToDoContact): Long
 
     @Update
-    suspend fun updateLocalToDoContact(toDoContact: LokalToDoContact)
+    suspend fun updateLocalToDoContact(toDoContact: LocalToDoContact)
 
     @Delete
-    suspend fun deleteLocalToDoContact(toDoContact: LokalToDoContact)
+    suspend fun deleteLocalToDoContact(toDoContact: LocalToDoContact)
 
     // Abfragen
 
@@ -51,24 +51,24 @@ interface ToDoDao {
     suspend fun getLocalToDosCount(): Long
 
     @Query("select * from ToDo where toDo_Id = :toDoId")
-    suspend fun getLocalToDoById(toDoId: Int): List<LokalToDo>
+    suspend fun getLocalToDoById(toDoId: Int): List<LocalToDo>
 
     @Query("select * from ToDo")
-    suspend fun getAllLocalToDos(): List<LokalToDo>
+    suspend fun getAllLocalToDos(): List<LocalToDo>
 
     @Query("select * from ToDo_Contact where toDoContact_State = :action")
-    suspend fun getAllLocalDeletedToDoContacts(action: Int = ToDoContactState.Deleted.ordinal): List<LokalToDoContact>
+    suspend fun getAllLocalDeletedToDoContacts(action: Int = ToDoContactState.Deleted.ordinal): List<LocalToDoContact>
 
     @Query("select * from ToDo_Contact where toDoContact_State = :action")
-    suspend fun getAllLocalAddedToDoContacts(action: Int = ToDoContactState.Added.ordinal): List<LokalToDoContact>
+    suspend fun getAllLocalAddedToDoContacts(action: Int = ToDoContactState.Added.ordinal): List<LocalToDoContact>
 
     @Query("select * from ToDo_Contact where toDoContact_State != :action")
-    suspend fun getAllLocalTouchedToDoContacts(action: Int = ToDoContactState.Save.ordinal): List<LokalToDoContact>
+    suspend fun getAllLocalTouchedToDoContacts(action: Int = ToDoContactState.Save.ordinal): List<LocalToDoContact>
 
     @Query("select * from ToDo_Contact where toDo_Id = :toDoItemID")
     suspend fun getAllLocalToDoContactsByToDo(
         toDoItemID: Long
-    ): List<LokalToDoContact>
+    ): List<LocalToDoContact>
 
     // Abfragen für Flow und Observer
 
@@ -80,18 +80,18 @@ interface ToDoDao {
     // Sortierung: Datum aufsteigend ==> asc
     // Sortierung: Important (1) am Anfang ==> desc
     @Query("select * from ToDo order by toDo_IsDone asc, toDo_DoUntil asc, toDo_IsFavourite desc")
-    fun getAllLocalToDosAsFlowByDateThenImportance(): Flow<List<LokalToDo>>
+    fun getAllLocalToDosAsFlowByDateThenImportance(): Flow<List<LocalToDo>>
 
     // Sortierung: Erledigt (1) am Ende ==> asc
     // Sortierung: Important (1) am Anfang ==> desc
     // Sortierung: Datum aufsteigend ==> asc
     @Query("select * from ToDo order by toDo_IsDone asc, toDo_IsFavourite desc, toDo_DoUntil asc")
-    fun getAllLocalToDosAsFlowByImportanceThenDate(): Flow<List<LokalToDo>>
+    fun getAllLocalToDosAsFlowByImportanceThenDate(): Flow<List<LocalToDo>>
 
     // Es scheint zu einem Problem zu kommen, wenn ich keine Klammern verwende ==> Abstürze !
     @Query("select * from ToDo_Contact where (toDo_Id = :toDoItemID) AND (toDoContact_State <> :action)")
     fun getAllLocalValidToDoContactsByToDo(
         toDoItemID: Long,
         action: Int = ToDoContactState.Deleted.ordinal
-    ): Flow<List<LokalToDoContact>>
+    ): Flow<List<LocalToDoContact>>
 }

@@ -5,8 +5,8 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import de.ckitte.myapplication.database.entities.LokalToDoContact
-import de.ckitte.myapplication.database.entities.LokalToDo
+import de.ckitte.myapplication.database.entities.LocalToDoContact
+import de.ckitte.myapplication.database.entities.LocalToDo
 import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.util.*
 import kotlinx.coroutines.Dispatchers
@@ -29,13 +29,13 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
     }
         .asLiveData(Dispatchers.IO);
 
-    fun addToDoItem(lokalToDo: LokalToDo) = viewModelScope.launch {
+    fun addToDoItem(lokalToDo: LocalToDo) = viewModelScope.launch {
         toDoDao.addToDoItem(lokalToDo)
     }.invokeOnCompletion {
         commitToDoContacts(lokalToDo)
     }
 
-    fun updateToDoItem(lokalToDo: LokalToDo) = viewModelScope.launch {
+    fun updateToDoItem(lokalToDo: LocalToDo) = viewModelScope.launch {
         when (lokalToDo.toDoLocalId) {
             0 -> toDoDao.addToDoItem(lokalToDo)
             else -> toDoDao.updateToDoItem(lokalToDo)
@@ -44,33 +44,33 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
         commitToDoContacts(lokalToDo)
     }
 
-    fun deleteToDoItem(lokalToDo: LokalToDo) = viewModelScope.launch {
+    fun deleteToDoItem(lokalToDo: LocalToDo) = viewModelScope.launch {
         toDoDao.deleteToDoItem(lokalToDo)
     }
 
-    fun getCurrentToDoItem(): LokalToDo? {
+    fun getCurrentToDoItem(): LocalToDo? {
         return ToDoRepository.getCurrentToDoItem()
     }
 
-    fun getNewToDoContact(): LokalToDoContact {
+    fun getNewToDoContact(): LocalToDoContact {
         return ToDoRepository.getNewToDoContact()
     }
 
-    fun addToDoContact(toDoContact: LokalToDoContact) = viewModelScope.launch {
+    fun addToDoContact(toDoContact: LocalToDoContact) = viewModelScope.launch {
         toDoContact.toDoContactLocalState = ToDoContactState.Added.ordinal
         toDoDao.addToDoContacts(toDoContact)
     }
 
-    fun deleteToDoContact(toDoContact: LokalToDoContact) = viewModelScope.launch {
+    fun deleteToDoContact(toDoContact: LocalToDoContact) = viewModelScope.launch {
         toDoContact.toDoContactLocalState = ToDoContactState.Deleted.ordinal
         toDoDao.updateToDoContact(toDoContact)
     }
 
-    fun commitToDoContacts(lokalToDo: LokalToDo) = viewModelScope.launch {
+    fun commitToDoContacts(lokalToDo: LocalToDo) = viewModelScope.launch {
         toDoDao.commitTransientToDoContacts()
     }
 
-    fun rollbackToDoContacts(lokalToDo: LokalToDo) = viewModelScope.launch {
+    fun rollbackToDoContacts(lokalToDo: LocalToDo) = viewModelScope.launch {
         toDoDao.rollbackTransientToDoContacts()
     }
 

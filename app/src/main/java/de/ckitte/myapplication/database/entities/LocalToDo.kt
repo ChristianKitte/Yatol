@@ -12,7 +12,7 @@ import java.time.LocalDateTime
         )
     )
 )
-data class LokalToDo(
+data class LocalToDo(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "toDo_Id")
     var toDoLocalId: Int,
