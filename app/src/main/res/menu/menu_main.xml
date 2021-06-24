@@ -17,4 +17,8 @@
     <item
         android:id="@+id/miMirrorToRemote"
         android:title="Daten nach Firestore Verschieben" />
+
+    <item
+        android:id="@+id/miDeleteDone"
+        android:title="Erledigte löschen" />
 </menu>

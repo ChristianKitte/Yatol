@@ -13,8 +13,16 @@
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
 
-    <color name="isDone">#FF17C31E</color>
-    <color name="isLate">#FFF63122</color>
+    <color name="isStart">#3402FA0D</color>
+    <color name="isStartFavourite">#C602FA0D</color>
+
+    <color name="isLate">#63F83D05</color>
+    <color name="isLateFavourite">#B4F83D05</color>
+
+    <color name="isDone">#481E1D1D</color>
+    <color name="isDoneFavourite">#7C1E1D1D</color>
+
+
 
     <color name="infoHint">#FFF63122</color>
 </resources>

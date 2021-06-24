@@ -29,8 +29,6 @@ class MainActivity : AppCompatActivity() {
         connectionLiveData = ConnectionLiveData(this)
         connectionLiveData.observe(this, {
             if (it) {
-                //this.title = "YATOL - Verbunden"
-
                 when (LoginProvider.isLoggedIn()) {
                     true -> {
                         configureActionBar("YATOL - Verbunden", "Logged In")
@@ -40,8 +38,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                //this.title = "YATOL - Kein Netzwerk"
-
                 when (LoginProvider.isLoggedIn()) {
                     true -> {
                         configureActionBar("YATOL - Kein Netzwerk", "Logged In")
@@ -132,8 +128,6 @@ class MainActivity : AppCompatActivity() {
                             showToast("Die lokalen Daten wurden in Firestore gesichert")
                         }
                     }
-
-
                 } else {
                     if (!ConnectionLiveData.isConnected) {
                         showToast("Kein Netzwerk - Die lokalen Daten können nicht in Firestore gesichert werden")

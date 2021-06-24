@@ -1,10 +1,8 @@
 package de.ckitte.myapplication.viewadapter
 
 import android.annotation.SuppressLint
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -24,6 +22,7 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
         val binding =
             FragmentTodoListitemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
         return ToDoViewHolder(binding, viewModel)
     }
 
@@ -38,116 +37,53 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(lokalToDo: LocalToDo) {
+        @SuppressLint("ResourceAsColor")
+        fun bind(localToDo: LocalToDo) {
             binding.apply {
-                tvTitle.text = lokalToDo.toDoLocalTitle
-                tvDescription.text = lokalToDo.toDoLocalDescription
+                tvTitle.text = localToDo.toDoLocalTitle
 
-                checkIsDone.isChecked = lokalToDo.toDoLocalIsDone
-                checkIsFavourite.isChecked = lokalToDo.toDoLocalIsFavourite
+                tvDescription.text = localToDo.toDoLocalDescription
 
-                tvDoUntil.text = getTimeString(lokalToDo.toDoLocalDoUntil)
-                setTitleColor(lokalToDo)
-                setFavouriteIcon()
+                checkIsDone.isChecked = localToDo.toDoLocalIsDone
+                checkIsFavourite.isChecked = localToDo.toDoLocalIsFavourite
+
+                tvDoUntil.text = getTimeString(localToDo.toDoLocalDoUntil)
 
                 btnEdit.setOnClickListener {
-                    viewModel.setCurrentToDoItem(lokalToDo)
+                    viewModel.setCurrentToDoItem(localToDo)
                     it.findNavController().navigate(R.id.action_toDoList_to_editToDo)
                 }
 
                 checkIsDone.setOnClickListener {
-                    lokalToDo.toDoLocalIsDone = checkIsDone.isChecked
-                    viewModel.updateToDoItem(lokalToDo)
-
-                    setTitleColor(lokalToDo)
+                    localToDo.toDoLocalIsDone = checkIsDone.isChecked
+                    viewModel.updateToDoItem(localToDo)
                 }
 
                 checkIsFavourite.setOnClickListener {
-                    lokalToDo.toDoLocalIsFavourite = checkIsFavourite.isChecked
-                    viewModel.updateToDoItem(lokalToDo)
-
-                    setFavouriteIcon()
+                    localToDo.toDoLocalIsFavourite = checkIsFavourite.isChecked
+                    viewModel.updateToDoItem(localToDo)
                 }
-            }
-        }
 
-        private fun FragmentTodoListitemBinding.setFavouriteIcon() {
-            val image: Drawable? = getDrawable()
-
-            if (checkIsFavourite.isChecked == true) {
-                tvTitle.setCompoundDrawables(
-                    image,
-                    null,
-                    null,
-                    null
-                )
-            } else {
-                tvTitle.setCompoundDrawables(
-                    null,
-                    null,
-                    null,
-                    null
-                )
-            }
-        }
-
-        @SuppressLint("UseCompatLoadingForDrawables")
-        private fun getDrawable(): Drawable? {
-            // WICHTIG ! Sehr lange für gesucht !!!
-            // https://www.programmersought.com/article/67787700192/
-            // Einzig mir bekannter Weg dafür...
-            //val image: Drawable = this@ToDoViewHolder.itemView.context.resources.getDrawable(R.drawable.ic_favourite)
-
-            val image: Drawable? =
-                this@ToDoViewHolder.itemView.context.getDrawable(R.drawable.ic_favourite)
-
-            val h = image?.intrinsicHeight
-            val w = image?.intrinsicWidth
-
-            if (image != null) {
-                if (w != null) {
-                    if (h != null) {
-                        image.setBounds(0, 0, w, h)
-                    }
+                // Vorbelegung
+                if (localToDo.toDoLocalIsFavourite) {
+                    statusBar.setBackgroundResource(R.color.isStartFavourite)
+                } else {
+                    statusBar.setBackgroundResource(R.color.isStart)
                 }
-            }
 
-            return image
-        }
-
-        private fun FragmentTodoListitemBinding.setTitleColor(lokalToDo: LocalToDo) {
-            if (lokalToDo.toDoLocalDoUntil.isBefore(LocalDateTime.now())) {
-                if (lokalToDo.toDoLocalDoUntil.isBefore(LocalDateTime.now())) {
-                    if (checkIsDone.isChecked == false) {
-                        tvTitle.setTextColor(
-                            ContextCompat.getColor(
-                                binding.root.context,
-                                R.color.isLate
-                            )
-                        )
+                if (localToDo.toDoLocalIsDone) {
+                    // erledigt...
+                    if (localToDo.toDoLocalIsFavourite) {
+                        statusBar.setBackgroundResource(R.color.isDoneFavourite)
                     } else {
-                        tvTitle.setTextColor(
-                            ContextCompat.getColor(
-                                binding.root.context,
-                                R.color.isDone
-                            )
-                        )
+                        statusBar.setBackgroundResource(R.color.isDone)
                     }
-                } else if (lokalToDo.toDoLocalDoUntil.isAfter(LocalDateTime.now())) {
-                    if (checkIsDone.isChecked == false) {
-                        tvTitle.setTextColor(
-                            ContextCompat.getColor(
-                                binding.root.context,
-                                R.color.black_overlay
-                            )
-                        )
+                } else if (!localToDo.toDoLocalIsDone && localToDo.toDoLocalDoUntil < LocalDateTime.now()) {
+                    //nicht erledigt und zu spät...
+                    if (localToDo.toDoLocalIsFavourite) {
+                        statusBar.setBackgroundResource(R.color.isLateFavourite)
                     } else {
-                        tvTitle.setTextColor(
-                            ContextCompat.getColor(
-                                binding.root.context,
-                                R.color.isDone
-                            )
-                        )
+                        statusBar.setBackgroundResource(R.color.isLate)
                     }
                 }
             }

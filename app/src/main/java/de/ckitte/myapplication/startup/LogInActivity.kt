@@ -27,10 +27,9 @@ class LogInActivity : AppCompatActivity() {
         this._binding = ActivityLoginBinding.inflate(layoutInflater)
 
         connectionLiveData = ConnectionLiveData(this)
+
         connectionLiveData.observe(this, {
             if (it) {
-                //this.title = "YATOL - Verbunden"
-
                 when (LoginProvider.isLoggedIn()) {
                     true -> {
                         configureActionBar("YATOL - Verbunden", "Logged In")
@@ -40,8 +39,6 @@ class LogInActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                //this.title = "YATOL - Kein Netzwerk"
-
                 when (LoginProvider.isLoggedIn()) {
                     true -> {
                         configureActionBar("YATOL - Kein Netzwerk", "Logged In")
@@ -51,14 +48,14 @@ class LogInActivity : AppCompatActivity() {
                     }
                 }
 
-                startApplication()
+                startApplication(false)
             }
         })
 
         val view = _binding.root
         setContentView(view)
 
-        val applicationScope = CoroutineScope(SupervisorJob())
+        //val applicationScope = CoroutineScope(SupervisorJob())
         this.db = ToDoDatabase.getInstance(this).toToDao
 
         _binding.etEmail.addTextChangedListener {
@@ -110,12 +107,16 @@ class LogInActivity : AppCompatActivity() {
         }
     }
 
-    private fun startApplication() {
-        CoroutineScope(Dispatchers.IO).launch {
-            ToDoRepository(db).refreshDatabase()
-            withContext(Dispatchers.Main) {
-                openMainActivity()
+    private fun startApplication(synchronize: Boolean) {
+        if (synchronize) {
+            CoroutineScope(Dispatchers.IO).launch {
+                ToDoRepository(db).refreshDatabase()
+                withContext(Dispatchers.Main) {
+                    openMainActivity()
+                }
             }
+        } else {
+            openMainActivity()
         }
     }
 
@@ -130,7 +131,7 @@ class LogInActivity : AppCompatActivity() {
 
     private fun loginResultHandler(isValid: Boolean) {
         if (isValid) {
-            startApplication()
+            startApplication(true)
         } else {
             _binding.progBar.visibility = View.INVISIBLE
 
