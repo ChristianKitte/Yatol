@@ -32,6 +32,20 @@ import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.viewadapter.ContactListViewAdapter
 import java.time.LocalDateTime
 
+/**
+ *
+ * @property _viewModel EditToDoModel
+ * @property contactListViewAdapter ContactListViewAdapter
+ * @property _binding FragmentEditTodoBinding
+ * @property cal (android.icu.util.Calendar..android.icu.util.Calendar?)
+ * @property currentDay Int
+ * @property currentMonth Int
+ * @property currentYear Int
+ * @property currentHour Int
+ * @property currentMinute Int
+ * @property resultLauncher ActivityResultLauncher<(android.content.Intent..android.content.Intent?)>
+ * @property ItemTouchHelperCallback SimpleCallback
+ */
 class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener {
     private lateinit var _viewModel: EditToDoModel
@@ -45,6 +59,13 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
     private var currentHour = cal.get(Calendar.HOUR)
     private var currentMinute = cal.get(Calendar.MINUTE)
 
+    /**
+     *
+     * @param inflater LayoutInflater
+     * @param container ViewGroup?
+     * @param savedInstanceState Bundle?
+     * @return View?
+     */
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -54,6 +75,11 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         return inflater.inflate(R.layout.fragment_edit_todo, container, false)
     }
 
+    /**
+     *
+     * @param view View
+     * @param savedInstanceState Bundle?
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -178,7 +204,10 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
     }
 
     //region Confirm Dialogs
-
+    /**
+     *
+     * @param currentLokalToDo LocalToDo
+     */
     fun confirmSaveBeforeAddContact(currentLokalToDo: LocalToDo) {
         this.context?.let {
             MaterialAlertDialogBuilder(it)
@@ -196,6 +225,10 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         }
     }
 
+    /**
+     *
+     * @param currentLokalToDo LocalToDo
+     */
     fun confirmToDoDelete(currentLokalToDo: LocalToDo) {
         this.context?.let {
             MaterialAlertDialogBuilder(it)
@@ -216,6 +249,10 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
     //endregion
 
+    /**
+     *
+     * @param currentLokalToDo LocalToDo
+     */
     fun saveCurrentToDo(currentLokalToDo: LocalToDo) {
         currentLokalToDo?.let {
             _binding.apply {
@@ -242,11 +279,17 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         }
     }
 
+    /**
+     *
+     */
     fun selectContact() {
         val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
         resultLauncher.launch(intent)
     }
 
+    /**
+     *
+     */
     var resultLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -261,6 +304,10 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
             }
         }
 
+    /**
+     *
+     * @param uri Uri
+     */
     fun addToDoContact(uri: Uri) {
         val newContact = _viewModel.getNewToDoContact()
         val currentToDoItem = _viewModel.getCurrentToDoItem()
@@ -278,6 +325,9 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         }
     }
 
+    /**
+     *
+     */
     val ItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
         ItemTouchHelper.UP or ItemTouchHelper.DOWN,
         ItemTouchHelper.LEFT
@@ -303,6 +353,9 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
     //region Edit Date and Time
 
+    /**
+     *
+     */
     private fun setUpCalender() {
         _binding.tvDoUntil.setOnClickListener {
             // month is zero based!
@@ -310,6 +363,10 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         }
     }
 
+    /**
+     *
+     * @return String
+     */
     private fun getDoUntilString(): String {
         val currentDayString = currentDay.toString().padStart(2, '0')
         val currentMonthString = currentMonth.toString().padStart(2, '0')
@@ -320,6 +377,10 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         return "Am $currentDayString.$currentMonthString.$currentYearString um $currentHourString:$currentMinuteString Uhr"
     }
 
+    /**
+     *
+     * @param dateTime LocalDateTime
+     */
     private fun setCalender(dateTime: LocalDateTime) {
         dateTime.apply {
             currentDay = dayOfMonth
@@ -330,6 +391,13 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         }
     }
 
+    /**
+     *
+     * @param view DatePicker
+     * @param year Int
+     * @param month Int
+     * @param dayOfMonth Int
+     */
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
         currentDay = dayOfMonth
         currentMonth = month + 1 // month is zero based!
@@ -340,6 +408,12 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         TimePickerDialog(this.view?.context, this, currentHour, currentMinute, true).show()
     }
 
+    /**
+     *
+     * @param view TimePicker
+     * @param hourOfDay Int
+     * @param minute Int
+     */
     override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
         currentHour = hourOfDay
         currentMinute = minute

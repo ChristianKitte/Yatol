@@ -14,11 +14,28 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
+/**
+ *
+ * @property toDoDao ToDoRepository
+ * @property toDoRepository ToDoRepository
+ * @property contactFilter MutableStateFlow<Int>
+ * @property toDoContacts LiveData<List<LocalToDoContact>>
+ * @constructor
+ */
 class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
+    /**
+     *
+     */
     private val toDoRepository = toDoDao
 
+    /**
+     *
+     */
     private val contactFilter = MutableStateFlow(0);
 
+    /**
+     *
+     */
     var toDoContacts = contactFilter.flatMapLatest { currentCurrency ->
         // In case they return different types
         when (currentCurrency) {
@@ -29,12 +46,23 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
     }
         .asLiveData(Dispatchers.IO);
 
+    /**
+     *
+     * @param lokalToDo LocalToDo
+     * @return DisposableHandle
+     */
     fun addToDoItem(lokalToDo: LocalToDo) = viewModelScope.launch {
         toDoDao.addToDoItem(lokalToDo)
     }.invokeOnCompletion {
         commitToDoContacts(lokalToDo)
     }
 
+
+    /**
+     *
+     * @param lokalToDo LocalToDo
+     * @return DisposableHandle
+     */
     fun updateToDoItem(lokalToDo: LocalToDo) = viewModelScope.launch {
         when (lokalToDo.toDoLocalId) {
             0 -> toDoDao.addToDoItem(lokalToDo)
@@ -44,6 +72,11 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
         commitToDoContacts(lokalToDo)
     }
 
+    /**
+     *
+     * @param lokalToDo LocalToDo
+     * @return Job
+     */
     fun deleteToDoItem(lokalToDo: LocalToDo) = viewModelScope.launch {
         toDoDao.deleteToDoItem(lokalToDo)
     }
@@ -52,36 +85,78 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
         return ToDoRepository.getCurrentToDoItem()
     }
 
+    /**
+     *
+     * @return LocalToDoContact
+     */
     fun getNewToDoContact(): LocalToDoContact {
         return ToDoRepository.getNewToDoContact()
     }
 
+    /**
+     *
+     * @param toDoContact LocalToDoContact
+     * @return Job
+     */
     fun addToDoContact(toDoContact: LocalToDoContact) = viewModelScope.launch {
         toDoContact.toDoContactLocalState = ToDoContactState.Added.ordinal
         toDoDao.addToDoContacts(toDoContact)
     }
 
+    /**
+     *
+     * @param toDoContact LocalToDoContact
+     * @return Job
+     */
     fun deleteToDoContact(toDoContact: LocalToDoContact) = viewModelScope.launch {
         toDoContact.toDoContactLocalState = ToDoContactState.Deleted.ordinal
         toDoDao.updateToDoContact(toDoContact)
     }
 
+    /**
+     *
+     * @param lokalToDo LocalToDo
+     * @return Job
+     */
     fun commitToDoContacts(lokalToDo: LocalToDo) = viewModelScope.launch {
         toDoDao.commitTransientToDoContacts()
     }
 
+    /**
+     *
+     * @param lokalToDo LocalToDo
+     * @return Job
+     */
     fun rollbackToDoContacts(lokalToDo: LocalToDo) = viewModelScope.launch {
         toDoDao.rollbackTransientToDoContacts()
     }
 
+    /**
+     *
+     * @param uri Uri
+     * @param contentResolver ContentResolver?
+     * @return String
+     */
     fun getDisplayName(uri: Uri, contentResolver: ContentResolver?): String {
         return getDisplayNameByUri(uri, contentResolver!!)
     }
 
+    /**
+     *
+     * @param uri Uri
+     * @param contentResolver ContentResolver?
+     * @return String
+     */
     fun getPhoneNumber(uri: Uri, contentResolver: ContentResolver?): String {
         return getPhoneNumberByUri(uri, contentResolver!!)
     }
 
+    /**
+     *
+     * @param uri Uri
+     * @param contentResolver ContentResolver?
+     * @return String
+     */
     fun getEmailAdress(uri: Uri, contentResolver: ContentResolver?): String {
         return getEmailAdressByUri(uri, contentResolver!!)
     }

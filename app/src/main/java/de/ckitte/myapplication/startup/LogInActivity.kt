@@ -16,12 +16,33 @@ import de.ckitte.myapplication.util.ConnectionLiveData
 import de.ckitte.myapplication.util.EmailUtil
 import kotlinx.coroutines.*
 
+/**
+ *
+ * @property _binding ActivityLoginBinding
+ * @property connectionLiveData ConnectionLiveData
+ * @property db ToDoDao
+ */
 class LogInActivity : AppCompatActivity() {
+    /**
+     *
+     */
     private lateinit var _binding: ActivityLoginBinding
+
+    /**
+     *
+     */
     private lateinit var connectionLiveData: ConnectionLiveData
+
+    /**
+     *
+     */
     private lateinit var db: ToDoDao
 
     // https://miromatech.com/android/edittext-inputtype/
+    /**
+     *
+     * @param savedInstanceState Bundle?
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this._binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -93,6 +114,11 @@ class LogInActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     *
+     * @param titel String
+     * @param subtitle String
+     */
     private fun configureActionBar(titel: String, subtitle: String) {
         val bar = supportActionBar
 
@@ -107,6 +133,10 @@ class LogInActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     *
+     * @param synchronize Boolean
+     */
     private fun startApplication(synchronize: Boolean) {
         if (synchronize) {
             CoroutineScope(Dispatchers.IO).launch {
@@ -121,14 +151,19 @@ class LogInActivity : AppCompatActivity() {
     }
 
     // https://riptutorial.com/android/example/17590/clear-your-current-activity-stack-and-launch-a-new-activity
+    /**
+     *
+     */
     private fun openMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
-
-        //_binding.progBar.visibility = View.INVISIBLE
         finishAffinity()
     }
 
+    /**
+     *
+     * @param isValid Boolean
+     */
     private fun loginResultHandler(isValid: Boolean) {
         if (isValid) {
             startApplication(true)
@@ -145,6 +180,9 @@ class LogInActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     *
+     */
     private fun wipeInput() {
         _binding.apply {
             etEmail.text.clear()
@@ -152,6 +190,9 @@ class LogInActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     *
+     */
     private fun validateForm() {
         _binding.apply {
             btnLogin.isEnabled = etPassword.length() > 0

@@ -10,16 +10,34 @@ import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDo
 import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDoContact
 import kotlinx.coroutines.tasks.await
 
+/**
+ *
+ * @property db FirebaseFirestore
+ */
 class FirestoreApi {
+    /**
+     *
+     */
     var db = FirebaseFirestore.getInstance()
 
     companion object {
+        /**
+         *
+         */
         val getToDoRemoteCollection = "ToDoItems"
+
+        /**
+         *
+         */
         val getToDoContactRemoteCollection = "Contacts"
     }
 
     // CRUD ToDoItem
 
+    /**
+     *
+     * @return List<RemoteToDo>
+     */
     suspend fun getAllRemoteToDos(): List<RemoteToDo> {
         var remoteToDo: List<RemoteToDo> = emptyList()
 
@@ -44,6 +62,11 @@ class FirestoreApi {
         }
     }
 
+    /**
+     *
+     * @param toDoRemoteId String
+     * @return List<RemoteToDoContact>
+     */
     suspend fun getAllRemoteToDoContactsByRemoteToDo(toDoRemoteId: String): List<RemoteToDoContact> {
         var remoteToDoContacts: List<RemoteToDoContact> = emptyList()
 
@@ -69,6 +92,12 @@ class FirestoreApi {
         }
     }
 
+    /**
+     *
+     * @param collection String
+     * @param remoteToDo RemoteToDo
+     * @return RemoteToDo
+     */
     suspend fun insertToDoRemoteItem(
         collection: String,
         remoteToDo: RemoteToDo
@@ -84,6 +113,11 @@ class FirestoreApi {
         return remoteToDo
     }
 
+    /**
+     *
+     * @param collection String
+     * @param remoteToDo RemoteToDo
+     */
     suspend fun updateToDoRemoteItem(
         collection: String,
         remoteToDo: RemoteToDo
@@ -95,6 +129,11 @@ class FirestoreApi {
             .await()
     }
 
+    /**
+     *
+     * @param remoteToDo RemoteToDo
+     * @return MutableMap<String, Any>
+     */
     private fun getMutableMapFromToDoRemoteItem(remoteToDo: RemoteToDo): MutableMap<String, Any> {
         val map = mutableMapOf<String, Any>()
 
@@ -109,6 +148,11 @@ class FirestoreApi {
         return map
     }
 
+    /**
+     *
+     * @param collection String
+     * @param remoteToDo RemoteToDo
+     */
     suspend fun deleteToDoRemoteItem(
         collection: String,
         remoteToDo: RemoteToDo
@@ -119,6 +163,12 @@ class FirestoreApi {
 
 // CRUD ToDoContacts
 
+    /**
+     *
+     * @param collection String
+     * @param remoteToDoContact RemoteToDoContact
+     * @return RemoteToDoContact
+     */
     suspend fun insertToDoContact(
         collection: String,
         remoteToDoContact: RemoteToDoContact
@@ -134,6 +184,11 @@ class FirestoreApi {
         return remoteToDoContact
     }
 
+    /**
+     *
+     * @param collection String
+     * @param remoteToDoContact RemoteToDoContact
+     */
     suspend fun updateToDoContact(
         collection: String,
         remoteToDoContact: RemoteToDoContact
@@ -146,6 +201,11 @@ class FirestoreApi {
             .await()
     }
 
+    /**
+     *
+     * @param remoteToDoContact RemoteToDoContact
+     * @return MutableMap<String, Any>
+     */
     private fun getMutableMapFromToDoItemContact(remoteToDoContact: RemoteToDoContact): MutableMap<String, Any> {
         val map = mutableMapOf<String, Any>()
 
@@ -156,6 +216,11 @@ class FirestoreApi {
         return map
     }
 
+    /**
+     *
+     * @param collection String
+     * @param remoteToDoContact RemoteToDoContact
+     */
     suspend fun deleteToDoContact(
         collection: String,
         remoteToDoContact: RemoteToDoContact
@@ -166,11 +231,18 @@ class FirestoreApi {
 
 // Zusätzliche Funktionalität
 
+    /**
+     *
+     */
     suspend fun deleteAllRemoteItems() {
         DeleteAllRemoteDocumentsFromCollection(getToDoContactRemoteCollection)
         DeleteAllRemoteDocumentsFromCollection(getToDoRemoteCollection)
     }
 
+    /**
+     *
+     * @param collection String
+     */
     private suspend fun DeleteAllRemoteDocumentsFromCollection(
         collection: String
     ) {

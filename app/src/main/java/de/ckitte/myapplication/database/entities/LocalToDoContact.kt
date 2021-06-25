@@ -2,6 +2,16 @@ package de.ckitte.myapplication.database.entities
 
 import androidx.room.*
 
+/**
+ *
+ * @property toDoContactLocalId Int
+ * @property toDoContactRemoteId String
+ * @property toDoContactLocalUri String
+ * @property toDoLocalId Long
+ * @property toDoRemoteId String
+ * @property toDoContactLocalState Int
+ * @constructor
+ */
 @Entity(
     tableName = "ToDo_Contact",
     indices = arrayOf(

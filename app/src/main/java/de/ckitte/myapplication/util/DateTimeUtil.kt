@@ -2,8 +2,16 @@ package de.ckitte.myapplication.util
 
 import java.time.LocalDateTime
 
+/**
+ *
+ */
 class DateTimeUtil {
     companion object {
+        /**
+         *
+         * @param dateTime LocalDateTime
+         * @return String
+         */
         fun getTimeString(dateTime: LocalDateTime): String {
             val currentDayString = dateTime.dayOfMonth.toString().padStart(2, '0')
             val currentMonthString = dateTime.monthValue.toString().padStart(2, '0')

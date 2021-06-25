@@ -6,8 +6,10 @@
     <!--Permission for internet connectivity-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+
     <!--Permission to read contacts-->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <!--Permission to init a direct call-->
     <uses-permission android:name="android.permission.CALL_PHONE" />
 
@@ -17,21 +19,22 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
-        <activity android:name=".startup.LogInActivity">
+
+        <activity
+            android:name=".startup.LogInActivity"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".startup.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

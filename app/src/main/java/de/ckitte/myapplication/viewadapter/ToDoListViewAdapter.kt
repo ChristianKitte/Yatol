@@ -15,10 +15,20 @@ import de.ckitte.myapplication.databinding.FragmentTodoListitemBinding
 import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter.ToDoViewHolder
 import java.time.LocalDateTime
 
-
+/**
+ *
+ * @property viewModel ToDoListModel
+ * @constructor
+ */
 class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
     ListAdapter<LocalToDo, ToDoViewHolder>(ToDoComparator()) {
 
+    /**
+     *
+     * @param parent ViewGroup
+     * @param viewType Int
+     * @return ToDoViewHolder
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
         val binding =
             FragmentTodoListitemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -26,17 +36,32 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
         return ToDoViewHolder(binding, viewModel)
     }
 
+    /**
+     *
+     * @param holder ToDoViewHolder
+     * @param position Int
+     */
     override fun onBindViewHolder(holder: ToDoViewHolder, position: Int) {
         val currentItem = getItem(position)
         holder.bind(currentItem)
     }
 
+    /**
+     *
+     * @property binding FragmentTodoListitemBinding
+     * @property viewModel ToDoListModel
+     * @constructor
+     */
     class ToDoViewHolder(
         private val binding: FragmentTodoListitemBinding,
         private var viewModel: ToDoListModel
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
+        /**
+         *
+         * @param localToDo LocalToDo
+         */
         @SuppressLint("ResourceAsColor")
         fun bind(localToDo: LocalToDo) {
             binding.apply {
@@ -90,11 +115,26 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
         }
     }
 
+    /**
+     *
+     */
     class ToDoComparator : DiffUtil.ItemCallback<LocalToDo>() {
+        /**
+         *
+         * @param oldItemLokal LocalToDo
+         * @param newItemLokal LocalToDo
+         * @return Boolean
+         */
         override fun areItemsTheSame(oldItemLokal: LocalToDo, newItemLokal: LocalToDo): Boolean {
             return oldItemLokal === newItemLokal
         }
 
+        /**
+         *
+         * @param oldItemLokal LocalToDo
+         * @param newItemLokal LocalToDo
+         * @return Boolean
+         */
         override fun areContentsTheSame(oldItemLokal: LocalToDo, newItemLokal: LocalToDo): Boolean {
             return oldItemLokal.toDoLocalId == newItemLokal.toDoLocalId
         }

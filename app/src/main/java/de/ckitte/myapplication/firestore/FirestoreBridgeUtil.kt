@@ -5,8 +5,16 @@ import de.ckitte.myapplication.database.entities.LocalToDo
 import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDoContact
 import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDo
 
+/**
+ *
+ */
 class FirestoreBridgeUtil {
     companion object {
+        /***
+         *
+         * @param lokalToDo LocalToDo
+         * @return RemoteToDo
+         */
         fun getRemoteToDoTemplateFromLokalToDo(lokalToDo: LocalToDo): RemoteToDo {
 
             val firestoreToDoItem = RemoteToDo(
@@ -22,6 +30,11 @@ class FirestoreBridgeUtil {
             return firestoreToDoItem
         }
 
+        /**
+         *
+         * @param localToDoContact LocalToDoContact
+         * @return RemoteToDoContact
+         */
         fun getRemoteToDoContactTemplateFromLokalToDoContact(localToDoContact: LocalToDoContact): RemoteToDoContact {
 
             val firestoreToDoContacts = RemoteToDoContact(

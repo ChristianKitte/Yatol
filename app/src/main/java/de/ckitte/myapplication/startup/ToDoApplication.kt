@@ -5,6 +5,9 @@ import de.ckitte.myapplication.database.ToDoDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
+/**
+ *
+ */
 class ToDoApplication : Application() {
     /*
     val applicationScope = CoroutineScope(SupervisorJob())

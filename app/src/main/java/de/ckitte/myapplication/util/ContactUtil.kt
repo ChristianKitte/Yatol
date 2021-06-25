@@ -7,13 +7,21 @@ import android.net.Uri
 import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds.Email.DISPLAY_NAME
 
-
+/**
+ *
+ */
 enum class ToDoContactState {
     Save,
     Added,
     Deleted
 }
 
+/**
+ *
+ * @param uri Uri
+ * @param contentResolver ContentResolver
+ * @return String
+ */
 fun getDisplayNameByUri(uri: Uri, contentResolver: ContentResolver): String {
     var displayName = ""
 
@@ -39,6 +47,12 @@ fun getDisplayNameByUri(uri: Uri, contentResolver: ContentResolver): String {
     return displayName
 }
 
+/**
+ *
+ * @param uri Uri
+ * @param contentResolver ContentResolver
+ * @return String
+ */
 fun getPhoneNumberByUri(uri: Uri, contentResolver: ContentResolver): String {
     var phoneNumber = ""
 
@@ -75,6 +89,12 @@ fun getPhoneNumberByUri(uri: Uri, contentResolver: ContentResolver): String {
     return phoneNumber
 }
 
+/**
+ *
+ * @param uri Uri
+ * @param contentResolver ContentResolver
+ * @return String
+ */
 fun getEmailAdressByUri(uri: Uri, contentResolver: ContentResolver): String {
     var eMailAdress = ""
 

@@ -17,11 +17,32 @@ import de.ckitte.myapplication.login.LoginProvider
 import de.ckitte.myapplication.util.ConnectionLiveData
 import kotlinx.coroutines.*
 
+/**
+ *
+ * @property _binding ActivityMainBinding
+ * @property connectionLiveData ConnectionLiveData
+ * @property db ToDoDao
+ */
 class MainActivity : AppCompatActivity() {
+    /**
+     *
+     */
     private lateinit var _binding: ActivityMainBinding
+
+    /**
+     *
+     */
     private lateinit var connectionLiveData: ConnectionLiveData
+
+    /**
+     *
+     */
     private lateinit var db: ToDoDao
 
+    /**
+     *
+     * @param savedInstanceState Bundle?
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this._binding = ActivityMainBinding.inflate(layoutInflater)
@@ -59,6 +80,11 @@ class MainActivity : AppCompatActivity() {
         checkPermission(Manifest.permission.CALL_PHONE, 110)
     }
 
+    /**
+     *
+     * @param titel String
+     * @param subtitle String
+     */
     private fun configureActionBar(titel: String, subtitle: String) {
         val bar = supportActionBar
 
@@ -73,6 +99,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     *
+     * @param menu Menu
+     * @return Boolean
+     */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
 
@@ -81,6 +112,11 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    /**
+     *
+     * @param item MenuItem
+     * @return Boolean
+     */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // https://developer.android.com/guide/topics/ui/menus
 
@@ -166,6 +202,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     *
+     * @param text String
+     */
     private fun showToast(text: String) {
         Toast.makeText(
             applicationContext,
@@ -175,6 +215,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Function to check and request permission.
+    /**
+     *
+     * @param permission String
+     * @param requestCode Int
+     */
     private fun checkPermission(permission: String, requestCode: Int) {
         if (ContextCompat.checkSelfPermission(
                 this,

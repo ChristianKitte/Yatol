@@ -24,17 +24,41 @@ android/rickmortydatabase/utils/networking/ConnectionLiveData.kt
 
 // Weiter überarbeiten
 
+/**
+ *
+ * @property networkCallback NetworkCallback
+ * @property connectivityManeger ConnectivityManager
+ * @property networkList MutableSet<Network>
+ * @constructor
+ */
 class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
     companion object {
+        /**
+         *
+         */
         @Volatile
         var isConnected: Boolean = false
     }
 
+    /**
+     *
+     */
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
+
+    /**
+     *
+     */
     private val connectivityManeger =
         context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    /**
+     *
+     */
     private val networkList: MutableSet<Network> = HashSet()
 
+    /**
+     *
+     */
     override fun onActive() {
         networkCallback = createNetworkCallback()
         val networkRequest = NetworkRequest.Builder()
@@ -47,12 +71,23 @@ class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
         }
     }
 
+    /**
+     *
+     */
     override fun onInactive() {
         connectivityManeger.unregisterNetworkCallback(networkCallback)
     }
 
+    /**
+     *
+     * @return <no name provided>
+     */
     private fun createNetworkCallback() = object : ConnectivityManager.NetworkCallback() {
         // https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback#onAvailable(android.net.Network)
+        /**
+         *
+         * @param network Network
+         */
         override fun onAvailable(network: Network) {
             val networkCapabilities = connectivityManeger.getNetworkCapabilities(network)
             val hasInternetCapability = networkCapabilities?.hasCapability(NET_CAPABILITY_INTERNET)
@@ -70,6 +105,10 @@ class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
         }
 
         // https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback#onLost(android.net.Network)
+        /**
+         *
+         * @param network Network
+         */
         override fun onLost(network: Network) {
             networkList.remove(network)
             checkValidNetworks()
@@ -77,12 +116,20 @@ class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
 
     }
 
+    /**
+     *
+     */
     private fun checkValidNetworks() {
         isConnected = networkList.size > 0
         postValue(networkList.size > 0)
     }
 
     // https://kodlogs.com/93804/cannot-connect-to-server-check-whether-the-network-is-available-or-use-a-proxy-server
+    /**
+     *
+     * @param socketFactory SocketFactory
+     * @return Boolean
+     */
     private fun isInternet(socketFactory: SocketFactory): Boolean {
         try {
             socketFactory

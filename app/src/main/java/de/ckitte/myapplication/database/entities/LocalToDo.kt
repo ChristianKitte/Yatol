@@ -3,6 +3,17 @@ package de.ckitte.myapplication.database.entities
 import androidx.room.*
 import java.time.LocalDateTime
 
+/**
+ *
+ * @property toDoLocalId Int
+ * @property toDoRemoteId String
+ * @property toDoLocalTitle String
+ * @property toDoLocalDescription String
+ * @property toDoLocalIsDone Boolean
+ * @property toDoLocalIsFavourite Boolean
+ * @property toDoLocalDoUntil LocalDateTime
+ * @constructor
+ */
 @Entity(
     tableName = "ToDo",
     indices = arrayOf(

@@ -5,7 +5,15 @@ import de.ckitte.myapplication.database.daos.ToDoDao
 import de.ckitte.myapplication.database.entities.LocalToDo
 import java.time.LocalDateTime
 
+/**
+ *
+ * @property toDoDao ToDoDao
+ * @constructor
+ */
 class RepositoryHelper(private val toDoDao: ToDoDao) {
+    /**
+     *
+     */
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun createSampleEntities() {

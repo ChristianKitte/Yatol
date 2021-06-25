@@ -17,11 +17,25 @@ import de.ckitte.myapplication.login.LoginProvider
 import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter
 import kotlinx.coroutines.*
 
+/**
+ *
+ * @property viewModel ToDoListModel
+ * @property toDoListViewAdapter ToDoListViewAdapter
+ * @property _binding FragmentTodoListBinding
+ * @property ItemTouchHelperCallback <no name provided>
+ */
 class ToDoList : Fragment(R.layout.fragment_todo_list) {
     private lateinit var viewModel: ToDoListModel
     private lateinit var toDoListViewAdapter: ToDoListViewAdapter
     private lateinit var _binding: FragmentTodoListBinding
 
+    /**
+     *
+     * @param inflater LayoutInflater
+     * @param container ViewGroup?
+     * @param savedInstanceState Bundle?
+     * @return View?
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -31,6 +45,11 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
+    /**
+     *
+     * @param item MenuItem
+     * @return Boolean
+     */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.mi_sort_date -> {
@@ -53,6 +72,11 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         }
     }
 
+    /**
+     *
+     * @param view View
+     * @param savedInstanceState Bundle?
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -126,6 +150,9 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         }
     }
 
+    /**
+     *
+     */
     private val ItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
         ItemTouchHelper.UP or ItemTouchHelper.DOWN,
         ItemTouchHelper.LEFT
