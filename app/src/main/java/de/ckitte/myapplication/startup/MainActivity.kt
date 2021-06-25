@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         val view = _binding.root
         setContentView(view)
 
-        val applicationScope = CoroutineScope(SupervisorJob())
+        CoroutineScope(SupervisorJob())
         this.db = ToDoDatabase.getInstance(this).toToDao
 
         checkPermission(Manifest.permission.READ_CONTACTS, 100)

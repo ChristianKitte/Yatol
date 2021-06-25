@@ -46,7 +46,7 @@ class FirestoreApi {
             val querySnapshot = targetCollection.get().await()
 
             querySnapshot.documents.forEach {
-                val x = it.data
+
                 val newToDo = it.toObject<RemoteToDo>()
 
                 if (newToDo != null) {
@@ -103,7 +103,6 @@ class FirestoreApi {
         remoteToDo: RemoteToDo
     ): RemoteToDo {
         val targetCollection = Firebase.firestore.collection(collection)
-        var newID: String = ""
 
         // soll explizit blocken !
         targetCollection.add(remoteToDo).addOnSuccessListener {
@@ -174,7 +173,6 @@ class FirestoreApi {
         remoteToDoContact: RemoteToDoContact
     ): RemoteToDoContact {
         val targetCollection = Firebase.firestore.collection(collection)
-        var newID: String = ""
 
         // soll explizit blocken !
         targetCollection.add(remoteToDoContact).addOnSuccessListener {

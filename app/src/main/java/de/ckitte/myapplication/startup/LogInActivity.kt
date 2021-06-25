@@ -103,7 +103,7 @@ class LogInActivity : AppCompatActivity() {
                 key = _binding.etPassword.text.toString()
             )
 
-            var isValid = false
+            var isValid: Boolean
             CoroutineScope(Dispatchers.IO).launch {
                 isValid = LoginProvider.LogIn(myCredentials)
 

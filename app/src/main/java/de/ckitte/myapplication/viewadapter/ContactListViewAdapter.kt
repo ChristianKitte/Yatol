@@ -114,15 +114,15 @@ class ContactListViewAdapter(
                 if (contentResolver != null) {
                     val uri: Uri = Uri.parse(contact.toDoContactLocalUri)
 
-                    tvContact.text = viewModel.getDisplayName(uri, contentResolver!!)
+                    tvContact.text = viewModel.getDisplayName(uri, contentResolver)
                     //tvContact.text = getDisplayNameByUri(uri, contentResolver!!)
 
-                    currentPhoneNumber = viewModel.getPhoneNumber(uri, contentResolver!!)
+                    currentPhoneNumber = viewModel.getPhoneNumber(uri, contentResolver)
                     if (currentPhoneNumber.isEmpty()) {
                         this.btnCall.isEnabled = false
                     }
 
-                    currentEmail = viewModel.getEmailAdress(uri, contentResolver!!)
+                    currentEmail = viewModel.getEmailAdress(uri, contentResolver)
                     if (currentEmail.isEmpty()) {
                         this.btnMail.isEnabled = false
                     }

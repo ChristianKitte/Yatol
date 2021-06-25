@@ -30,6 +30,7 @@ import de.ckitte.myapplication.databinding.FragmentEditTodoBinding
 import de.ckitte.myapplication.model.EditToDoModel
 import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.viewadapter.ContactListViewAdapter
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.time.LocalDateTime
 
 /**
@@ -80,6 +81,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
      * @param view View
      * @param savedInstanceState Bundle?
      */
+    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -173,7 +175,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
         _binding.btnBack.setOnClickListener {
             if (currentToDoItem != null) {
-                _viewModel.rollbackToDoContacts(currentToDoItem)
+                _viewModel.rollbackToDoContacts()
             }
 
             it.findNavController().navigate(R.id.action_editToDo_to_toDoListFragment)
@@ -254,7 +256,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
      * @param currentLokalToDo LocalToDo
      */
     fun saveCurrentToDo(currentLokalToDo: LocalToDo) {
-        currentLokalToDo?.let {
+        currentLokalToDo.let {
             _binding.apply {
                 currentLokalToDo.apply {
                     toDoLocalTitle = etTitle.text.toString()

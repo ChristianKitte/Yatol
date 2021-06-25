@@ -358,7 +358,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     @WorkerThread
     suspend fun mirrorLocalToRemote() {
         if (ConnectionLiveData.isConnected) {
-            val api = FirestoreApi()
+            FirestoreApi()
 
             emptyRemoteDatabase()
 

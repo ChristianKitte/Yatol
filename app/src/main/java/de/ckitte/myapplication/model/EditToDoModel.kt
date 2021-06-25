@@ -10,6 +10,7 @@ import de.ckitte.myapplication.database.entities.LocalToDo
 import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.util.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
@@ -36,6 +37,7 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
     /**
      *
      */
+    @ExperimentalCoroutinesApi
     var toDoContacts = contactFilter.flatMapLatest { currentCurrency ->
         // In case they return different types
         when (currentCurrency) {
@@ -54,7 +56,7 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
     fun addToDoItem(lokalToDo: LocalToDo) = viewModelScope.launch {
         toDoDao.addToDoItem(lokalToDo)
     }.invokeOnCompletion {
-        commitToDoContacts(lokalToDo)
+        commitToDoContacts()
     }
 
 
@@ -69,7 +71,7 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
             else -> toDoDao.updateToDoItem(lokalToDo)
         }
     }.invokeOnCompletion {
-        commitToDoContacts(lokalToDo)
+        commitToDoContacts()
     }
 
     /**
@@ -118,7 +120,7 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
      * @param lokalToDo LocalToDo
      * @return Job
      */
-    fun commitToDoContacts(lokalToDo: LocalToDo) = viewModelScope.launch {
+    fun commitToDoContacts() = viewModelScope.launch {
         toDoDao.commitTransientToDoContacts()
     }
 
@@ -127,7 +129,7 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
      * @param lokalToDo LocalToDo
      * @return Job
      */
-    fun rollbackToDoContacts(lokalToDo: LocalToDo) = viewModelScope.launch {
+    fun rollbackToDoContacts() = viewModelScope.launch {
         toDoDao.rollbackTransientToDoContacts()
     }
 

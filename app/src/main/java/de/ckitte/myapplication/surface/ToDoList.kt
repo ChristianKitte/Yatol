@@ -77,6 +77,7 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
      * @param view View
      * @param savedInstanceState Bundle?
      */
+    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
