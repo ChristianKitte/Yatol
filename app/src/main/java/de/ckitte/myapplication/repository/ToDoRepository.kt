@@ -9,7 +9,10 @@ import de.ckitte.myapplication.firestore.FirestoreApi
 import de.ckitte.myapplication.firestore.FirestoreBridgeUtil
 import de.ckitte.myapplication.util.ConnectionLiveData
 import de.ckitte.myapplication.util.ToDoContactState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 /**
@@ -87,6 +90,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         lokalToDos.forEach {
             val newID = toDoDao.addLocalToDo(it)
             it.toDoLocalId = newID.toInt()
+
             setCurrentToDoItem(it)
 
             if (ConnectionLiveData.isConnected) {
@@ -97,7 +101,12 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
                     firestoreToDoItem
                 )
 
-                toDoDao.updateRemoteToDoItemId(insertedFirestoreToDoItem.toDoRemoteId, newID)
+                toDoDao.updateRemoteToDoItemId(
+                    insertedFirestoreToDoItem.toDoRemoteId,
+                    newID
+                )
+
+                it.toDoRemoteId = insertedFirestoreToDoItem.toDoRemoteId
             }
         }
     }
@@ -132,6 +141,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
                         insertedFirestoreToDoItem.toDoRemoteId,
                         it.toDoLocalId.toLong()
                     )
+                    it.toDoRemoteId = insertedFirestoreToDoItem.toDoRemoteId
                 }
             }
         }
@@ -147,6 +157,15 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         setCurrentToDoItem(getNewToDoItem())
 
         lokalToDos.forEach {
+            CoroutineScope(Dispatchers.IO).launch {
+                val s = toDoDao.ToDosItemsWithContacts(it.toDoLocalId.toLong())
+                s.forEach {
+                    it.toDoContacts.forEach {
+                        deleteToDoContacts(it)
+                    }
+                }
+            }
+
             toDoDao.deleteLokalToDo(it)
 
             if (ConnectionLiveData.isConnected && it.toDoRemoteId.isNotBlank()) {
@@ -157,6 +176,12 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
                     firestoreToDoItem
                 )
             }
+        }
+    }
+
+    suspend fun deleteDoneToDoItems() {
+        toDoDao.getLocalToDoByDone().forEach {
+            deleteToDoItem(it)
         }
     }
 
@@ -264,8 +289,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
      */
     @WorkerThread
     suspend fun commitTransientToDoContacts() {
-        val contactsToDelete = toDoDao.getAllLocalDeletedToDoContacts()
-        val contactsToAdd = toDoDao.getAllLocalAddedToDoContacts()
+        val contactsToDelete = toDoDao.getAllLocalToDoContactsByState(ToDoContactState.Deleted.ordinal) //.getAllLocalDeletedToDoContacts()
+        val contactsToAdd = toDoDao.getAllLocalToDoContactsByState(ToDoContactState.Added.ordinal) //.getAllLocalAddedToDoContacts()
 
         contactsToDelete.forEach {
             deleteToDoContacts(it)
@@ -278,11 +303,11 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     }
 
     /**
-     *
+     * Gibt alle als gespeichert vermerkte lokale Kontakte zurück
      */
     @WorkerThread
     suspend fun rollbackTransientToDoContacts() {
-        val contactsTouched = toDoDao.getAllLocalTouchedToDoContacts()
+        val contactsTouched = toDoDao.getAllLocalToDoContactsByInverseState(ToDoContactState.Save.ordinal) //.getAllLocalTouchedToDoContacts()
 
         contactsTouched.forEach {
             when (it.toDoContactLocalState) {
@@ -316,6 +341,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     fun getAllToDosAsFlow_ImportanceThenDate(): Flow<List<LocalToDo>> =
         toDoDao.getAllLocalToDosAsFlowByImportanceThenDate()
 
+    /*
     /**
      *
      * @param toDoItemID Long
@@ -323,6 +349,15 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
      */
     fun getAllContacts(toDoItemID: Long): Flow<List<LocalToDoContact>> =
         toDoDao.getAllLocalValidToDoContactsByToDo(toDoItemID)
+     */
+
+    /**
+     *
+     * @param toDoItemID Long
+     * @return Flow<List<LocalToDoContact>>
+     */
+    fun getAllLocalValidToDoContactsByToDo(toDoItemID: Long): Flow<List<LocalToDoContact>> =
+        toDoDao.getAllLocalValidToDoContactsByToDo(toDoItemID, ToDoContactState.Deleted.ordinal)
 
     //endregion
 

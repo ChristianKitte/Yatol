@@ -6,10 +6,9 @@ import de.ckitte.myapplication.database.entities.LocalToDoContact
 import de.ckitte.myapplication.database.entities.LocalToDo
 
 /**
- *
- * @property lokalToDo LocalToDo
- * @property toDoContacts List<LocalToDoContact>
- * @constructor
+ *  Definiert die 1:N Relation ToDoItem zu Kontakte
+ * @property lokalToDo LocalToDo Das lokale ToDoItem (Parent)
+ * @property toDoContacts List<LocalToDoContact> Die zugehörigen Kontakte (Children) des ToDoItems
  */
 data class ToDosItemsWithContacts(
     @Embedded val lokalToDo: LocalToDo,

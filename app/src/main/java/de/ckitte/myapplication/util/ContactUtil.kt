@@ -8,7 +8,13 @@ import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds.Email.DISPLAY_NAME
 
 /**
+ * Gibt den aktuellen Status eines Kontaktes an
  *
+ * SAVE ==> Der default Zustand
+ *
+ * ADDED ==> Der Zustand wurde hinzugefügt, aber noch nicht commited
+ *
+ * DELETED ==> Der Zustand wurde gelöscht, aber noch nicht commited
  */
 enum class ToDoContactState {
     Save,

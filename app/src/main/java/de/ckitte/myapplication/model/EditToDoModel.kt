@@ -32,33 +32,21 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
     /**
      *
      */
-    private val contactFilter = MutableStateFlow(0);
+    private val contactFilter = MutableStateFlow(0)
 
     /**
      *
      */
     @ExperimentalCoroutinesApi
-    var toDoContacts = contactFilter.flatMapLatest { currentCurrency ->
+    var toDoContacts = contactFilter.flatMapLatest { currentContact ->
         // In case they return different types
-        when (currentCurrency) {
+        when (currentContact) {
             // Assuming all of these database calls return a Flow
-            0 -> toDoRepository.getAllContacts(ToDoRepository.getCurrentToDoItem()?.toDoLocalId!!.toLong())
-            else -> toDoRepository.getAllContacts(0)
+            0 -> toDoRepository.getAllLocalValidToDoContactsByToDo(ToDoRepository.getCurrentToDoItem()?.toDoLocalId!!.toLong())
+            else -> toDoRepository.getAllLocalValidToDoContactsByToDo(0)
         }
     }
         .asLiveData(Dispatchers.IO);
-
-    /**
-     *
-     * @param lokalToDo LocalToDo
-     * @return DisposableHandle
-     */
-    fun addToDoItem(lokalToDo: LocalToDo) = viewModelScope.launch {
-        toDoDao.addToDoItem(lokalToDo)
-    }.invokeOnCompletion {
-        commitToDoContacts()
-    }
-
 
     /**
      *
@@ -103,6 +91,7 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
     fun addToDoContact(toDoContact: LocalToDoContact) = viewModelScope.launch {
         toDoContact.toDoContactLocalState = ToDoContactState.Added.ordinal
         toDoDao.addToDoContacts(toDoContact)
+        contactFilter.value=0
     }
 
     /**

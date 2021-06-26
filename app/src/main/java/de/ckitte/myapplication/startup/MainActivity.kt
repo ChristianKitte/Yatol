@@ -196,6 +196,24 @@ class MainActivity : AppCompatActivity() {
 
                 true
             }
+            R.id.miDeleteDone -> {
+                if (!ConnectionLiveData.isConnected || !LoginProvider.isLoggedIn()) {
+                    if (!ConnectionLiveData.isConnected) {
+                        showToast("Kein Netzwerk - Die Daten werden nicht aus Firestore entfernt werden ")
+                    } else if (!LoginProvider.isLoggedIn()) {
+                        showToast("Nicht eingelogged - Die Daten werden nicht aus Firestore entfernt werden")
+                    }
+                }
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    ToDoRepository(db).deleteDoneToDoItems()
+                    withContext(Dispatchers.Main) {
+                        showToast("Die Daten wurden entfernt")
+                    }
+                }
+
+                true
+            }
             else -> {
                 super.onOptionsItemSelected(item)
             }

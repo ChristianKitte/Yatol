@@ -3,13 +3,13 @@ package de.ckitte.myapplication.database.entities
 import androidx.room.*
 
 /**
- *
- * @property toDoContactLocalId Int
- * @property toDoContactRemoteId String
- * @property toDoContactLocalUri String
- * @property toDoLocalId Long
- * @property toDoRemoteId String
- * @property toDoContactLocalState Int
+ * Repräsentiert einen lokalen Kontakt
+ * @property toDoContactLocalId Int Die lokale ID des Kontaktes
+ * @property toDoContactRemoteId String Die Remote ID des Kontaktes
+ * @property toDoContactLocalUri String Die URI des Kontaktes auf dem erzeugenden Mobil Phone
+ * @property toDoLocalId Long Die Lokale ID des zugehörigen ToDos
+ * @property toDoRemoteId String Die Remote ID des zugehörigen ToDos
+ * @property toDoContactLocalState Int Der Status des Kontaktes als [ToDoContactState]
  * @constructor
  */
 @Entity(

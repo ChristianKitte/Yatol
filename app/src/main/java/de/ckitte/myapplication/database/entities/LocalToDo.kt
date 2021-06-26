@@ -4,14 +4,14 @@ import androidx.room.*
 import java.time.LocalDateTime
 
 /**
- *
- * @property toDoLocalId Int
- * @property toDoRemoteId String
- * @property toDoLocalTitle String
- * @property toDoLocalDescription String
- * @property toDoLocalIsDone Boolean
- * @property toDoLocalIsFavourite Boolean
- * @property toDoLocalDoUntil LocalDateTime
+ * Repräsentiert ein lokales ToDoItem
+ * @property toDoLocalId Int Die lokale ID des Eintrages
+ * @property toDoRemoteId String Die Remote ID des Eintrages
+ * @property toDoLocalTitle String Der Titel des Eintrages
+ * @property toDoLocalDescription String Die Beschreibung des Eintrages
+ * @property toDoLocalIsDone Boolean True (1), wenn der Eintrag erledigt ist
+ * @property toDoLocalIsFavourite Boolean True (1), wenn der Eintrag wichtig ist
+ * @property toDoLocalDoUntil LocalDateTime, Das Datum der Fälligkeit
  * @constructor
  */
 @Entity(

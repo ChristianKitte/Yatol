@@ -4,13 +4,13 @@ import androidx.room.TypeConverter
 import java.time.LocalDateTime
 
 /**
- *
+ * Konverter zum Konvertieren eines Datums in einen String
  */
 class DateConverter {
     /**
-     *
-     * @param date String?
-     * @return LocalDateTime?
+     * Konvertiert einen String in ein Datumsobjekt
+     * @param date String? Ein String, der ein Datum repräsentiert
+     * @return LocalDateTime? Eine Instanz von LocalDateTime
      */
     @TypeConverter
     fun timestampToDate(date: String?): LocalDateTime? {
@@ -24,9 +24,9 @@ class DateConverter {
     }
 
     /**
-     *
-     * @param date LocalDateTime?
-     * @return String?
+     * Konvertiert ein Datumsobjekt in einen String
+     * @param date LocalDateTime? Eine Instanz von LoacalDateTime
+     * @return String? Ein String, der das Datum repräsentiert
      */
     @TypeConverter
     fun dateToTimestamp(date: LocalDateTime?): String? {
