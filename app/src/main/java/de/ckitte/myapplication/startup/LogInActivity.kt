@@ -34,10 +34,10 @@ class LogInActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val view = _binding.root
-        setContentView(view)
-
         this._binding = ActivityLoginBinding.inflate(layoutInflater)
+        val view = _binding.root
+
+        setContentView(view)
 
         // Definition des EventHandler als annonyme Methode
         connectionLiveData = ConnectionLiveData(this)

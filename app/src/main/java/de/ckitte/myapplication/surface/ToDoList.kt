@@ -18,11 +18,11 @@ import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter
 import kotlinx.coroutines.*
 
 /**
- *
- * @property viewModel ToDoListModel
- * @property toDoListViewAdapter ToDoListViewAdapter
- * @property _binding FragmentTodoListBinding
- * @property ItemTouchHelperCallback <no name provided>
+ * Die Fensterklasse für die Oberfläche des Hauptfenster
+ * @property viewModel ToDoListModel Das zuständige ViewModel
+ * @property toDoListViewAdapter ToDoListViewAdapter Der Adapter für die Listenansicht der ToDos
+ * @property _binding FragmentTodoListBinding Die generierte Bindingklasse zur Layout Ressource
+ * @property ItemTouchHelperCallback SimpleCallback Hilfsklasse zum Behandeln von Wischbewegungen
  */
 class ToDoList : Fragment(R.layout.fragment_todo_list) {
     private lateinit var viewModel: ToDoListModel
@@ -30,10 +30,10 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
     private lateinit var _binding: FragmentTodoListBinding
 
     /**
-     *
-     * @param inflater LayoutInflater
-     * @param container ViewGroup?
-     * @param savedInstanceState Bundle?
+     * Überschreibt die onCreateView Methode und erstellt eine neue Klasse auf Basis der Ressource
+     * @param inflater LayoutInflater Das übergebene LayoutInflater Objekt
+     * @param container ViewGroup? Der übergebene Container
+     * @param savedInstanceState Bundle? Das übergebene Bundle Objekt
      * @return View?
      */
     override fun onCreateView(
@@ -46,9 +46,88 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
     }
 
     /**
-     *
-     * @param item MenuItem
-     * @return Boolean
+     * Überschreibt die onViewCreate Methode und initialisiert die Klasse und setzt alle notwendigen EventHandler
+     * @param view View Die Übergebene View
+     * @param savedInstanceState Bundle? Das übergebene Bundle Objekt
+     */
+    @ExperimentalCoroutinesApi
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val dao = parentFragment?.let {
+            ToDoDatabase.getInstance(
+                view.context
+            ).toToDao
+        }
+
+        val toDoRepository = dao?.let { ToDoRepository(it) }
+
+        this.viewModel = toDoRepository?.let { ToDoListModel(it) }!!
+
+        toDoListViewAdapter = ToDoListViewAdapter(viewModel)
+
+        this.viewModel.toDos.observe(viewLifecycleOwner) {
+            toDoListViewAdapter.submitList(it)
+        }
+
+        _binding = FragmentTodoListBinding.bind(view)
+        _binding.apply {
+            rvtodoitems.apply {
+                adapter = toDoListViewAdapter
+                layoutManager = LinearLayoutManager(requireContext())
+                setHasFixedSize(true) //optimierung
+            }
+
+            //Den mittleren Menüpunkt disablen
+            menuBottomNavigation.menu.getItem(2).isEnabled = false
+            menuBottomNavigation.setOnNavigationItemSelectedListener {
+                when (it.itemId) {
+                    R.id.miClose -> {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            LoginProvider.LogOut()
+                            withContext(Dispatchers.Main) {
+                                this@ToDoList.activity?.finishAndRemoveTask()
+                            }
+                        }
+                    }
+                    R.id.miRefresh -> {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            viewModel.refreshDatabase()
+                        }
+                    }
+                    R.id.mi_sort_date -> {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            viewModel.changeSortOrder(ListSort.DateThenImportance)
+                        }
+                    }
+                    R.id.mi_sort_favourite -> {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            viewModel.changeSortOrder(ListSort.ImportanceThenDate)
+                        }
+                    }
+                }
+
+                true
+            }
+
+            fabAdd.setOnClickListener {
+                viewModel.iniNewToDoItem()
+                it.findNavController().navigate(R.id.action_toDoList_to_editToDo)
+            }
+        }
+
+        ItemTouchHelper(ItemTouchHelperCallback).apply {
+            attachToRecyclerView(_binding.rvtodoitems)
+        }
+    }
+
+    //region Handler Optionsmenü
+    
+    /*
+    /**
+     * Verarbeitet die EIngaben des Optionsmenüs
+     * @param item MenuItem Der ausgewählte Menüpunkt
+     * @return Boolean True, wenn der Eintrag behandelt wurde, sonst False
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
@@ -71,93 +150,26 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
             }
         }
     }
+    */
+
+    //endregion
+
+    //region Movefunktionalität
 
     /**
-     *
-     * @param view View
-     * @param savedInstanceState Bundle?
-     */
-    @ExperimentalCoroutinesApi
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val dao = parentFragment?.let {
-            ToDoDatabase.getInstance(
-                view.context
-            ).toToDao
-        }
-
-        val toDoRepository = dao?.let { ToDoRepository(it) }
-        this.viewModel = toDoRepository?.let { ToDoListModel(it) }!!
-
-        _binding = FragmentTodoListBinding.bind(view)
-        //val toDoListViewAdapter = ToDoListViewAdapter(viewModel)
-        toDoListViewAdapter = ToDoListViewAdapter(viewModel)
-
-        _binding.apply {
-            rvtodoitems.apply {
-                adapter = toDoListViewAdapter
-                layoutManager = LinearLayoutManager(requireContext())
-                setHasFixedSize(true) //optimierung
-            }
-        }
-
-        _binding.menuBottomNavigation.menu.getItem(2).isEnabled = false
-
-        _binding.fabAdd.setOnClickListener {
-            viewModel.iniNewToDoItem()
-            it.findNavController().navigate(R.id.action_toDoList_to_editToDo)
-        }
-
-        _binding.menuBottomNavigation.setOnNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.miClose -> {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        LoginProvider.LogOut()
-                        withContext(Dispatchers.Main) {
-                            this@ToDoList.activity?.finishAndRemoveTask()
-                        }
-                    }
-                }
-                R.id.miRefresh -> {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        viewModel.refreshDatabase()
-                    }
-                }
-                R.id.mi_sort_date -> {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        viewModel.changeSortOrder(ListSort.DateThenImportance)
-                    }
-                }
-                R.id.mi_sort_favourite -> {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        viewModel.changeSortOrder(ListSort.ImportanceThenDate)
-                    }
-                }
-            }
-
-            true
-        }
-
-        ItemTouchHelper(ItemTouchHelperCallback).apply {
-            attachToRecyclerView(_binding.rvtodoitems)
-        }
-
-        this.viewModel.toDos.observe(viewLifecycleOwner) {
-            //Achtung: Ich habe lange gesucht. Problem: Zunächst TextView Höhe auf 0 gewesen
-            //dann das Fragment selbst nicht auf den Inhalt angepasst.
-            //Sehr böse Falle und nicht leicht aufzuspüren...
-            toDoListViewAdapter.submitList(it)
-        }
-    }
-
-    /**
-     *
+     * Callbackfunktion zum behandeln von Wischbewegungen auf der Liste der ToDos
      */
     private val ItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
         ItemTouchHelper.UP or ItemTouchHelper.DOWN,
         ItemTouchHelper.LEFT
     ) {
+        /**
+         *  Überschreibt on Move und gibt True zurück
+         * @param recyclerView RecyclerView Die zugrundeliegende RecyclerView
+         * @param viewHolder ViewHolder Der ViewHolder der View
+         * @param target ViewHolder Das Ziel der Bewegung
+         * @return Boolean True
+         */
         override fun onMove(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder,
@@ -166,6 +178,11 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
             return true
         }
 
+        /**
+         * Überschreibt onSwiped und löscht das ToDoItem bei einem Wischen nach links
+         * @param viewHolder ViewHolder Der ViewHolder der ToDoKontakte
+         * @param direction Int Die Wischbewegung
+         */
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val currentItemIndex = viewHolder.adapterPosition
             val currentItem = toDoListViewAdapter.currentList[currentItemIndex]
@@ -175,4 +192,6 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
             }
         }
     }
+
+    //endregion
 }

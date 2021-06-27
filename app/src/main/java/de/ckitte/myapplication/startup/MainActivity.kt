@@ -35,10 +35,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val view = _binding.root
-        setContentView(view)
-
         this._binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = _binding.root
+
+        setContentView(view)
 
         // Definition des EventHandler als annonyme Methode
         connectionLiveData = ConnectionLiveData(this)

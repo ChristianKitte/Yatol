@@ -34,20 +34,20 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.time.LocalDateTime
 
 /**
- *
- * @property _viewModel EditToDoModel
- * @property contactListViewAdapter ContactListViewAdapter
- * @property _binding FragmentEditTodoBinding
- * @property cal (android.icu.util.Calendar..android.icu.util.Calendar?)
- * @property currentDay Int
- * @property currentMonth Int
- * @property currentYear Int
- * @property currentHour Int
- * @property currentMinute Int
- * @property resultLauncher ActivityResultLauncher<(android.content.Intent..android.content.Intent?)>
- * @property ItemTouchHelperCallback SimpleCallback
+ * Die Fensterklasse für die Edit Oberfläche
+ * @property _viewModel EditToDoModel Das zuständige ViewModel
+ * @property contactListViewAdapter ContactListViewAdapter Der Adapter für die Listenansicht der ToDoContacts
+ * @property _binding FragmentEditTodoBinding Die generierte Bindingklasse zur Layout Ressource
+ * @property cal android.icu.util.Calendar Eine Instanz der Android Kalender Komponente
+ * @property currentDay Int Der aktuelle Tag
+ * @property currentMonth Int Der aktuelle Monat
+ * @property currentYear Int Das aktuelle Jahr
+ * @property currentHour Int Die aktuelle Stunde
+ * @property currentMinute Int Die aktuelle Minute
+ * @property ItemTouchHelperCallback SimpleCallback Hilfsklasse zum Behandeln von Wischbewegungen
  */
-class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateSetListener,
+class EditToDo : Fragment(R.layout.fragment_edit_todo),
+    DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener {
     private lateinit var _viewModel: EditToDoModel
     private lateinit var contactListViewAdapter: ContactListViewAdapter
@@ -61,25 +61,24 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
     private var currentMinute = cal.get(Calendar.MINUTE)
 
     /**
-     *
-     * @param inflater LayoutInflater
-     * @param container ViewGroup?
-     * @param savedInstanceState Bundle?
+     * Überschreibt die onCreateView Methode und erstellt eine neue Klasse auf Basis der Ressource
+     * @param inflater LayoutInflater Das übergebene LayoutInflater Objekt
+     * @param container ViewGroup? Der übergebene Container
+     * @param savedInstanceState Bundle? Das übergebene Bundle Objekt
      * @return View?
      */
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        //LoaderManager.getInstance(this).initLoader(0,null,this)
         return inflater.inflate(R.layout.fragment_edit_todo, container, false)
     }
 
     /**
-     *
-     * @param view View
-     * @param savedInstanceState Bundle?
+     * Überschreibt die onViewCreate Methode und initialisiert die Klasse und setzt alle notwendigen EventHandler
+     * @param view View Die Übergebene View
+     * @param savedInstanceState Bundle? Das übergebene Bundle Objekt
      */
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -94,24 +93,28 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
         val toDoRepository = dao?.let { ToDoRepository(it) }
 
         _viewModel = toDoRepository?.let { EditToDoModel(it) }!!
-        _binding = FragmentEditTodoBinding.bind(view)
 
         contactListViewAdapter = ContactListViewAdapter(
             _viewModel, activity?.contentResolver,
             this.activity?.packageManager, this
         )
 
+        this._viewModel.toDoContacts.observe(viewLifecycleOwner) {
+            contactListViewAdapter.submitList(it)
+        }
+
+        val currentToDoItem = _viewModel.getCurrentToDoItem()
+
+        _binding = FragmentEditTodoBinding.bind(view)
+
+        setUpCalender() // benötigt _binding!
         _binding.apply {
             rvContacts.apply {
                 adapter = contactListViewAdapter
                 layoutManager = LinearLayoutManager(requireContext())
                 setHasFixedSize(true) //optimierung
             }
-        }
 
-        val currentToDoItem = _viewModel.getCurrentToDoItem()
-
-        _binding.apply {
             currentToDoItem?.apply {
                 setCalender(toDoLocalDoUntil)
 
@@ -121,94 +124,194 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
                 checkIsDone.isChecked = toDoLocalIsDone
                 checkIsFavourite.isChecked = toDoLocalIsFavourite
             }
-        }
 
-        _binding.etTitle.addTextChangedListener(
-            object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
+            etTitle.addTextChangedListener(
+                object : TextWatcher {
+                    override fun beforeTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
+                    }
 
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    _binding.apply {
-                        btnSave.isEnabled = (etTitle.length() > 0) && (etDescription.length() > 0)
+                    override fun onTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
+                        _binding.apply {
+                            btnSave.isEnabled =
+                                (etTitle.length() > 0) && (etDescription.length() > 0)
+                        }
+                    }
+
+                    override fun afterTextChanged(s: Editable?) {
                     }
                 }
+            )
 
-                override fun afterTextChanged(s: Editable?) {
-                }
-            }
-        )
+            etDescription.addTextChangedListener(
+                object : TextWatcher {
+                    override fun beforeTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        count: Int,
+                        after: Int
+                    ) {
+                    }
 
-        _binding.etDescription.addTextChangedListener(
-            object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
+                    override fun onTextChanged(
+                        s: CharSequence?,
+                        start: Int,
+                        before: Int,
+                        count: Int
+                    ) {
+                        _binding.apply {
+                            btnSave.isEnabled =
+                                (etTitle.length() > 0) && (etDescription.length() > 0)
+                        }
+                    }
 
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    _binding.apply {
-                        btnSave.isEnabled = (etTitle.length() > 0) && (etDescription.length() > 0)
+                    override fun afterTextChanged(s: Editable?) {
                     }
                 }
+            )
 
-                override fun afterTextChanged(s: Editable?) {
+            btnSave.setOnClickListener {
+                currentToDoItem?.let {
+                    saveCurrentToDo(it)
                 }
             }
-        )
 
-        setUpCalender()
+            btnBack.setOnClickListener {
+                if (currentToDoItem != null) {
+                    _viewModel.rollbackToDoContacts()
+                }
 
-        _binding.btnSave.setOnClickListener {
-            currentToDoItem?.let {
-                saveCurrentToDo(it)
-            }
-        }
-
-        _binding.btnBack.setOnClickListener {
-            if (currentToDoItem != null) {
-                _viewModel.rollbackToDoContacts()
+                it.findNavController().navigate(R.id.action_editToDo_to_toDoListFragment)
             }
 
-            it.findNavController().navigate(R.id.action_editToDo_to_toDoListFragment)
-        }
-
-        _binding.btnContacts.setOnClickListener {
-            currentToDoItem?.let {
-                when (it.toDoLocalId) {
-                    0 -> confirmSaveBeforeAddContact(it)
-                    else -> selectContact()
+            btnContacts.setOnClickListener {
+                currentToDoItem?.let {
+                    when (it.toDoLocalId) {
+                        0 -> confirmSaveBeforeAddContact(it)
+                        else -> selectContact()
+                    }
                 }
             }
-        }
 
-        _binding.btnDelete.setOnClickListener {
-            currentToDoItem?.let {
-                confirmToDoDelete(it)
+            btnDelete.setOnClickListener {
+                currentToDoItem?.let {
+                    confirmToDoDelete(it)
+                }
             }
         }
 
         ItemTouchHelper(ItemTouchHelperCallback).apply {
             attachToRecyclerView(_binding.rvContacts)
         }
+    }
 
-        this._viewModel.toDoContacts.observe(viewLifecycleOwner) {
-            contactListViewAdapter.submitList(it)
+    //region Hinzufügen eines Kontaktes
+
+    /**
+     * Launcher als Ergebnis der Registrierung für ein Activity mit Result. Die annonyme Callbackfunktion
+     * ruft die Methode [addToDoContact] auf
+     */
+    var resultLauncher =
+        registerForActivityResult(StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val intent: Intent? = result.data
+
+                if (intent != null) {
+                    val uri = intent.data
+                    uri?.let {
+                        addToDoContact(uri)
+                    }
+                }
+            }
+        }
+
+    /**
+     * Ruft den KontaktPicker von Android auf und nutz hierfür den Launcher [resultLauncher]
+     */
+    fun selectContact() {
+        val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
+        resultLauncher.launch(intent)
+    }
+
+    /**
+     * Fügt die übergebene URI dem ToDoItem als neuen Kontakt hinzu
+     * @param uri Uri Die gültige lokale URI eines Kontaktes
+     */
+    fun addToDoContact(uri: Uri) {
+        val newContact = _viewModel.getNewToDoContact()
+        val currentToDoItem = _viewModel.getCurrentToDoItem()
+
+        if (currentToDoItem != null) {
+            newContact.apply {
+                toDoContactLocalId = 0
+                toDoContactRemoteId = ""
+                toDoContactLocalUri = uri.toString()
+                toDoLocalId = currentToDoItem.toDoLocalId.toLong()
+                toDoRemoteId = currentToDoItem.toDoRemoteId
+            }
+
+            _viewModel.addToDoContact(newContact)
         }
     }
 
-    //region Confirm Dialogs
+    //endregion
+
+    //region Movefunktionalität
+
     /**
-     *
-     * @param currentLokalToDo LocalToDo
+     * Callbackfunktion zum behandeln von Wischbewegungen auf der Liste der ToDoKontakte
+     */
+    val ItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+        ItemTouchHelper.LEFT
+    ) {
+        /**
+         *  Überschreibt on Move und gibt True zurück
+         * @param recyclerView RecyclerView Die zugrundeliegende RecyclerView
+         * @param viewHolder ViewHolder Der ViewHolder der View
+         * @param target ViewHolder Das Ziel der Bewegung
+         * @return Boolean True
+         */
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            return true
+        }
+
+        /**
+         * Überschreibt onSwiped und löscht den ToDoContact bei einem Wischen nach links
+         * @param viewHolder ViewHolder Der ViewHolder der ToDoKontakte
+         * @param direction Int Die Wischbewegung
+         */
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            val currentItemIndex = viewHolder.adapterPosition
+            val currentItem = contactListViewAdapter.currentList[currentItemIndex]
+
+            if (direction == ItemTouchHelper.LEFT) {
+                _viewModel.deleteToDoContact(currentItem)
+            }
+
+        }
+    }
+
+    //endregion
+
+    //region Bestätigungsdialoge und Logik
+
+    /**
+     * Bestätigungsdialog für den Hinweis zur Speicherung des ToDoItems vor dem Hinzufügen von Kontakten
+     * @param currentLokalToDo LocalToDo Das betreffende [LocalToDo] Element
      */
     fun confirmSaveBeforeAddContact(currentLokalToDo: LocalToDo) {
         this.context?.let {
@@ -228,8 +331,8 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
     }
 
     /**
-     *
-     * @param currentLokalToDo LocalToDo
+     * Bestätigungsdialog für das Löschen des aktuellen ToDoItems
+     * @param currentLokalToDo LocalToDo Das betreffende [LocalToDo] Element
      */
     fun confirmToDoDelete(currentLokalToDo: LocalToDo) {
         this.context?.let {
@@ -251,9 +354,86 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
 
     //endregion
 
+    //region Datum und Zeitangaben
+
     /**
-     *
-     * @param currentLokalToDo LocalToDo
+     * Defniert einen Handler für den Aufruf eines DatePicker auf Basis der aktuellen Datumswerte.
+     */
+    private fun setUpCalender() {
+        _binding.tvDoUntil.setOnClickListener {
+            // month is zero based!
+            DatePickerDialog(it.context, this, currentYear, currentMonth - 1, currentDay).show()
+        }
+    }
+
+    /**
+     * Rückgabefunktion eines DatePickers. Ruft nach Speicherung der erhaltenen Datumswerte als aktuelle
+     * Datumsangaben einen TimePicker auf und initialisiert diesen auf Basis der aktuell gehaltenen Zeitangabe.
+     * @param view DatePicker Der DateTimePicker
+     * @param year Int Das gewählte Jahr
+     * @param month Int Der gewählte Monat
+     * @param dayOfMonth Int Der gewählte Tag des Monats
+     */
+    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+        currentDay = dayOfMonth
+        currentMonth = month + 1 // month is zero based!
+        currentYear = year
+
+        _binding.tvDoUntil.text = getDoUntilString()
+
+        TimePickerDialog(this.view?.context, this, currentHour, currentMinute, true).show()
+    }
+
+    /**
+     * Rückgabefunktion eines TimePickers. Aktualisiert nach Speicherung der erhaltenen Zeitwerte als aktuelle
+     * Zeitangabe den Zeichenstring, welcher den aktuellen Termin des ToDoItems als Text anzeigt.
+     * @param view TimePicker Der TimePicker
+     * @param hourOfDay Int Die gewählte Stunde
+     * @param minute Int Die gewählte Minute
+     */
+    override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
+        currentHour = hourOfDay
+        currentMinute = minute
+
+        _binding.tvDoUntil.text = getDoUntilString()
+    }
+
+    //endregion
+
+    //region Hilfsfunktionen
+
+    /**
+     * Erzeugt einen formatierten String mit Datum und Uhrzeit für die
+     * direkte Anzeige auf Basis der aktuellen lokalen Variablen
+     * @return String Der Anzeigestring des Datums und der Uhrzeit
+     */
+    private fun getDoUntilString(): String {
+        val currentDayString = currentDay.toString().padStart(2, '0')
+        val currentMonthString = currentMonth.toString().padStart(2, '0')
+        val currentYearString = currentYear.toString().padStart(4, '0')
+        val currentHourString = currentHour.toString().padStart(2, '0')
+        val currentMinuteString = currentMinute.toString().padStart(2, '0')
+
+        return "Am $currentDayString.$currentMonthString.$currentYearString um $currentHourString:$currentMinuteString Uhr"
+    }
+
+    /**
+     * Erzeugt eine LocalDateTime Instanz auf Basis der aktuellen lokalen Variablen
+     * @param dateTime LocalDateTime
+     */
+    private fun setCalender(dateTime: LocalDateTime) {
+        dateTime.apply {
+            currentDay = dayOfMonth
+            currentMonth = monthValue
+            currentYear = year
+            currentHour = hour
+            currentMinute = minute
+        }
+    }
+
+    /**
+     * Speichert das übergebene ToDoItem
+     * @param currentLokalToDo LocalToDo Das betreffende [LocalToDo] Element
      */
     fun saveCurrentToDo(currentLokalToDo: LocalToDo) {
         currentLokalToDo.let {
@@ -279,148 +459,6 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo), DatePickerDialog.OnDateS
                 }
             }
         }
-    }
-
-    /**
-     *
-     */
-    fun selectContact() {
-        val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
-        resultLauncher.launch(intent)
-    }
-
-    /**
-     *
-     */
-    var resultLauncher =
-        registerForActivityResult(StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val intent: Intent? = result.data
-
-                if (intent != null) {
-                    val uri = intent.data
-                    uri?.let {
-                        addToDoContact(uri)
-                    }
-                }
-            }
-        }
-
-    /**
-     *
-     * @param uri Uri
-     */
-    fun addToDoContact(uri: Uri) {
-        val newContact = _viewModel.getNewToDoContact()
-        val currentToDoItem = _viewModel.getCurrentToDoItem()
-
-        if (currentToDoItem != null) {
-            newContact.apply {
-                toDoContactLocalId = 0
-                toDoContactRemoteId = ""
-                toDoContactLocalUri = uri.toString()
-                toDoLocalId = currentToDoItem.toDoLocalId.toLong()
-                toDoRemoteId = currentToDoItem.toDoRemoteId
-            }
-
-            _viewModel.addToDoContact(newContact)
-        }
-    }
-
-    /**
-     *
-     */
-    val ItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
-        ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-        ItemTouchHelper.LEFT
-    ) {
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
-        ): Boolean {
-            return true
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            val currentItemIndex = viewHolder.adapterPosition
-            val currentItem = contactListViewAdapter.currentList[currentItemIndex]
-
-            if (direction == ItemTouchHelper.LEFT) {
-                _viewModel.deleteToDoContact(currentItem)
-            }
-
-        }
-    }
-
-    //region Edit Date and Time
-
-    /**
-     *
-     */
-    private fun setUpCalender() {
-        _binding.tvDoUntil.setOnClickListener {
-            // month is zero based!
-            DatePickerDialog(it.context, this, currentYear, currentMonth - 1, currentDay).show()
-        }
-    }
-
-    /**
-     *
-     * @return String
-     */
-    private fun getDoUntilString(): String {
-        val currentDayString = currentDay.toString().padStart(2, '0')
-        val currentMonthString = currentMonth.toString().padStart(2, '0')
-        val currentYearString = currentYear.toString().padStart(4, '0')
-        val currentHourString = currentHour.toString().padStart(2, '0')
-        val currentMinuteString = currentMinute.toString().padStart(2, '0')
-
-        return "Am $currentDayString.$currentMonthString.$currentYearString um $currentHourString:$currentMinuteString Uhr"
-    }
-
-    /**
-     *
-     * @param dateTime LocalDateTime
-     */
-    private fun setCalender(dateTime: LocalDateTime) {
-        dateTime.apply {
-            currentDay = dayOfMonth
-            currentMonth = monthValue
-            currentYear = year
-            currentHour = hour
-            currentMinute = minute
-        }
-    }
-
-    /**
-     *
-     * @param view DatePicker
-     * @param year Int
-     * @param month Int
-     * @param dayOfMonth Int
-     */
-    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-        currentDay = dayOfMonth
-        currentMonth = month + 1 // month is zero based!
-        currentYear = year
-
-        _binding.tvDoUntil.text = getDoUntilString()
-
-        TimePickerDialog(this.view?.context, this, currentHour, currentMinute, true).show()
-    }
-
-    /**
-     *
-     * @param view TimePicker
-     * @param hourOfDay Int
-     * @param minute Int
-     */
-    override fun onTimeSet(view: TimePicker?, hourOfDay: Int, minute: Int) {
-        currentHour = hourOfDay
-        currentMinute = minute
-
-        _binding.tvDoUntil.text = getDoUntilString()
     }
 
     //endregion
