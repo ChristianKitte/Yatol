@@ -16,20 +16,23 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 /**
- *
- * @property toDoDao ToDoDao
+ * Repository der Anwendung. Alle Zugriffe auf und Anfragen an die Datenbanken laufen über diese Klasse.
+ * Alle globalen Zustände werden hier gehalten.
+ * @property toDoDao ToDoDao Die DAO Klasse der ROOM Bibliothek. Enthält Zugriffe zur SQLite DB via Room
  * @constructor
  */
 class ToDoRepository(private val toDoDao: ToDoDao) {
     companion object StaticMembers {
+        //region Handling der aktuellen Elemente und Templates
+
         /**
-         *
+         * Das aktuelle [LocalToDo] Element
          */
         @Volatile
         private var currentLokalToDo: LocalToDo? = null
 
         /**
-         *
+         * Setzt das aktuelle [LocalToDo] Element
          * @param currentLokalToDo LocalToDo
          */
         fun setCurrentToDoItem(currentLokalToDo: LocalToDo) {
@@ -37,7 +40,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         }
 
         /**
-         *
+         * Gibt das aktuelle [LocalToDo] Element zurück
          * @return LocalToDo?
          */
         fun getCurrentToDoItem(): LocalToDo? {
@@ -46,8 +49,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         }
 
         /**
-         *
-         * @return LocalToDo
+         * Eine Template für ein neues [LocalToDo] Element
+         * @return LocalToDo Die Instanz eines neuen [LocalToDo] Element
          */
         fun getNewToDoItem(): LocalToDo {
             return LocalToDo(
@@ -62,8 +65,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         }
 
         /**
-         *
-         * @return LocalToDoContact
+         * Eine Template für ein neues [LocalToDoContact] Element
+         * @return LocalToDoContact Die Instanz eines neuen [LocalToDoContact] Element
          */
         fun getNewToDoContact(): LocalToDoContact {
             return LocalToDoContact(
@@ -75,13 +78,15 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
                 toDoContactLocalState = ToDoContactState.Added.ordinal
             )
         }
+
+        //endregion
     }
 
     //region CRUD ToDoItem
 
     /**
-     *
-     * @param lokalToDos Array<out LocalToDo>
+     * Fügt die übergebenen ToDos der Datenbank hinzu
+     * @param lokalToDos Array<out LocalToDo> Ein Liste mit [LocalToDo] Elemente
      */
     @WorkerThread
     suspend fun addToDoItem(vararg lokalToDos: LocalToDo) {
@@ -112,8 +117,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     }
 
     /**
-     *
-     * @param lokalToDos Array<out LocalToDo>
+     * Aktualisiert die übergebenen ToDos in der Datenbank
+     * @param lokalToDos Array<out LocalToDo> Ein Liste mit [LocalToDo] Elemente
      */
     @WorkerThread
     suspend fun updateToDoItem(vararg lokalToDos: LocalToDo) {
@@ -148,8 +153,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     }
 
     /**
-     *
-     * @param lokalToDos Array<out LocalToDo>
+     * Löscht die übergebenen ToDos in der Datenbank
+     * @param lokalToDos Array<out LocalToDo> Ein Liste mit [LocalToDo] Elemente
      */
     @WorkerThread
     suspend fun deleteToDoItem(vararg lokalToDos: LocalToDo) {
@@ -179,6 +184,9 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         }
     }
 
+    /**
+     * Löscht alle [LocalToDo] Elemente und deren [LocalToDoContact] Elemente, welche als erledigt gekennzeichnet wurden
+     */
     suspend fun deleteDoneToDoItems() {
         toDoDao.getLocalToDoByDone().forEach {
             deleteToDoItem(it)
@@ -190,8 +198,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     //region CRUD ToDoContact
 
     /**
-     *
-     * @param toDoContacts Array<out LocalToDoContact>
+     * Fügt die übergebenen ToDoContacts in die Datenbank ein
+     * @param toDoContacts Array<out LocalToDoContact> Ein Liste mit [LocalToDoContact] Elemente
      */
     @WorkerThread
     suspend fun addToDoContacts(vararg toDoContacts: LocalToDoContact) {
@@ -219,8 +227,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     }
 
     /**
-     *
-     * @param toDoContacts Array<out LocalToDoContact>
+     * Aktualisiert die übergebenen ToDoContacts in der Datenbank
+     * @param toDoContacts Array<out LocalToDoContact> Ein Liste mit [LocalToDoContact] Elemente
      */
     @WorkerThread
     suspend fun updateToDoContact(vararg toDoContacts: LocalToDoContact) {
@@ -258,8 +266,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     }
 
     /**
-     *
-     * @param localToDoContacts Array<out LocalToDoContact>
+     * Löscht die übergebenen ToDoContacts in der Datenbank
+     * @param localToDoContacts Array<out LocalToDoContact> Ein Liste mit [LocalToDoContact] Elemente
      */
     @WorkerThread
     suspend fun deleteToDoContacts(vararg localToDoContacts: LocalToDoContact) {
@@ -285,12 +293,16 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     //region Commit and rollback contacts in transient
 
     /**
-     *
+     * Führt für alle [LocalToDoContact] im Transient ([ToDoContactState.Added] oder [ToDoContactState.Deleted])
+     * einen Commit aus. Hierbei werden alle vermerkten Operationen (Hinzufügen, Löschen) durchgeführt
+     * Anschließend werden deren Status auf [ToDoContactState.Save] gesetzt.
      */
     @WorkerThread
     suspend fun commitTransientToDoContacts() {
-        val contactsToDelete = toDoDao.getAllLocalToDoContactsByState(ToDoContactState.Deleted.ordinal) //.getAllLocalDeletedToDoContacts()
-        val contactsToAdd = toDoDao.getAllLocalToDoContactsByState(ToDoContactState.Added.ordinal) //.getAllLocalAddedToDoContacts()
+        val contactsToDelete =
+            toDoDao.getAllLocalToDoContactsByState(ToDoContactState.Deleted.ordinal) //.getAllLocalDeletedToDoContacts()
+        val contactsToAdd =
+            toDoDao.getAllLocalToDoContactsByState(ToDoContactState.Added.ordinal) //.getAllLocalAddedToDoContacts()
 
         contactsToDelete.forEach {
             deleteToDoContacts(it)
@@ -303,11 +315,13 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     }
 
     /**
-     * Gibt alle als gespeichert vermerkte lokale Kontakte zurück
+     * Führt für alle [LocalToDoContact] im Transient ([ToDoContactState.Added] oder [ToDoContactState.Deleted])
+     * einen Rollback aus. Anschließend werden deren Status auf [ToDoContactState.Save] gesetzt.
      */
     @WorkerThread
     suspend fun rollbackTransientToDoContacts() {
-        val contactsTouched = toDoDao.getAllLocalToDoContactsByInverseState(ToDoContactState.Save.ordinal) //.getAllLocalTouchedToDoContacts()
+        val contactsTouched =
+            toDoDao.getAllLocalToDoContactsByInverseState(ToDoContactState.Save.ordinal) //.getAllLocalTouchedToDoContacts()
 
         contactsTouched.forEach {
             when (it.toDoContactLocalState) {
@@ -325,46 +339,38 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     //endregion
 
     //region Flow and Observer
-    //Es existieren zwei Pattern. Hier: fun ohne suspend!
 
     /**
-     *
-     * @return Flow<List<LocalToDo>>
+     * Liefert ein Flowobjekt mit allen ToDos in der Sortierung Datum, dann Wichtigkeit zurück
+     * @return Flow<List<LocalToDo>> Das Flowobjekt
      */
     fun getAllToDosAsFlow_DateThenImportance(): Flow<List<LocalToDo>> =
         toDoDao.getAllLocalToDosAsFlowByDateThenImportance()
 
     /**
-     *
-     * @return Flow<List<LocalToDo>>
+     * Liefert ein Flowobjekt mit allen ToDos in der Sortierung Wichtigkeit, dann Datum zurück
+     * @return Flow<List<LocalToDo>> Das Flowobjekt
      */
     fun getAllToDosAsFlow_ImportanceThenDate(): Flow<List<LocalToDo>> =
         toDoDao.getAllLocalToDosAsFlowByImportanceThenDate()
 
-    /*
     /**
-     *
-     * @param toDoItemID Long
-     * @return Flow<List<LocalToDoContact>>
-     */
-    fun getAllContacts(toDoItemID: Long): Flow<List<LocalToDoContact>> =
-        toDoDao.getAllLocalValidToDoContactsByToDo(toDoItemID)
-     */
-
-    /**
-     *
-     * @param toDoItemID Long
-     * @return Flow<List<LocalToDoContact>>
+     * Liefert ein Flowobjekt mit allen Kontakten des zu der übergebenen lokalen ID gehörenden [LocalToDo]
+     * Elements zurück
+     * @param toDoItemID Long Die lokale ID des [LocalToDo]
+     * @return Flow<List<LocalToDoContact>> Das Flowobjekt
      */
     fun getAllLocalValidToDoContactsByToDo(toDoItemID: Long): Flow<List<LocalToDoContact>> =
         toDoDao.getAllLocalValidToDoContactsByToDo(toDoItemID, ToDoContactState.Deleted.ordinal)
 
     //endregion
 
-    //region Synchronization of local and remote data store
+    //region Synchronisation der Datenbanken
 
     /**
-     *
+     * Stößt die Synchronisation der Datenbanken an. Sofern die lokale Datenbank Einträge enthät, werde
+     * alle Remote Daten gelöscht und die lokale Datenbank übertragen. Sofern keine lokalen Einträge vorhanden
+     * sind, werden auf Basis der Remote Daten lokale Daten generiert.
      */
     @WorkerThread
     suspend fun refreshDatabase() {
@@ -379,21 +385,20 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     }
 
     /**
-     *
+     * Erzeugt Beispieldaten zu Testzwecken
      */
     @WorkerThread
     suspend fun mirrorSampleToLocal() {
         RepositoryHelper(toDoDao).createSampleEntities()
     }
 
-    //Transaction? In Scope?
     /**
-     *
+     * Spiegelt die lokale Datenbank in die Remote Datenbank
      */
     @WorkerThread
     suspend fun mirrorLocalToRemote() {
         if (ConnectionLiveData.isConnected) {
-            FirestoreApi()
+            //FirestoreApi()
 
             emptyRemoteDatabase()
 
@@ -403,7 +408,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
                 it1.toDoRemoteId = ""
                 updateToDoItem(it1)
 
-                // aktualisiertes ToDoItem undd alle Kontakte des aktuelle ToDos abfragen
+                // aktualisiertes ToDoItem und alle Kontakte des aktuelle ToDos abfragen
                 val actCurrentToDo = toDoDao.getLocalToDoById(it1.toDoLocalId)
                 val currentLocalToDoContacts =
                     toDoDao.getAllLocalToDoContactsByToDo(it1.toDoLocalId.toLong())
@@ -422,10 +427,8 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
         }
     }
 
-    //Transaction? In Scope?
-    //Niemals LocalDateTime mit Firestore verwenden, immer auf Text gehen !!!!!!
     /**
-     *
+     * Spiegelt die Remote Datenbank in die lokale Datenbank
      */
     @WorkerThread
     suspend fun mirrorRemoteToLocal() {
@@ -466,7 +469,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     }
 
     /**
-     *
+     * Löscht alle Elemente der lokalen Datenbank
      */
     @WorkerThread
     suspend fun emptyLokalDatabase() {
@@ -475,7 +478,7 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     }
 
     /**
-     *
+     * Löscht alle Elemente der Remote Datenbank
      */
     @WorkerThread
     suspend fun emptyRemoteDatabase() {

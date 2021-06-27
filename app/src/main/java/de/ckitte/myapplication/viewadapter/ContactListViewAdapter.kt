@@ -15,38 +15,26 @@ import de.ckitte.myapplication.databinding.FragmentContactListitemBinding
 import de.ckitte.myapplication.model.EditToDoModel
 
 /**
- *
- * @property viewModel EditToDoModel
- * @property contentResolver ContentResolver?
- * @property packageManager PackageManager?
- * @property parentFragment Fragment
+ * ListView Adapter für die Kontaktliste eines ToDos
+ * @property viewModel EditToDoModel Das zugehörige ViewModel
+ * @property contentResolver ContentResolver? Ein gültiger ContentResolver Objekt
+ * @property packageManager PackageManager? Ein gültiger PackageManager
+ * @property parentFragment Fragment Eine Referenz auf das zugehörige Fragment
  * @constructor
  */
 class ContactListViewAdapter(
-    /**
-     *
-     */
     private val viewModel: EditToDoModel,
-    /**
-     *
-     */
     private val contentResolver: ContentResolver?,
-    /**
-     *
-     */
     private val packageManager: PackageManager?,
-    /**
-     *
-     */
     private val parentFragment: Fragment
 ) :
     ListAdapter<LocalToDoContact, ContactListViewAdapter.ContactViewHolder>(ContactComparator()) {
 
     /**
-     *
-     * @param parent ViewGroup
-     * @param viewType Int
-     * @return ContactViewHolder
+     * Wird bei der Erzeugung eines neuen ViewHolders aufgerufen
+     * @param parent ViewGroup Die übergebene ViewGruppe
+     * @param viewType Int Der übergebene ViewTyp
+     * @return ContactViewHolder Eine neue Instanz von [ContactViewHolder]
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         val binding =
@@ -66,9 +54,9 @@ class ContactListViewAdapter(
     }
 
     /**
-     *
-     * @param holder ContactViewHolder
-     * @param position Int
+     * Wird bei der Bindung von Daten und ViewHolder aufgerufen
+     * @param holder ContactViewHolder Der übergebene View Holder vom Typ [ContactViewHolder]
+     * @param position Int Die Position des zu bindenden Elements
      */
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         val currentItem = getItem(position)
@@ -76,14 +64,15 @@ class ContactListViewAdapter(
     }
 
     /**
-     *
-     * @property binding FragmentContactListitemBinding
-     * @property viewModel EditToDoModel
-     * @property contentResolver ContentResolver?
-     * @property packageManager PackageManager?
-     * @property parentFragment Fragment
-     * @property currentPhoneNumber String
-     * @property currentEmail String
+     * Der [ContactViewHolder] des Adapters. Implementiert die Logik der visuelle Darstellung des Kontaktes auf Basis
+     * der hinterlegten Ressource
+     * @property binding FragmentContactListitemBinding Ein Binding Objekt der zu verwendenen Ressource
+     * @property viewModel EditToDoModel Das zu verwendende ViewModel
+     * @property contentResolver ContentResolver? Ein gültes ContentResolver Objekt
+     * @property packageManager PackageManager? Ein gültiger PacketManager
+     * @property parentFragment Fragment Das zugrunde liegende Fragment
+     * @property currentPhoneNumber String Die aktuelle Telefonnummer des Kontaktes
+     * @property currentEmail String Die aktuelle eMail Adresse des Kontaktes
      * @constructor
      */
     class ContactViewHolder(
@@ -94,19 +83,13 @@ class ContactListViewAdapter(
         private val parentFragment: Fragment
     ) :
         RecyclerView.ViewHolder(binding.root) {
-        /**
-         *
-         */
-        private lateinit var currentPhoneNumber: String
 
-        /**
-         *
-         */
+        private lateinit var currentPhoneNumber: String
         private lateinit var currentEmail: String
 
         /**
-         *
-         * @param contact LocalToDoContact
+         * Wird zum Binden des ToDoContacts aufgerufen
+         * @param contact LocalToDoContact Der zu bindende [LocalToDoContact]
          */
         fun bind(contact: LocalToDoContact) {
             binding.apply {
@@ -159,9 +142,9 @@ class ContactListViewAdapter(
         }
 
         /**
-         *
-         * @param number String
-         * @param title String
+         * Initialisiert einen Anruf (kein direct call, sondern nur die Vorbelegung zum Einleiten des Anrufes)
+         * @param number String Die zu verwendende Telefonnummer
+         * @param title String der zu verwendende Titel
          */
         fun callContact(number: String, title: String) {
             val intent = Intent(Intent.ACTION_DIAL).apply {
@@ -175,11 +158,11 @@ class ContactListViewAdapter(
         }
 
         /**
-         *
-         * @param addresses Array<String>
-         * @param subject String
-         * @param text String
-         * @param title String
+         * Initialisiert ein eMailversand
+         * @param addresses Array<String> Die zu verwendenen Adressen
+         * @param subject String Der Betreff der eMail
+         * @param text String Der Text der eMail
+         * @param title String Der Titel der eMail
          */
         fun sendEmail(addresses: Array<String>, subject: String, text: String, title: String) {
             val intent = Intent(Intent.ACTION_SENDTO).apply {
@@ -199,24 +182,24 @@ class ContactListViewAdapter(
     }
 
     /**
-     *
+     * Ein Vergleichsobjekt für [LocalToDoContact]
      */
     class ContactComparator : DiffUtil.ItemCallback<LocalToDoContact>() {
         /**
-         *
-         * @param oldItem LocalToDoContact
-         * @param newItem LocalToDoContact
-         * @return Boolean
+         * Zwei Elemente sind gleich, wenn deren Instanzen gleich sind
+         * @param oldItem LocalToDoContact Das alte Element
+         * @param newItem LocalToDoContact Das neue Element
+         * @return Boolean True, wenn sie identisch sind, sonst False
          */
         override fun areItemsTheSame(oldItem: LocalToDoContact, newItem: LocalToDoContact): Boolean {
             return oldItem === newItem
         }
 
         /**
-         *
-         * @param oldItem LocalToDoContact
-         * @param newItem LocalToDoContact
-         * @return Boolean
+         * Zwei Elemente sind identisch, wenn deren lokale ID übereinstimmen
+         * @param oldItem LocalToDoContact Das alte Element
+         * @param newItem LocalToDoContact Das neue Element
+         * @return Boolean True, wenn sie gleich sind, sonst False
          */
         override fun areContentsTheSame(oldItem: LocalToDoContact, newItem: LocalToDoContact): Boolean {
             return oldItem.toDoContactLocalId == newItem.toDoContactLocalId

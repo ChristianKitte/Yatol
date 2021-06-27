@@ -6,13 +6,13 @@ import de.ckitte.myapplication.database.entities.LocalToDo
 import java.time.LocalDateTime
 
 /**
- *
- * @property toDoDao ToDoDao
+ * Helferklasse für das Repository
+ * @property toDoDao ToDoDao Die DAO Klasse der ROOM Bibliothek. Enthält Zugriffe zur SQLite DB via Room
  * @constructor
  */
 class RepositoryHelper(private val toDoDao: ToDoDao) {
     /**
-     *
+     * Erzeugt sieben Dummy Einträge eines [LocalToDo] und fügt sie der Datenbank hinzu
      */
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
@@ -34,7 +34,7 @@ class RepositoryHelper(private val toDoDao: ToDoDao) {
                 0,
                 "",
                 "Sample 2",
-                "toDo Sample 2wwwwwwwwwwwwwwwwwwwwwwwwwwwwwoooooooooooooooooooooooooooooooooooppppppppppppppppppppppppppp",
+                "toDo Sample 2",
                 true,
                 false,
                 LocalDateTime.now().plusDays(1)

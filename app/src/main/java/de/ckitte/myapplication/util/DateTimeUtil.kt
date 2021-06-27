@@ -3,14 +3,15 @@ package de.ckitte.myapplication.util
 import java.time.LocalDateTime
 
 /**
- *
+ * Enthält statische Hilfsmethoden für Datumsfunktionen
  */
 class DateTimeUtil {
     companion object {
         /**
-         *
-         * @param dateTime LocalDateTime
-         * @return String
+         * Erzeugt aus einem LocalDateTime einen formatierten String mit Datum und Uhrzeit für die
+         * direkte Anzeige
+         * @param dateTime LocalDateTime Eine INstanz von [LocalDateTime]
+         * @return String Der Anzeigestring des Datums und der Uhrzeit
          */
         fun getTimeString(dateTime: LocalDateTime): String {
             val currentDayString = dateTime.dayOfMonth.toString().padStart(2, '0')

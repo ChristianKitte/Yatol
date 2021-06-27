@@ -17,38 +17,30 @@ import de.ckitte.myapplication.util.EmailUtil
 import kotlinx.coroutines.*
 
 /**
- *
- * @property _binding ActivityLoginBinding
- * @property connectionLiveData ConnectionLiveData
- * @property db ToDoDao
+ * LogIn Aktivität. Bietet die Funktionalität für einen LogIn an
+ * @property _binding ActivityLoginBinding Das zugehörige Binding Objekt
+ * @property connectionLiveData ConnectionLiveData Eine Observer Objekt für die Netzverfügbarkeit
+ * @property db ToDoDao Eine Instanz von [ToDoDao]
  */
 class LogInActivity : AppCompatActivity() {
-    /**
-     *
-     */
     private lateinit var _binding: ActivityLoginBinding
-
-    /**
-     *
-     */
     private lateinit var connectionLiveData: ConnectionLiveData
-
-    /**
-     *
-     */
     private lateinit var db: ToDoDao
 
-    // https://miromatech.com/android/edittext-inputtype/
     /**
-     *
-     * @param savedInstanceState Bundle?
+     * Initialisiert die neue Instanz
+     * @param savedInstanceState Bundle? Eine Instanz von Typ Bundle
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val view = _binding.root
+        setContentView(view)
+
         this._binding = ActivityLoginBinding.inflate(layoutInflater)
 
+        // Definition des EventHandler als annonyme Methode
         connectionLiveData = ConnectionLiveData(this)
-
         connectionLiveData.observe(this, {
             if (it) {
                 when (LoginProvider.isLoggedIn()) {
@@ -73,10 +65,6 @@ class LogInActivity : AppCompatActivity() {
             }
         })
 
-        val view = _binding.root
-        setContentView(view)
-
-        //val applicationScope = CoroutineScope(SupervisorJob())
         this.db = ToDoDatabase.getInstance(this).toToDao
 
         _binding.etEmail.addTextChangedListener {
@@ -114,10 +102,44 @@ class LogInActivity : AppCompatActivity() {
         }
     }
 
+    //region Start der Anwendung
+
     /**
+     * Führt den Start der Anwendung durch und wechselt dann zu [MainActivity]
+     * @param synchronize Boolean True, wenn vorher eine Synchronisierung durchgeführt werden soll, sonst False
+     */
+    private fun startApplication(synchronize: Boolean) {
+        if (synchronize) {
+            CoroutineScope(Dispatchers.IO).launch {
+                ToDoRepository(db).refreshDatabase()
+                withContext(Dispatchers.Main) {
+                    openMainActivity()
+                }
+            }
+        } else {
+            openMainActivity()
+        }
+    }
+
+    /**
+     * Führt den eigentlcihen Wechsel zu [MainActivity] aus
      *
-     * @param titel String
-     * @param subtitle String
+     * https://riptutorial.com/android/example/17590/clear-your-current-activity-stack-and-launch-a-new-activity
+     */
+    private fun openMainActivity() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finishAffinity()
+    }
+
+    //endregion
+
+    //region Oberflächen und Interaktion
+
+    /**
+     * Setzt die Ausgabe der oberen Action Bar
+     * @param titel String Der Titel der Ausgabe
+     * @param subtitle String Der Untertitel der Ausgabe
      */
     private fun configureActionBar(titel: String, subtitle: String) {
         val bar = supportActionBar
@@ -134,35 +156,8 @@ class LogInActivity : AppCompatActivity() {
     }
 
     /**
-     *
-     * @param synchronize Boolean
-     */
-    private fun startApplication(synchronize: Boolean) {
-        if (synchronize) {
-            CoroutineScope(Dispatchers.IO).launch {
-                ToDoRepository(db).refreshDatabase()
-                withContext(Dispatchers.Main) {
-                    openMainActivity()
-                }
-            }
-        } else {
-            openMainActivity()
-        }
-    }
-
-    // https://riptutorial.com/android/example/17590/clear-your-current-activity-stack-and-launch-a-new-activity
-    /**
-     *
-     */
-    private fun openMainActivity() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        finishAffinity()
-    }
-
-    /**
-     *
-     * @param isValid Boolean
+     * Startet die Hauptanwendung oder informiert über den Fehlversuch in Abhängigkeit des Ergebnisses des Logins
+     * @param isValid Boolean Das Ergbenis der Prüfung
      */
     private fun loginResultHandler(isValid: Boolean) {
         if (isValid) {
@@ -181,7 +176,7 @@ class LogInActivity : AppCompatActivity() {
     }
 
     /**
-     *
+     * Löscht die EIngabefelder für eMail und Passwort
      */
     private fun wipeInput() {
         _binding.apply {
@@ -191,7 +186,8 @@ class LogInActivity : AppCompatActivity() {
     }
 
     /**
-     *
+     * Prüft formale Kriterien der Eingabe der eMail Adresse. Wenn alle Voraussetzungen erfüllt
+     * sind, wird der Login Button enabled.
      */
     private fun validateForm() {
         _binding.apply {
@@ -200,4 +196,6 @@ class LogInActivity : AppCompatActivity() {
                     && EmailUtil.isValidEmail(etEmail.text.toString()) == true
         }
     }
+
+    //endregion
 }

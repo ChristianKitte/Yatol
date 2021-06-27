@@ -4,27 +4,27 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
 /**
- *
+ * Stellt statische Funktionalität für den Login auf dem Remote System bereit
  */
 class AuthenticationApi {
     companion object {
         /**
-         *
+         * Ein Instanz des Firebase Authentifizierungs Objektes
          */
         private val authObj: FirebaseAuth = FirebaseAuth.getInstance()
 
         /**
-         *
+         * Der aktuelle Nutzer
          */
         private lateinit var currentUser: FirebaseUser
 
         /**
-         *
-         * @param eMail String
-         * @param pwd String
-         * @return Boolean
+         * Führt anhand des übergebenen Passwortes und eMail eine Authentifizierungsabfrage aus
+         * @param eMail String Die zur Authentifizierung verwendete eMail
+         * @param pwd String Das zur Authentifizierung verwendete Passwort
+         * @return Boolean True, wenn die Authentifizierung erfolgreich war, ansonsten False
          */
-        suspend fun logIn(eMail: String, pwd: String): Boolean {
+        fun logIn(eMail: String, pwd: String): Boolean {
             try {
                 authObj.signInWithEmailAndPassword(eMail, pwd)
                 currentUser = authObj.currentUser!!
@@ -35,15 +35,18 @@ class AuthenticationApi {
         }
 
         /**
-         *
+         * Führt ein LogOut aus, indem es eine entsprechende Anforderung an das RemoteSystem übermittelt
          */
-        suspend fun logOut() {
+        fun logOut() {
             authObj.signOut()
         }
 
+        /**
+         * Liefert den aktuellen Nutzer der Anwendung zurück
+         * @return FirebaseUser Eine Instanz von FirebaseUser
+         */
         fun getCurrentUSer(): FirebaseUser {
             return currentUser
         }
     }
-
 }

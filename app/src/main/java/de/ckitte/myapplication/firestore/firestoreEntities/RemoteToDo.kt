@@ -1,16 +1,14 @@
 package de.ckitte.myapplication.firestore.firestoreEntities
 
-import java.time.LocalDateTime
-
 /**
- *
- * @property toDoRemoteId String
- * @property toDoRemoteTitle String
- * @property toDoRemoteDescription String
- * @property toDoRemoteIsDone Boolean
- * @property toDoRemoteIsFavourite Boolean
- * @property toDoRemoteDoUntil String
- * @property toDoRemoteUser String
+ * Repräsentiert ein Remote ToDoItem
+ * @property toDoRemoteId String Die Remote ID des Eintrages
+ * @property toDoRemoteTitle String Die Titel des Eintrages
+ * @property toDoRemoteDescription String Die Beschreibung des Eintrages
+ * @property toDoRemoteIsDone Boolean True (1), wenn der Eintrag erledigt ist
+ * @property toDoRemoteIsFavourite Boolean True (1), wenn der Eintrag wichtig ist
+ * @property toDoRemoteDoUntil String Das Datum der Fälligkeit
+ * @property toDoRemoteUser String Der Besitzer des Eintrages (Reserve für zukünftige Erweiterung)
  * @constructor
  */
 data class RemoteToDo(

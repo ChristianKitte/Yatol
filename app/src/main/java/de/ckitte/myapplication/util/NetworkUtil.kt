@@ -15,20 +15,18 @@ import java.io.IOException
 import java.net.InetSocketAddress
 import javax.net.SocketFactory
 
-/*
-Inspired by:
-https://www.youtube.com/watch?v=To9aHYD5OVk
-https://github.com/AlexSheva-mason/Rick-Morty-Database/blob/master/app/src/main/java/com/shevaalex/
-android/rickmortydatabase/utils/networking/ConnectionLiveData.kt
-*/
-
-// Weiter überarbeiten
-
 /**
+ * Implementiert ein LiveData Objekt, der die Netzverfügbarkeit überwacht und über Änderungen informiert
  *
- * @property networkCallback NetworkCallback
- * @property connectivityManeger ConnectivityManager
- * @property networkList MutableSet<Network>
+ * Inspired by:
+ *
+ * https://www.youtube.com/watch?v=To9aHYD5OVk
+ *
+ * https://github.com/AlexSheva-mason/Rick-Morty-Database/blob/master/app/src/main/java/com/shevaalex/android/rickmortydatabase/utils/networking/ConnectionLiveData.kt
+ *
+ * @property networkCallback NetworkCallback Eine Callbackklasse für den [ConnectivityManager]
+ * @property connectivityManeger ConnectivityManager Ein Systeminterner Verbindungsmanager
+ * @property networkList MutableSet<Network> Eine Liste verfügbarer Netzwerke
  * @constructor
  */
 class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
@@ -40,30 +38,26 @@ class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
         var isConnected: Boolean = false
     }
 
-    /**
-     *
-     */
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
 
-    /**
-     *
-     */
     private val connectivityManeger =
         context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    /**
-     *
-     */
     private val networkList: MutableSet<Network> = HashSet()
 
+    //region Aktivierung und Inactivierung des Datenstroms handeln
+
     /**
-     *
+     * Führt bei der Aktivierung eine Registrierung beim Conectivity Manager durch, um über
+     * Netzwerkänderungen informiert zu werden.
      */
     override fun onActive() {
         networkCallback = createNetworkCallback()
+
         val networkRequest = NetworkRequest.Builder()
             .addCapability(NET_CAPABILITY_INTERNET)
             .build()
+
         connectivityManeger.registerNetworkCallback(networkRequest, networkCallback)
 
         if (connectivityManeger.activeNetwork == null) {
@@ -72,21 +66,25 @@ class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
     }
 
     /**
-     *
+     * Führt bei der Deaktivierung eine Deregistrierung beim Conectivity Manager durch
      */
     override fun onInactive() {
         connectivityManeger.unregisterNetworkCallback(networkCallback)
     }
 
+    //endregion
+
+    //region Callback erstellen
+
     /**
-     *
+     * Eine Callback Klasse für die Information, dass sich die Netzwerksituation geändert hat.
      * @return <no name provided>
      */
     private fun createNetworkCallback() = object : ConnectivityManager.NetworkCallback() {
-        // https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback#onAvailable(android.net.Network)
         /**
-         *
-         * @param network Network
+         * Prüft und fügt ein neues oder wieder verfügbares Netzwerk an
+         * https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback#onAvailable(android.net.Network)
+         * @param network Network Eine Instanz vom Typ Network
          */
         override fun onAvailable(network: Network) {
             val networkCapabilities = connectivityManeger.getNetworkCapabilities(network)
@@ -104,31 +102,37 @@ class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
             }
         }
 
-        // https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback#onLost(android.net.Network)
         /**
-         *
+         * Löscht ein Netzwerk aus der List der verfügbaren Netzwerke, wenn es nicht mehr verfügbar ist.
+         * Dies erfolgt nicht automatisch.
+         * https://developer.android.com/reference/android/net/ConnectivityManager.NetworkCallback#onLost(android.net.Network)
          * @param network Network
          */
         override fun onLost(network: Network) {
             networkList.remove(network)
             checkValidNetworks()
         }
-
     }
 
+    //endregion
+
+    //region Service Methoden
+
     /**
-     *
+     * Prüft, ob ein Netzwerk verfügbar ist und veröffentlicht das Ergebnis. Gleichzeitig wird die
+     * Eigenschaft [ConnectionLiveData.isConnected] gesetzt. Ein Netzwerk ist verfügbar, wenn die Liste der verfügbaren
+     * Netzwerke größer 0 ist.
      */
     private fun checkValidNetworks() {
         isConnected = networkList.size > 0
         postValue(networkList.size > 0)
     }
 
-    // https://kodlogs.com/93804/cannot-connect-to-server-check-whether-the-network-is-available-or-use-a-proxy-server
     /**
-     *
-     * @param socketFactory SocketFactory
-     * @return Boolean
+     * Prüft die Internetverfügbarkeit anhand eines Prüfservers
+     * https://kodlogs.com/93804/cannot-connect-to-server-check-whether-the-network-is-available-or-use-a-proxy-server
+     * @param socketFactory SocketFactory Ermöglicht die Erstellung eines Websockets
+     * @return Boolean True, wenn ein Zugriff möglich ist, ansonsten False
      */
     private fun isInternet(socketFactory: SocketFactory): Boolean {
         try {
@@ -141,4 +145,5 @@ class ConnectionLiveData(context: Context) : LiveData<Boolean>() {
         }
     }
 
+    //endregion
 }

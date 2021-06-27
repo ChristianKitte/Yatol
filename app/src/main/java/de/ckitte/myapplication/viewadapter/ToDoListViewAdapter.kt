@@ -7,27 +7,27 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import de.ckitte.myapplication.model.ToDoListModel
 import de.ckitte.myapplication.R
-import de.ckitte.myapplication.util.DateTimeUtil.Companion.getTimeString
 import de.ckitte.myapplication.database.entities.LocalToDo
 import de.ckitte.myapplication.databinding.FragmentTodoListitemBinding
+import de.ckitte.myapplication.model.ToDoListModel
+import de.ckitte.myapplication.util.DateTimeUtil.Companion.getTimeString
 import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter.ToDoViewHolder
 import java.time.LocalDateTime
 
 /**
- *
- * @property viewModel ToDoListModel
+ * ListView Adapter für die Anzeige von ToDoItems
+ * @property viewModel ToDoListModel Das zugehörige ViewModel
  * @constructor
  */
 class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
     ListAdapter<LocalToDo, ToDoViewHolder>(ToDoComparator()) {
 
     /**
-     *
-     * @param parent ViewGroup
-     * @param viewType Int
-     * @return ToDoViewHolder
+     * Wird bei der Erzeugung eines neuen ViewHolders aufgerufen
+     * @param parent ViewGroup Die übergebene ViewGruppe
+     * @param viewType Int Der übergebene ViewTyp
+     * @return ToDoViewHolder Eine neue Instanz von [ToDoViewHolder]
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoViewHolder {
         val binding =
@@ -37,9 +37,9 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
     }
 
     /**
-     *
-     * @param holder ToDoViewHolder
-     * @param position Int
+     * Wird bei der Bindung von Daten und ViewHolder aufgerufen
+     * @param holder ContactViewHolder Der übergebene View Holder vom Typ [ToDoViewHolder]
+     * @param position Int Die Position des zu bindenden Elements
      */
     override fun onBindViewHolder(holder: ToDoViewHolder, position: Int) {
         val currentItem = getItem(position)
@@ -47,9 +47,10 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
     }
 
     /**
-     *
-     * @property binding FragmentTodoListitemBinding
-     * @property viewModel ToDoListModel
+     * Der [ToDoViewHolder] des Adapters. Implementiert die Logik der visuelle Darstellung des ToDos auf Basis
+     * der hinterlegten Ressource
+     * @property binding FragmentTodoListitemBinding Ein Binding Objekt der zu verwendenen Ressource
+     * @property viewModel ToDoListModel Das zu verwendende ViewModel
      * @constructor
      */
     class ToDoViewHolder(
@@ -116,24 +117,24 @@ class ToDoListViewAdapter(private val viewModel: ToDoListModel) :
     }
 
     /**
-     *
+     * Ein Vergleichsobjekt für [LocalToDo]
      */
     class ToDoComparator : DiffUtil.ItemCallback<LocalToDo>() {
         /**
-         *
-         * @param oldItemLokal LocalToDo
-         * @param newItemLokal LocalToDo
-         * @return Boolean
+         * Zwei Elemente sind gleich, wenn deren Instanzen gleich sind
+         * @param oldItemLokal LocalToDo Das alte Element
+         * @param newItemLokal LocalToDo Das neue Element
+         * @return Boolean True, wenn sie identisch sind, sonst False
          */
         override fun areItemsTheSame(oldItemLokal: LocalToDo, newItemLokal: LocalToDo): Boolean {
             return oldItemLokal === newItemLokal
         }
 
         /**
-         *
-         * @param oldItemLokal LocalToDo
-         * @param newItemLokal LocalToDo
-         * @return Boolean
+         * Zwei Elemente sind identisch, wenn deren lokale ID übereinstimmen
+         * @param oldItemLokal LocalToDo Das alte Element
+         * @param newItemLokal LocalToDo Das neue Element
+         * @return Boolean True, wenn sie gleich sind, sonst False
          */
         override fun areContentsTheSame(oldItemLokal: LocalToDo, newItemLokal: LocalToDo): Boolean {
             return oldItemLokal.toDoLocalId == newItemLokal.toDoLocalId

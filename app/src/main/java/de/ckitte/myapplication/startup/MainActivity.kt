@@ -18,35 +18,29 @@ import de.ckitte.myapplication.util.ConnectionLiveData
 import kotlinx.coroutines.*
 
 /**
- *
- * @property _binding ActivityMainBinding
- * @property connectionLiveData ConnectionLiveData
- * @property db ToDoDao
+ * Hauptfenster der Anwendung
+ * @property _binding ActivityMainBinding Das zugehörige Binding Objekt
+ * @property connectionLiveData ConnectionLiveData Eine Observer Objekt für die Netzverfügbarkeit
+ * @property db ToDoDao Eine Instanz von [ToDoDao]
  */
 class MainActivity : AppCompatActivity() {
-    /**
-     *
-     */
     private lateinit var _binding: ActivityMainBinding
-
-    /**
-     *
-     */
     private lateinit var connectionLiveData: ConnectionLiveData
-
-    /**
-     *
-     */
     private lateinit var db: ToDoDao
 
     /**
-     *
-     * @param savedInstanceState Bundle?
+     * Initialisiert die neue Instanz
+     * @param savedInstanceState Bundle? Eine Instanz von Typ Bundle
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val view = _binding.root
+        setContentView(view)
+
         this._binding = ActivityMainBinding.inflate(layoutInflater)
 
+        // Definition des EventHandler als annonyme Methode
         connectionLiveData = ConnectionLiveData(this)
         connectionLiveData.observe(this, {
             if (it) {
@@ -70,20 +64,19 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        val view = _binding.root
-        setContentView(view)
-
-        CoroutineScope(SupervisorJob())
         this.db = ToDoDatabase.getInstance(this).toToDao
 
+        // Einholen von Erlaubnissen
         checkPermission(Manifest.permission.READ_CONTACTS, 100)
         checkPermission(Manifest.permission.CALL_PHONE, 110)
     }
 
+    //region Actionbar
+
     /**
-     *
-     * @param titel String
-     * @param subtitle String
+     * Setzt die Ausgabe der oberen Action Bar
+     * @param titel String Der Titel der Ausgabe
+     * @param subtitle String Der Untertitel der Ausgabe
      */
     private fun configureActionBar(titel: String, subtitle: String) {
         val bar = supportActionBar
@@ -99,10 +92,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //endregion
+
+    //region Optionsmenü
+
     /**
-     *
-     * @param menu Menu
-     * @return Boolean
+     * Erstellen des Optionsmenüs
+     * @param menu Menu Das Menü
+     * @return Boolean True, wenn alles in Ordnung ist, sonst False
      */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
@@ -113,13 +110,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     *
-     * @param item MenuItem
-     * @return Boolean
+     * Handler für das Optionsmenü oben rechts
+     * @param item MenuItem Das Menü
+     * @return Boolean True, wenn alles in Ordnung ist, sonst False
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // https://developer.android.com/guide/topics/ui/menus
-
         return when (item.itemId) {
             R.id.miCleanLokal -> {
                 showToast("Starte das Löschen der lokalen Daten")
@@ -220,9 +215,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //endregion
+
+    //region Hilfsfunktionen
+
     /**
-     *
-     * @param text String
+     * Hilfsfunktion zum vereinfachten Anzeigen eines Toasts
+     * @param text String Der anzuzeigende Text
      */
     private fun showToast(text: String) {
         Toast.makeText(
@@ -234,9 +233,9 @@ class MainActivity : AppCompatActivity() {
 
     // Function to check and request permission.
     /**
-     *
-     * @param permission String
-     * @param requestCode Int
+     * Hilfsfunktion zum vereinfachten Anfordern von Erlaubnissen
+     * @param permission String Die anzufordernde Erlaubnis als Text
+     * @param requestCode Int Ein frei wählbarer Anfragecode
      */
     private fun checkPermission(permission: String, requestCode: Int) {
         if (ContextCompat.checkSelfPermission(
@@ -251,4 +250,6 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show()
         }
     }
+
+    //endregion
 }

@@ -10,31 +10,17 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-// Es wird abgeraten, ein Context auf die View zu übergeben wegen möglicher
-// Memory Leaks wegen unterschiedlicher Laufzeiten. Flow hingegen achtet den
-// Status.
-
 /**
- *
- * @property toDoRepository ToDoRepository
- * @property sortOrder MutableStateFlow<String>
- * @property toDos LiveData<List<LocalToDo>>
+ * Model für die Verwendung im Kontext der Listenansicht von ToDos
+ * @property toDoRepository ToDoRepository Eine Referenz auf das aktuelle Repository
+ * @property sortOrder MutableStateFlow<String> Ein FlowObjekt für den Zugriff auf ToDos
+ * @property toDos LiveData<List<LocalToDo>> Ein Observer eines FlowObjekt für den Zugriff auf ToDos
  * @constructor
  */
 class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
-    /**
-     *
-     */
     private val toDoRepository = toDoDao
-
-    /**
-     *
-     */
     private val sortOrder = MutableStateFlow("DateThenImportance")
 
-    /**
-     *
-     */
     @ExperimentalCoroutinesApi
     var toDos = sortOrder.flatMapLatest { currentCurrency ->
         // In case they return different types
@@ -47,51 +33,52 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
     }
         .asLiveData(Dispatchers.IO)
 
+    //region CRUD ToDoItem
+
     /**
-     *
-     * @param lokalToDo LocalToDo
-     * @return Job
+     * Löscht das übergeben ToDoItem und alle seine Kontakte
+     * @param lokalToDo LocalToDo Das [LocalToDo] Element
+     * @return Job Der iniziierte Task
      */
     fun deleteToDoItem(lokalToDo: LocalToDo) = viewModelScope.launch {
         toDoRepository.deleteToDoItem(lokalToDo)
     }
 
     /**
-     *
-     * @param lokalToDo LocalToDo
-     * @return Job
-     */
-    fun addToDoItem(lokalToDo: LocalToDo) = viewModelScope.launch {
-        toDoRepository.addToDoItem(lokalToDo)
-    }
-
-    /**
-     *
-     * @param lokalToDo LocalToDo
-     * @return Job
+     * Aktualisiert das übergebene ToDoItem
+     * @param lokalToDo LocalToDo Das [LocalToDo] Element
+     * @return Job Der iniziierte Task
      */
     fun updateToDoItem(lokalToDo: LocalToDo) = viewModelScope.launch {
         toDoRepository.updateToDoItem(lokalToDo)
     }
 
+    //endregion
+
+    //region Handle neues ToDoItem
+
     /**
-     *
-     * @param lokalToDo LocalToDo
-     * @return Job
+     * Setzt das übergebene ToDoItem als aktuelles Item
+     * @param lokalToDo LocalToDo Das [LocalToDo] Element
+     * @return Job Der iniziierte Task
      */
     fun setCurrentToDoItem(lokalToDo: LocalToDo) = viewModelScope.launch {
         ToDoRepository.setCurrentToDoItem(lokalToDo)
     }
 
     /**
-     *
+     * Initialisiert ein neues ToDoItem und setzt es als aktuelles ToDoItem
      */
     fun iniNewToDoItem() {
         ToDoRepository.setCurrentToDoItem(ToDoRepository.getNewToDoItem())
     }
 
+    //endregion
+
+    //region Utils
+
     /**
-     *
+     * Iniziiert einen Refresh der Datenbank
      */
     fun refreshDatabase() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -100,8 +87,8 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
     }
 
     /**
-     *
-     * @param newSortOrder ListSort
+     * Iniziiert eine neue Sortierfolge der ToDos im Flow
+     * @param newSortOrder ListSort Gibt die zu nutzende Sortierfolge als [ListSort] an
      */
     fun changeSortOrder(newSortOrder: ListSort) {
         when (newSortOrder) {
@@ -113,4 +100,6 @@ class ToDoListModel(toDoDao: ToDoRepository) : ViewModel() {
             }
         }
     }
+
+    //endregion
 }

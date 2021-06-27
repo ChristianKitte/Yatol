@@ -138,32 +138,6 @@ interface ToDoDao {
     @Query("select * from ToDo")
     suspend fun getAllLocalToDos(): List<LocalToDo>
 
-    /*
-    /**
-     * Gibt alle als gelöscht vermerkte lokale Kontakte zurück
-     * @param action Int  Der abzurufende Status Deleted
-     * @return List<LocalToDoContact> Die lokalen Kontakte in einer Liste
-     */
-    @Query("select * from ToDo_Contact where toDoContact_State = :action")
-    suspend fun getAllLocalDeletedToDoContacts(action: Int = ToDoContactState.Deleted.ordinal): List<LocalToDoContact>
-
-    /**
-     * Gibt alle als hinzugefügt vermerkte lokale Kontakte zurück
-     * @param action Int Der abzurufende Status ADDED
-     * @return List<LocalToDoContact> Die lokalen Kontakte in einer Liste
-     */
-    @Query("select * from ToDo_Contact where toDoContact_State = :action")
-    suspend fun getAllLocalAddedToDoContacts(action: Int = ToDoContactState.Added.ordinal): List<LocalToDoContact>
-
-    /**
-     * Gibt alle als gespeichert vermerkte lokale Kontakte zurück
-     * @param action Int Der abzurufende Status SAVE
-     * @return List<LocalToDoContact> Die lokalen Kontakte in einer Liste
-     */
-    @Query("select * from ToDo_Contact where toDoContact_State != :action")
-    suspend fun getAllLocalTouchedToDoContacts(action: Int = ToDoContactState.Save.ordinal): List<LocalToDoContact>
-    */
-
     /**
      * Gibt alle lokale Kontakte mit dem angegebenen Status zurück
      * @param action Int Der abzurufende Status als [ToDoContactState]
@@ -222,7 +196,6 @@ interface ToDoDao {
     @Query("select * from ToDo order by toDo_IsDone asc, toDo_DoUntil asc, toDo_IsFavourite desc")
     fun getAllLocalToDosAsFlowByDateThenImportance(): Flow<List<LocalToDo>>
 
-
     /**
      * Alle lokalen ToDos als sortierte Liste
      *
@@ -237,21 +210,6 @@ interface ToDoDao {
     fun getAllLocalToDosAsFlowByImportanceThenDate(): Flow<List<LocalToDo>>
 
     // Es scheint zu einem Problem zu kommen, wenn ich keine Klammern verwende ==> Abstürze !
-
-    /*
-    /**
-     * Alle lokalen Kontakte des angegebenen ToDos, sofern sie einen Status ungleich des übergebenen
-     * haben
-     * @param toDoItemID Long Die ID des ToDos
-     * @param action Int Der nicht zu berücksichtigende Status der Kontakte
-     * @return Flow<List<LocalToDoContact>> Das angeforderte Flow Objekt
-     */
-    @Query("select * from ToDo_Contact where (toDo_Id = :toDoItemID) AND (toDoContact_State <> :action)")
-    fun getAllLocalValidToDoContactsByToDo(
-        toDoItemID: Long,
-        action: Int = ToDoContactState.Deleted.ordinal
-    ): Flow<List<LocalToDoContact>>
-    */
 
     /**
      * Alle lokalen Kontakte des angegebenen ToDos, sofern sie einen Status ungleich des übergebenen

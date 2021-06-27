@@ -11,32 +11,172 @@ import de.ckitte.myapplication.firestore.firestoreEntities.RemoteToDoContact
 import kotlinx.coroutines.tasks.await
 
 /**
- *
- * @property db FirebaseFirestore
+ * Stellt Funktionalität für den Zugriff auf eine Firestore Datenbank zur Verfügung
+ * @property db FirebaseFirestore Instanz der aktuellen Firestore Datenbank
  */
 class FirestoreApi {
-    /**
-     *
-     */
-    var db = FirebaseFirestore.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
     companion object {
         /**
-         *
+         * Die Bezeichnung der Collection für ToDoItems
          */
         val getToDoRemoteCollection = "ToDoItems"
 
         /**
-         *
+         * Die Bezeichnung der Collection für ToDoContacts
          */
         val getToDoContactRemoteCollection = "Contacts"
     }
 
-    // CRUD ToDoItem
+    //region CRUD ToDoItem
 
     /**
-     *
-     * @return List<RemoteToDo>
+     * Fügt ein Remote ToDoItem in eine Collection ein
+     * @param collection String Die Collection, in der das Objekt eingefügt werden soll
+     * @param remoteToDo RemoteToDo Das einzufügende [RemoteToDo]
+     * @return RemoteToDo Das hinzugefügte [RemoteToDo] Element mit seiner RemoteID
+     */
+    suspend fun insertToDoRemoteItem(
+        collection: String,
+        remoteToDo: RemoteToDo
+    ): RemoteToDo {
+        val targetCollection = Firebase.firestore.collection(collection)
+
+        // soll explizit blocken !
+        targetCollection.add(remoteToDo).addOnSuccessListener {
+            remoteToDo.toDoRemoteId = it.id
+        }.await()
+
+        return remoteToDo
+    }
+
+    /**
+     * Aktualisiert ein Remote ToDoItem in einer Collection
+     * @param collection String Die Collection, in der das Objekt vorhanden ist
+     * @param remoteToDo RemoteToDo Ein [RemoteToDo] mit neuen Werten
+     */
+    suspend fun updateToDoRemoteItem(
+        collection: String,
+        remoteToDo: RemoteToDo
+    ) {
+        val targetCollection = Firebase.firestore.collection(collection)
+
+        val map = getMutableMapFromToDoRemoteItem(remoteToDo)
+        targetCollection.document(remoteToDo.toDoRemoteId).set(map, SetOptions.merge())
+            .await()
+    }
+
+    /**
+     * Erzeugt eine für die Aktualisierung notwendig Map auf Basis des übergebenen Elements für alle Eigenschaften.
+     * Nicht geänderte Werte behalten hierbei ihren Wert.
+     * @param remoteToDo RemoteToDo Ein [RemoteToDo] mit neuen Werten
+     * @return MutableMap<String, Any> Eine Map, welche zur Aktualisierung des Remote ToDos verwendet werden kann.
+     */
+    private fun getMutableMapFromToDoRemoteItem(remoteToDo: RemoteToDo): MutableMap<String, Any> {
+        val map = mutableMapOf<String, Any>()
+
+        map["toDoRemoteId"] = remoteToDo.toDoRemoteId
+        map["toDoRemoteTitle"] = remoteToDo.toDoRemoteTitle
+        map["toDoRemoteDescription"] = remoteToDo.toDoRemoteDescription
+        map["toDoRemoteIsDone"] = remoteToDo.toDoRemoteIsDone
+        map["toDoRemoteIsFavourite"] = remoteToDo.toDoRemoteIsFavourite
+        map["toDoRemoteDoUntil"] = remoteToDo.toDoRemoteDoUntil
+        map["toDoRemoteUser"] = remoteToDo.toDoRemoteUser
+
+        return map
+    }
+
+    /**
+     * Löscht ein Remote ToDoItem aus einer Collection
+     * @param collection String Die Collection, die das Element enthält
+     * @param remoteToDo RemoteToDo Das zu löschende [RemoteToDo] Element
+     */
+    suspend fun deleteToDoRemoteItem(
+        collection: String,
+        remoteToDo: RemoteToDo
+    ) {
+        val targetCollection = Firebase.firestore.collection(collection)
+        targetCollection.document(remoteToDo.toDoRemoteId).delete().await()
+    }
+
+    //endregion
+
+    //region CRUD ToDoContacts
+
+    /**
+     * Fügt einen Remote Kontakt in eine Collection ein
+     * @param collection String Die Collection, in der das Element eingefügt werden soll
+     * @param remoteToDoContact RemoteToDoContact Das hinzuzufügende [RemoteToDoContact] Element
+     * @return RemoteToDoContact Das hinzugefügte [RemoteToDoContact] Element mit seiner RemoteID
+     */
+    suspend fun insertToDoContact(
+        collection: String,
+        remoteToDoContact: RemoteToDoContact
+    ): RemoteToDoContact {
+        val targetCollection = Firebase.firestore.collection(collection)
+
+        // soll explizit blocken !
+        targetCollection.add(remoteToDoContact).addOnSuccessListener {
+            remoteToDoContact.toDoContactRemoteID = it.id
+        }.await()
+
+        return remoteToDoContact
+    }
+
+    /**
+     * Aktualisiert einen Remote ToDoContact in einer Collection
+     * @param collection String Die Collection, in der das Objekt vorhanden ist
+     * @param remoteToDoContact RemoteToDoContact Ein [RemoteToDoContact] mit neuen Werten
+     */
+    suspend fun updateToDoContact(
+        collection: String,
+        remoteToDoContact: RemoteToDoContact
+    ) {
+        val targetCollection = Firebase.firestore.collection(collection)
+
+        val map = getMutableMapFromToDoItemContact(remoteToDoContact)
+        targetCollection.document(remoteToDoContact.toDoContactRemoteID)
+            .set(map, SetOptions.merge())
+            .await()
+    }
+
+    /**
+     * Erzeugt eine für die Aktualisierung notwendig Map auf Basis des übergebenen Elements für alle Eigenschaften.
+     * Nicht geänderte Werte behalten hierbei ihren Wert.
+     * @param remoteToDoContact RemoteToDoContact Ein [RemoteToDoContact] mit neuen Werten
+     * @return MutableMap<String, Any> Eine Map, welche zur Aktualisierung des Remote ToDoContacts verwendet werden kann.
+     */
+    private fun getMutableMapFromToDoItemContact(remoteToDoContact: RemoteToDoContact): MutableMap<String, Any> {
+        val map = mutableMapOf<String, Any>()
+
+        map["toDoRemoteId"] = remoteToDoContact.toDoRemoteId
+        map["toDoContactRemoteID"] = remoteToDoContact.toDoContactRemoteID
+        map["toDoLocalUri"] = remoteToDoContact.toDoRemoteUri
+
+        return map
+    }
+
+    /**
+     * Löscht ein Remote ToDoItem aus einer Collection
+     * @param collection String Die Collection, die das Element enthält
+     * @param remoteToDoContact RemoteToDoContact Das zu löschende [RemoteToDoContact] Element
+     */
+    suspend fun deleteToDoContact(
+        collection: String,
+        remoteToDoContact: RemoteToDoContact
+    ) {
+        val targetCollection = Firebase.firestore.collection(collection)
+        targetCollection.document(remoteToDoContact.toDoContactRemoteID).delete().await()
+    }
+
+    //endregion
+
+    //region Zusätzliche Funktionalität
+
+    /**
+     * Gibt alle remote verfügbaren ToDos zurück
+     * @return List<RemoteToDo> Eine Liste aller [RemoteToDo]
      */
     suspend fun getAllRemoteToDos(): List<RemoteToDo> {
         var remoteToDo: List<RemoteToDo> = emptyList()
@@ -63,9 +203,9 @@ class FirestoreApi {
     }
 
     /**
-     *
-     * @param toDoRemoteId String
-     * @return List<RemoteToDoContact>
+     * Gibt alle remote verfügbaren Kontakte eines ToDos zurück
+     * @param toDoRemoteId String Die RemoteID des ToDos
+     * @return List<RemoteToDoContact> Eine Liste aller für den Kontakt verfügbaren [RemoteToDoContact]
      */
     suspend fun getAllRemoteToDoContactsByRemoteToDo(toDoRemoteId: String): List<RemoteToDoContact> {
         var remoteToDoContacts: List<RemoteToDoContact> = emptyList()
@@ -93,144 +233,7 @@ class FirestoreApi {
     }
 
     /**
-     *
-     * @param collection String
-     * @param remoteToDo RemoteToDo
-     * @return RemoteToDo
-     */
-    suspend fun insertToDoRemoteItem(
-        collection: String,
-        remoteToDo: RemoteToDo
-    ): RemoteToDo {
-        val targetCollection = Firebase.firestore.collection(collection)
-
-        // soll explizit blocken !
-        targetCollection.add(remoteToDo).addOnSuccessListener {
-            remoteToDo.toDoRemoteId = it.id
-        }.await()
-
-        return remoteToDo
-    }
-
-    /**
-     *
-     * @param collection String
-     * @param remoteToDo RemoteToDo
-     */
-    suspend fun updateToDoRemoteItem(
-        collection: String,
-        remoteToDo: RemoteToDo
-    ) {
-        val targetCollection = Firebase.firestore.collection(collection)
-
-        val map = getMutableMapFromToDoRemoteItem(remoteToDo)
-        targetCollection.document(remoteToDo.toDoRemoteId).set(map, SetOptions.merge())
-            .await()
-    }
-
-    /**
-     *
-     * @param remoteToDo RemoteToDo
-     * @return MutableMap<String, Any>
-     */
-    private fun getMutableMapFromToDoRemoteItem(remoteToDo: RemoteToDo): MutableMap<String, Any> {
-        val map = mutableMapOf<String, Any>()
-
-        map["toDoRemoteId"] = remoteToDo.toDoRemoteId
-        map["toDoRemoteTitle"] = remoteToDo.toDoRemoteTitle
-        map["toDoRemoteDescription"] = remoteToDo.toDoRemoteDescription
-        map["toDoRemoteIsDone"] = remoteToDo.toDoRemoteIsDone
-        map["toDoRemoteIsFavourite"] = remoteToDo.toDoRemoteIsFavourite
-        map["toDoRemoteDoUntil"] = remoteToDo.toDoRemoteDoUntil
-        map["toDoRemoteUser"] = remoteToDo.toDoRemoteUser
-
-        return map
-    }
-
-    /**
-     *
-     * @param collection String
-     * @param remoteToDo RemoteToDo
-     */
-    suspend fun deleteToDoRemoteItem(
-        collection: String,
-        remoteToDo: RemoteToDo
-    ) {
-        val targetCollection = Firebase.firestore.collection(collection)
-        targetCollection.document(remoteToDo.toDoRemoteId).delete().await()
-    }
-
-// CRUD ToDoContacts
-
-    /**
-     *
-     * @param collection String
-     * @param remoteToDoContact RemoteToDoContact
-     * @return RemoteToDoContact
-     */
-    suspend fun insertToDoContact(
-        collection: String,
-        remoteToDoContact: RemoteToDoContact
-    ): RemoteToDoContact {
-        val targetCollection = Firebase.firestore.collection(collection)
-
-        // soll explizit blocken !
-        targetCollection.add(remoteToDoContact).addOnSuccessListener {
-            remoteToDoContact.toDoContactRemoteID = it.id
-        }.await()
-
-        return remoteToDoContact
-    }
-
-    /**
-     *
-     * @param collection String
-     * @param remoteToDoContact RemoteToDoContact
-     */
-    suspend fun updateToDoContact(
-        collection: String,
-        remoteToDoContact: RemoteToDoContact
-    ) {
-        val targetCollection = Firebase.firestore.collection(collection)
-
-        val map = getMutableMapFromToDoItemContact(remoteToDoContact)
-        targetCollection.document(remoteToDoContact.toDoContactRemoteID)
-            .set(map, SetOptions.merge())
-            .await()
-    }
-
-    /**
-     *
-     * @param remoteToDoContact RemoteToDoContact
-     * @return MutableMap<String, Any>
-     */
-    private fun getMutableMapFromToDoItemContact(remoteToDoContact: RemoteToDoContact): MutableMap<String, Any> {
-        val map = mutableMapOf<String, Any>()
-
-        map["toDoRemoteId"] = remoteToDoContact.toDoRemoteId
-        map["toDoContactRemoteID"] = remoteToDoContact.toDoContactRemoteID
-        map["toDoLocalUri"] = remoteToDoContact.toDoRemoteUri
-
-        return map
-    }
-
-    /**
-     *
-     * @param collection String
-     * @param remoteToDoContact RemoteToDoContact
-     */
-    suspend fun deleteToDoContact(
-        collection: String,
-        remoteToDoContact: RemoteToDoContact
-    ) {
-        val targetCollection = Firebase.firestore.collection(collection)
-        targetCollection.document(remoteToDoContact.toDoContactRemoteID).delete().await()
-    }
-
-// Zusätzliche Funktionalität
-
-    /**
-     *
+     * Löschte alle Remote verfügbaren Items
      */
     suspend fun deleteAllRemoteItems() {
         DeleteAllRemoteDocumentsFromCollection(getToDoContactRemoteCollection)
@@ -238,14 +241,14 @@ class FirestoreApi {
     }
 
     /**
-     *
-     * @param collection String
+     * Löscht alle Documents einer Collection
+     * @param collection String Die Collection, deren Documents gelöscht werden sollen
      */
     private suspend fun DeleteAllRemoteDocumentsFromCollection(
         collection: String
     ) {
         // Es ist kritisch und wird von Google nicht empfohlen, Sammlungen mit
-        // mobilen Geräten zu lösche. Mobile Function ist leider nicht in meinem
+        // mobilen Geräten zu löschen. Mobile Function ist leider nicht in meinem
         // Tarif enthalten. Daher gehe ich vorsichtig vor und nutze explizit await()
 
         val targetCollection = Firebase.firestore.collection(collection)
@@ -256,4 +259,6 @@ class FirestoreApi {
             targetCollection.document(it.id).delete().await()
         }
     }
+
+    //endregion
 }

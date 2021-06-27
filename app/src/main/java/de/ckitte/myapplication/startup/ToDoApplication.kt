@@ -6,13 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
 /**
- *
+ * Im Manifest hinterlegte Applikationsklasse der Anwendung
  */
-class ToDoApplication : Application() {
-    /*
-    val applicationScope = CoroutineScope(SupervisorJob())
-
-    val database by lazy { ToDoDatabase.getInstance(this, applicationScope) }
-    val repository by lazy { database.toToDao }
-    */
-}
+class ToDoApplication : Application()

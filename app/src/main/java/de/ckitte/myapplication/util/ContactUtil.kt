@@ -1,11 +1,9 @@
 package de.ckitte.myapplication.util
 
-import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
-import android.provider.ContactsContract.CommonDataKinds.Email.DISPLAY_NAME
 
 /**
  * Gibt den aktuellen Status eines Kontaktes an
@@ -23,10 +21,10 @@ enum class ToDoContactState {
 }
 
 /**
- *
- * @param uri Uri
- * @param contentResolver ContentResolver
- * @return String
+ * Gibt den zu einer URI gehörenden Display Namen eines Kontaktes zurück
+ * @param uri Uri Die URI eines Kontaktes
+ * @param contentResolver ContentResolver Ein Gültiges ContentResolver Objekt
+ * @return String Der Anzeigename
  */
 fun getDisplayNameByUri(uri: Uri, contentResolver: ContentResolver): String {
     var displayName = ""
@@ -54,10 +52,10 @@ fun getDisplayNameByUri(uri: Uri, contentResolver: ContentResolver): String {
 }
 
 /**
- *
- * @param uri Uri
- * @param contentResolver ContentResolver
- * @return String
+ * Gibt die zu einer URI gehörende Telefonnummer eines Kontaktes zurück
+ * @param uri Uri Die URI eines Kontaktes
+ * @param contentResolver ContentResolver Ein Gültiges ContentResolver Objekt
+ * @return String Die Telefonnummer
  */
 fun getPhoneNumberByUri(uri: Uri, contentResolver: ContentResolver): String {
     var phoneNumber = ""
@@ -96,10 +94,10 @@ fun getPhoneNumberByUri(uri: Uri, contentResolver: ContentResolver): String {
 }
 
 /**
- *
- * @param uri Uri
- * @param contentResolver ContentResolver
- * @return String
+ * Gibt die zu einer URI gehörende eMail Adresse eines Kontaktes zurück
+ * @param uri Uri Die URI eines Kontaktes
+ * @param contentResolver ContentResolver Ein Gültiges ContentResolver Objekt
+ * @return String Die eMail Adresse
  */
 fun getEmailAdressByUri(uri: Uri, contentResolver: ContentResolver): String {
     var eMailAdress = ""
