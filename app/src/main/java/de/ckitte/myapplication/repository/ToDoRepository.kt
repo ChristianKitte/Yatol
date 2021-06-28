@@ -487,4 +487,19 @@ class ToDoRepository(private val toDoDao: ToDoDao) {
     }
 
     //endregion
+
+    //region Sonstiges
+
+    /**
+     * Gibt die Anzahl der dem ToDoItem zugeordneten Kontakte mit der übergebenen URI zurück.
+     * @param toDoID Long Die ID des lokalen ToDoItems
+     * @param toDoContactUri String Die URI eines lokalen Kontaktes
+     * @return Int Die Zahl an Kontakten des ToDoItems mit dieser URI
+     */
+    @WorkerThread
+    suspend fun getLocalToDoContactsByURI(toDoID: Long, toDoContactUri: String): Int {
+        return toDoDao.getLocalToDoContactsByURI(toDoID, toDoContactUri)
+    }
+
+    //endregion
 }

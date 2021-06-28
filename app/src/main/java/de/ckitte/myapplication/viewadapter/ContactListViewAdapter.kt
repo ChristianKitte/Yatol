@@ -191,18 +191,24 @@ class ContactListViewAdapter(
          * @param newItem LocalToDoContact Das neue Element
          * @return Boolean True, wenn sie identisch sind, sonst False
          */
-        override fun areItemsTheSame(oldItem: LocalToDoContact, newItem: LocalToDoContact): Boolean {
+        override fun areItemsTheSame(
+            oldItem: LocalToDoContact,
+            newItem: LocalToDoContact
+        ): Boolean {
             return oldItem === newItem
         }
 
         /**
-         * Zwei Elemente sind identisch, wenn deren lokale ID übereinstimmen
+         * Zwei Elemente sind identisch, wenn deren lokale URI übereinstimmen
          * @param oldItem LocalToDoContact Das alte Element
          * @param newItem LocalToDoContact Das neue Element
          * @return Boolean True, wenn sie gleich sind, sonst False
          */
-        override fun areContentsTheSame(oldItem: LocalToDoContact, newItem: LocalToDoContact): Boolean {
-            return oldItem.toDoContactLocalId == newItem.toDoContactLocalId
+        override fun areContentsTheSame(
+            oldItem: LocalToDoContact,
+            newItem: LocalToDoContact
+        ): Boolean {
+            return oldItem.toDoContactLocalUri == newItem.toDoContactLocalUri
         }
     }
 }

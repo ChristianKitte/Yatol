@@ -7,10 +7,12 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.ckitte.myapplication.model.ToDoListModel
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.util.ListSort
 import de.ckitte.myapplication.database.ToDoDatabase
+import de.ckitte.myapplication.database.entities.LocalToDo
 import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.FragmentTodoListBinding
 import de.ckitte.myapplication.login.LoginProvider
@@ -121,39 +123,6 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
         }
     }
 
-    //region Handler Optionsmenü
-    
-    /*
-    /**
-     * Verarbeitet die EIngaben des Optionsmenüs
-     * @param item MenuItem Der ausgewählte Menüpunkt
-     * @return Boolean True, wenn der Eintrag behandelt wurde, sonst False
-     */
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.mi_sort_date -> {
-                CoroutineScope(Dispatchers.IO).launch {
-                    viewModel.changeSortOrder(ListSort.DateThenImportance)
-                }
-
-                true
-            }
-            R.id.mi_sort_favourite -> {
-                CoroutineScope(Dispatchers.IO).launch {
-                    viewModel.changeSortOrder(ListSort.ImportanceThenDate)
-                }
-
-                true
-            }
-            else -> {
-                super.onOptionsItemSelected(item)
-            }
-        }
-    }
-    */
-
-    //endregion
-
     //region Movefunktionalität
 
     /**
@@ -188,8 +157,36 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
             val currentItem = toDoListViewAdapter.currentList[currentItemIndex]
 
             if (direction == ItemTouchHelper.LEFT) {
-                viewModel.deleteToDoItem(currentItem)
+                confirmToDoDelete(currentItem)
             }
+        }
+    }
+
+    //endregion Bestätigungsdialoge und Logik
+
+    /**
+     * Bestätigungsdialog für das Löschen des aktuellen ToDoItems
+     * @param currentLokalToDo LocalToDo Das betreffende [LocalToDo] Element
+     */
+    fun confirmToDoDelete(currentLokalToDo: LocalToDo) {
+        this.context?.let {
+            MaterialAlertDialogBuilder(it)
+                .setTitle("Eintrag löschen?")
+                .setMessage("Soll der Eintrag wirklich gelöscht werden?")
+
+                .setNegativeButton("Abbrechen") { _, _ ->
+                    // Das Item ist bereits aus der View entfernt worden und muss wieder eingelesen werden
+                    toDoListViewAdapter.notifyDataSetChanged()
+                }
+                .setPositiveButton("Löschen") { _, _ ->
+                    CoroutineScope(Dispatchers.IO).launch {
+                        viewModel.deleteToDoItem(currentLokalToDo)
+                        withContext(Dispatchers.Main) {
+                            toDoListViewAdapter.notifyDataSetChanged()
+                        }
+                    }
+                }
+                .show()
         }
     }
 

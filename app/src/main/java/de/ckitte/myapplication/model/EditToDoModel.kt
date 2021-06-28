@@ -9,11 +9,9 @@ import de.ckitte.myapplication.database.entities.LocalToDoContact
 import de.ckitte.myapplication.database.entities.LocalToDo
 import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.util.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.launch
 
 /**
  * Model für die Verwendung im Kontext Anlegen und Editieren von ToDos
@@ -84,14 +82,26 @@ class EditToDoModel(private val toDoDao: ToDoRepository) : ViewModel() {
     }
 
     /**
-     * Fügt das übergebene ToDoContact Element den Kontakten des aktuelle ToDos hinzu
+     * Fügt das übergebene ToDoContact Element den Kontakten des aktuellen ToDos hinzu, sofern der
+     * Kontakt nicht schon vorhanden ist
      * @param toDoContact LocalToDoContact Das [LocalToDoContact] Element
      * @return Job Der iniziierte Task
      */
     fun addToDoContact(toDoContact: LocalToDoContact) = viewModelScope.launch {
-        toDoContact.toDoContactLocalState = ToDoContactState.Added.ordinal
-        toDoDao.addToDoContacts(toDoContact)
-        contactFilter.value = 0
+        var count = 0
+
+        CoroutineScope(Dispatchers.IO).launch {
+            count = toDoRepository.getLocalToDoContactsByURI(
+                toDoContact.toDoLocalId,
+                toDoContact.toDoContactLocalUri
+            )
+        }.join()
+
+        if (count == 0) {
+            toDoContact.toDoContactLocalState = ToDoContactState.Added.ordinal
+            toDoDao.addToDoContacts(toDoContact)
+            contactFilter.value = 0
+        }
     }
 
     /**

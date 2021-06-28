@@ -17,6 +17,7 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -26,11 +27,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.entities.LocalToDo
+import de.ckitte.myapplication.database.entities.LocalToDoContact
 import de.ckitte.myapplication.databinding.FragmentEditTodoBinding
 import de.ckitte.myapplication.model.EditToDoModel
 import de.ckitte.myapplication.repository.ToDoRepository
+import de.ckitte.myapplication.util.EmailUtil
 import de.ckitte.myapplication.viewadapter.ContactListViewAdapter
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import java.time.LocalDateTime
 
 /**
@@ -125,59 +128,16 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo),
                 checkIsFavourite.isChecked = toDoLocalIsFavourite
             }
 
-            etTitle.addTextChangedListener(
-                object : TextWatcher {
-                    override fun beforeTextChanged(
-                        s: CharSequence?,
-                        start: Int,
-                        count: Int,
-                        after: Int
-                    ) {
-                    }
+            btnSave.isEnabled =
+                (etTitle.length() > 0) && (etDescription.length() > 0)
 
-                    override fun onTextChanged(
-                        s: CharSequence?,
-                        start: Int,
-                        before: Int,
-                        count: Int
-                    ) {
-                        _binding.apply {
-                            btnSave.isEnabled =
-                                (etTitle.length() > 0) && (etDescription.length() > 0)
-                        }
-                    }
+            etTitle.addTextChangedListener {
+                validateForm()
+            }
 
-                    override fun afterTextChanged(s: Editable?) {
-                    }
-                }
-            )
-
-            etDescription.addTextChangedListener(
-                object : TextWatcher {
-                    override fun beforeTextChanged(
-                        s: CharSequence?,
-                        start: Int,
-                        count: Int,
-                        after: Int
-                    ) {
-                    }
-
-                    override fun onTextChanged(
-                        s: CharSequence?,
-                        start: Int,
-                        before: Int,
-                        count: Int
-                    ) {
-                        _binding.apply {
-                            btnSave.isEnabled =
-                                (etTitle.length() > 0) && (etDescription.length() > 0)
-                        }
-                    }
-
-                    override fun afterTextChanged(s: Editable?) {
-                    }
-                }
-            )
+            etDescription.addTextChangedListener {
+                validateForm()
+            }
 
             btnSave.setOnClickListener {
                 currentToDoItem?.let {
@@ -208,6 +168,8 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo),
                 }
             }
         }
+
+        validateForm()
 
         ItemTouchHelper(ItemTouchHelperCallback).apply {
             attachToRecyclerView(_binding.rvContacts)
@@ -247,6 +209,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo),
      * @param uri Uri Die gültige lokale URI eines Kontaktes
      */
     fun addToDoContact(uri: Uri) {
+
         val newContact = _viewModel.getNewToDoContact()
         val currentToDoItem = _viewModel.getCurrentToDoItem()
 
@@ -260,6 +223,7 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo),
             }
 
             _viewModel.addToDoContact(newContact)
+            contactListViewAdapter.notifyDataSetChanged()
         }
     }
 
@@ -299,9 +263,8 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo),
             val currentItem = contactListViewAdapter.currentList[currentItemIndex]
 
             if (direction == ItemTouchHelper.LEFT) {
-                _viewModel.deleteToDoContact(currentItem)
+                confirmToDoContactDelete(currentItem)
             }
-
         }
     }
 
@@ -325,6 +288,32 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo),
                 .setPositiveButton("Speichern") { _, _ ->
                     saveCurrentToDo(currentLokalToDo)
                     selectContact()
+                }
+                .show()
+        }
+    }
+
+    /**
+     * Bestätigungsdialog für das Löschen des aktuellen ToDoContacts
+     * @param currentLokalToDoContact LocalToDoContact Das betreffende [LocalToDoContact] Element
+     */
+    fun confirmToDoContactDelete(currentLokalToDoContact: LocalToDoContact) {
+        this.context?.let {
+            MaterialAlertDialogBuilder(it)
+                .setTitle("Kontakt löschen?")
+                .setMessage("Soll der Kontakt wirklich gelöscht werden?")
+
+                .setNegativeButton("Abbrechen") { _, _ ->
+                    // Das Item ist bereits aus der View entfernt worden und muss wieder eingelesen werden
+                    contactListViewAdapter.notifyDataSetChanged()
+                }
+                .setPositiveButton("Löschen") { _, _ ->
+                    CoroutineScope(Dispatchers.IO).launch {
+                        _viewModel.deleteToDoContact(currentLokalToDoContact)
+                        withContext(Dispatchers.Main) {
+                            contactListViewAdapter.notifyDataSetChanged()
+                        }
+                    }
                 }
                 .show()
         }
@@ -455,9 +444,21 @@ class EditToDo : Fragment(R.layout.fragment_edit_todo),
 
                     _viewModel.updateToDoItem(it)
 
-                    Toast.makeText(context, "Eintrag wurde gespeichert", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Eintrag wurde gespeichert", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
+        }
+    }
+
+    /**
+     * Prüft formale Kriterien der Eingabe des Titels und der Beschreibung. Wenn alle Voraussetzungen erfüllt
+     * sind, wird der Speicher Button enabled.
+     */
+    private fun validateForm() {
+        _binding.apply {
+            btnSave.isEnabled = etTitle.length() > 0 && etDescription.length() > 0
+            btnContacts.isEnabled = etTitle.length() > 0 && etDescription.length() > 0
         }
     }
 
