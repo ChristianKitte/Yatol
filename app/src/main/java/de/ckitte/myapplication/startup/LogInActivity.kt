@@ -43,6 +43,8 @@ class LogInActivity : AppCompatActivity() {
         connectionLiveData = ConnectionLiveData(this)
         connectionLiveData.observe(this, {
             if (it) {
+                _binding.btnLogin.isEnabled = true
+
                 when (LoginProvider.isLoggedIn()) {
                     true -> {
                         configureActionBar("YATOL - Verbunden", "Logged In")
@@ -52,6 +54,8 @@ class LogInActivity : AppCompatActivity() {
                     }
                 }
             } else {
+                _binding.btnLogin.isEnabled = false
+
                 when (LoginProvider.isLoggedIn()) {
                     true -> {
                         configureActionBar("YATOL - Kein Netzwerk", "Logged In")

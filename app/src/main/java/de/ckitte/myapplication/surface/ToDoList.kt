@@ -1,7 +1,9 @@
 package de.ckitte.myapplication.surface
 
+import android.graphics.BlendMode
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -16,6 +18,7 @@ import de.ckitte.myapplication.database.entities.LocalToDo
 import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.FragmentTodoListBinding
 import de.ckitte.myapplication.login.LoginProvider
+import de.ckitte.myapplication.util.ConnectionLiveData
 import de.ckitte.myapplication.viewadapter.ToDoListViewAdapter
 import kotlinx.coroutines.*
 
@@ -93,8 +96,12 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
                         }
                     }
                     R.id.miRefresh -> {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            viewModel.refreshDatabase()
+                        if (ConnectionLiveData.isConnected) {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                viewModel.refreshDatabase()
+                            }
+                        } else {
+                            showToast("Aktuell ist keine Netzverbindung vorhanden!")
                         }
                     }
                     R.id.mi_sort_date -> {
@@ -117,6 +124,17 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
                 it.findNavController().navigate(R.id.action_toDoList_to_editToDo)
             }
         }
+
+        /*
+        val parentActivity = this.activity
+        if (parentActivity != null) {
+            val connectionLiveData = ConnectionLiveData(parentActivity)
+
+            connectionLiveData.observe(parentActivity, {
+                _binding.menuBottomNavigation.menu.getItem(1).isEnabled = it
+            })
+        }
+        */
 
         ItemTouchHelper(ItemTouchHelperCallback).apply {
             attachToRecyclerView(_binding.rvtodoitems)
@@ -188,6 +206,22 @@ class ToDoList : Fragment(R.layout.fragment_todo_list) {
                 }
                 .show()
         }
+    }
+
+    //endregion
+
+    //region Hilfsfunktionen
+
+    /**
+     * Hilfsfunktion zum vereinfachten Anzeigen eines Toasts
+     * @param text String Der anzuzeigende Text
+     */
+    private fun showToast(text: String) {
+        Toast.makeText(
+            this.activity,
+            text,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     //endregion

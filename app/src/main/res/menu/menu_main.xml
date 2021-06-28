@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/miCleanLokal"
-        android:title="Lokale Daten löschen" />
+        android:title="@string/mi_clean_lokal" />
 
     <item
         android:id="@+id/miCleanRemote"
-        android:title="Remote Daten löschen" />
+        android:title="@string/mi_clean_remote" />
 
     <item
         android:id="@+id/miMirrorFromRemote"
-        android:title="Daten von Firestore holen" />
+        android:title="@string/mi_mirror_from_remote" />
 
     <item
         android:id="@+id/miMirrorToRemote"
-        android:title="Daten nach Firestore Verschieben" />
+        android:title="@string/mi_mirror_to_remote" />
 
     <item
         android:id="@+id/miDeleteDone"
-        android:title="Erledigte löschen" />
+        android:title="@string/mi_delete_done" />
 </menu>

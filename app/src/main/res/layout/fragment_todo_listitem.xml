@@ -18,7 +18,7 @@
         android:layout_marginBottom="8sp"
         android:drawablePadding="5sp"
         android:paddingStart="2sp"
-        android:text="TextView"
+        android:text="@string/tv_title_text"
         android:textSize="15sp" />
 
     <TextView
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5sp"
         android:paddingStart="12sp"
-        android:text="TextView"
+        android:text="@string/tv_description_text"
         android:textSize="13sp" />
 
     <TextView
@@ -37,7 +37,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5sp"
         android:paddingStart="12sp"
-        android:text="TextView"
+        android:text="@string/tv_do_until_text"
         android:textSize="13sp" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -51,8 +51,8 @@
             android:layout_width="92dp"
             android:layout_height="30dp"
             android:paddingStart="3dp"
-            android:text="Erledigt"
-            android:textSize="13dp"
+            android:text="@string/check_is_done_text"
+            android:textSize="13sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -61,8 +61,8 @@
             android:layout_width="92dp"
             android:layout_height="30dp"
             android:paddingStart="3dp"
-            android:text="Wichtig"
-            android:textSize="13dp"
+            android:text="@string/check_is_favourite_text"
+            android:textSize="13sp"
             app:layout_constraintEnd_toStartOf="@+id/btnEdit"
             app:layout_constraintStart_toEndOf="@+id/checkIsDone"
             app:layout_constraintTop_toTopOf="parent" />

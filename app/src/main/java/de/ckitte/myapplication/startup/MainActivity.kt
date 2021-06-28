@@ -11,11 +11,12 @@ import androidx.core.content.ContextCompat
 import de.ckitte.myapplication.R
 import de.ckitte.myapplication.database.ToDoDatabase
 import de.ckitte.myapplication.database.daos.ToDoDao
-import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.databinding.ActivityMainBinding
 import de.ckitte.myapplication.login.LoginProvider
+import de.ckitte.myapplication.repository.ToDoRepository
 import de.ckitte.myapplication.util.ConnectionLiveData
 import kotlinx.coroutines.*
+
 
 /**
  * Hauptfenster der Anwendung
@@ -105,6 +106,22 @@ class MainActivity : AppCompatActivity() {
         val inflater: MenuInflater = menuInflater
 
         inflater.inflate(R.menu.menu_main, menu)
+
+        return true
+    }
+
+    /**
+     * Setzte die Verfügbarkeit des OptionMenüs in Abhängigkeit von der Netzverbindung.
+     * Hierbei kann die Funktion trotzdessen fehlschlagen, sofern der Nutzer nicht eingelogged ist.
+     * Dies wird dem Nutzer jedoch rückgemeldet.
+     * @param menu Eine Referenz auf OptionMenü
+     */
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        if (menu != null) {
+            menu.findItem(R.id.miCleanRemote).isEnabled = ConnectionLiveData.isConnected
+            menu.findItem(R.id.miMirrorToRemote).isEnabled = ConnectionLiveData.isConnected
+            menu.findItem(R.id.miMirrorFromRemote).isEnabled = ConnectionLiveData.isConnected
+        }
 
         return true
     }

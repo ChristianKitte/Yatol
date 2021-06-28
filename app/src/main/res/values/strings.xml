@@ -1,28 +1,49 @@
 <resources>
+    <!-- Strings Manifest -->
     <string name="app_name">YATOL</string>
-    <string name="action_settings">Settings</string>
 
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
-
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
+    <!-- Strings activity_login -->
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome!"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="title_activity_login">Login</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="tv_email_hint_text">Für die Anmeldung ist eine eMail Adresse notwendig !</string>
+    <string name="et_password_hint">Passwort</string>
+    <string name="btn_login_anmelden">Anmelden</string>
+
+    <!-- Strings activity_main -->
+
+    <!-- Strings fragment_contact_listitem -->
+    <string name="tv_contact">DisplayName</string>
+    <string name="et_title_hint">Titel</string>
+    <string name="et_title_text">TextView</string>
+
+    <!-- Strings fragment_edit_todo -->
+    <string name="et_description_hint">Beschreibung</string>
+    <string name="et_description_text">TextView</string>
+    <string name="tv_do_until_text">1.1.2000</string>
+    <string name="check_is_done_text">Erledigt</string>
+    <string name="check_is_favourite_text">Wichtig</string>
+
+    <!-- Strings fragment_todo_list -->
+    <string name="fab_add_content_description">TODO</string>
+
+    <!-- Strings fragment_todo_listitem -->
+    <string name="tv_title_text">TextView</string>
+    <string name="tv_description_text">TextView</string>
+
+    <!-- Strings fragment_todo_listitem -->
+
+    <!-- Strings menu bottom -->
+    <string name="mi_close">Schließen</string>
+    <string name="mi_refresh">Aktualisieren</string>
+    <string name="mi_sort_date">Datum</string>
+    <string name="mi_sort_favourite">Wichtigkeit</string>
+
+    <!-- Strings menu main -->
+    <string name="mi_clean_lokal">Lokale Daten löschen</string>
+    <string name="mi_clean_remote">Remote Daten löschen</string>
+    <string name="mi_mirror_from_remote">Daten von Firestore holen</string>
+    <string name="mi_mirror_to_remote">Daten nach Firestore Verschieben</string>
+    <string name="mi_delete_done">Erledigte löschen</string>
 </resources>
