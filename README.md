@@ -1,10 +1,13 @@
 ## Yatol
 Bei YATOL (“Yet another ToDo List”) handelt es sich um eine einfache ToDo Liste für Android auf Basis von SQLite, Firestore. Als 
 Sprache kam Kotlin zum Einsatz. Zu den einzelnen ToDos lassen sich Kontakte hinzufügen und aus der Anwendung heraus kontaktieren. 
-Die Anwendung wurde mit Kotlin in der Version 1.5.10 gegen API Level 29 programmiert.
 
-Als Datenbank kamen auf Seite des Smartphones SQLite, serverseitig Firebase Firestore zum Einsatz. Als Abstraktion Framework für SQLite 
-wurde das Framework ROOM in der Version 2.3 verwendet. Zur Authentifizierung wurde Firebase Auth verwendet.
+Bei der Arbeit handelt es sich um meine allererste Anwendung für Android und mein erstes Projekt mit Kotlin als Programmiersprache. Auch 
+Firebase und Jetpack waren mir bis heute keine Begriffe.
+
+Die Anwendung wurde mit Kotlin in der Version 1.5.10 gegen API Level 29 programmiert. Als Datenbank kamen auf Seite des Smartphones SQLite, 
+serverseitig Firebase Firestore zum Einsatz. Als Abstraktion Framework für SQLite wurde das Framework ROOM in der Version 2.3 verwendet. 
+Zur Authentifizierung wurde Firebase Auth verwendet.
 
 Für die Navigation kamen die Navigation Components (Android Jetpack) zum Einsatz. Weiter wurde als Ersatz für als deprecated vermerkte Kotlin 
 Extension Pakete für die einfache Kopplung von Ressourcen und Code das neue View Binding (Android Jetpack) verwendet.
