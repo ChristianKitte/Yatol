@@ -70,6 +70,7 @@ class MainActivity : AppCompatActivity() {
         // Einholen von Erlaubnissen
         checkPermission(Manifest.permission.READ_CONTACTS, 100)
         checkPermission(Manifest.permission.CALL_PHONE, 110)
+        checkPermission(Manifest.permission.SEND_SMS, 120)
     }
 
     //region Actionbar
@@ -250,7 +251,9 @@ class MainActivity : AppCompatActivity() {
 
     // Function to check and request permission.
     /**
-     * Hilfsfunktion zum vereinfachten Anfordern von Erlaubnissen
+     * Hilfsfunktion zum vereinfachten Anfordern von Erlaubnissen. In einem realen und kommerziellen
+     * Projekt würde man hier anders vorgehen und auf eine Ablehnung reagieren, respektive die
+     * Anforderung begründen.
      * @param permission String Die anzufordernde Erlaubnis als Text
      * @param requestCode Int Ein frei wählbarer Anfragecode
      */

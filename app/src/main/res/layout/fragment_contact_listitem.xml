@@ -37,12 +37,21 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
+            android:id="@+id/btnSms"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@color/material_on_surface_stroke"
+            android:src="@drawable/ic_sms"
+            app:layout_constraintEnd_toStartOf="@+id/btnCall"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
             android:id="@+id/btnMail"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:background="@color/material_on_surface_stroke"
             android:src="@drawable/ic_mail"
-            app:layout_constraintEnd_toStartOf="@+id/btnCall"
+            app:layout_constraintEnd_toStartOf="@+id/btnSms"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.telephony.SmsManager
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -89,6 +90,11 @@ class ContactListViewAdapter(
 
         /**
          * Wird zum Binden des ToDoContacts aufgerufen
+         *
+         * checkPermission(Manifest.permission.READ_CONTACTS, 100)
+         * checkPermission(Manifest.permission.CALL_PHONE, 110)
+         * checkPermission(Manifest.permission.SEND_SMS, 120)
+         *
          * @param contact LocalToDoContact Der zu bindende [LocalToDoContact]
          */
         fun bind(contact: LocalToDoContact) {
@@ -98,11 +104,13 @@ class ContactListViewAdapter(
                     val uri: Uri = Uri.parse(contact.toDoContactLocalUri)
 
                     tvContact.text = viewModel.getDisplayName(uri, contentResolver)
-                    //tvContact.text = getDisplayNameByUri(uri, contentResolver!!)
 
+                    //ich gehe hier davon aus, das heute jedes Telefon - auch ein Festnetz - eine
+                    //SMS empfangen kann
                     currentPhoneNumber = viewModel.getPhoneNumber(uri, contentResolver)
                     if (currentPhoneNumber.isEmpty()) {
                         this.btnCall.isEnabled = false
+                        this.btnSms.isEnabled = false
                     }
 
                     currentEmail = viewModel.getEmailAdress(uri, contentResolver)
@@ -121,6 +129,20 @@ class ContactListViewAdapter(
                     }
 
                     callContact(currentPhoneNumber, title)
+                }
+
+                btnSms.setOnClickListener {
+                    var title = "Kein Titel"
+                    val anrede = "Hallo ${tvContact.text.toString()}"
+
+                    viewModel.getCurrentToDoItem()?.let {
+                        title = "${it.toDoLocalTitle} am ${it.toDoLocalDoUntil.toLocalDate()}"
+                    }
+
+                    sendSms(
+                        currentPhoneNumber,
+                        "Betreff: ${title}. ${anrede}"
+                    )
                 }
 
                 btnMail.setOnClickListener {
@@ -142,7 +164,8 @@ class ContactListViewAdapter(
         }
 
         /**
-         * Initialisiert einen Anruf (kein direct call, sondern nur die Vorbelegung zum Einleiten des Anrufes)
+         * Initialisiert einen Anruf (kein direct call, sondern nur die Vorbelegung zum Einleiten
+         * des Anrufes). Dies ist aus meiner Sicht sinnvoll, da der Nutzer so mehr Freiheiten hat.
          * @param number String Die zu verwendende Telefonnummer
          * @param title String der zu verwendende Titel
          */
@@ -155,6 +178,30 @@ class ContactListViewAdapter(
             if (packageManager?.let { intent.resolveActivity(it) } != null) {
                 parentFragment.startActivity(intent)
             }
+        }
+
+        /**
+         * Initialisiert eine SMS. Hierbei wird die hierfür vorgesehene Activity
+         * direkt geöffnet. So ist es möglich, den Text noch anzupassen und eine
+         * vorhergehende Unterhaltung nochmals einzusehen.
+         * @param number String Die zu verwendende Telefonnummer
+         * @param message String Der Text der SMS
+         */
+        fun sendSms(number: String, message: String) {
+
+            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("sms:${number}")
+                putExtra("sms_body", message)
+            }
+
+            if (packageManager?.let { intent.resolveActivity(it) } != null) {
+                parentFragment.startActivity(intent)
+            }
+
+            //Der hier zu sehende Code sendet direkt eine SMS, gibt aber keine
+            //Rückmeldung vom System und somit keine eindeutige Bestätigung:
+            //val smsManager = SmsManager.getDefault()
+            //smsManager.sendTextMessage(number, null, message, null, null)
         }
 
         /**

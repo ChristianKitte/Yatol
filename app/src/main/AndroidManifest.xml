@@ -10,8 +10,11 @@
     <!--Permission to read contacts-->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-    <!--Permission to init a direct call-->
+    <!--Permission to init an direct call (nur wenn ein direkter Anruf erfolgen soll notwendig)-->
     <uses-permission android:name="android.permission.CALL_PHONE" />
+
+    <!--Permission to init an direct sms-->
+    <uses-permission android:name="android.permission.SEND_SMS" />
 
     <application
         android:name=".startup.ToDoApplication"
