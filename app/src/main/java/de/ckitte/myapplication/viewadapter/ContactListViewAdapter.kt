@@ -184,6 +184,8 @@ class ContactListViewAdapter(
          * Initialisiert eine SMS. Hierbei wird die hierfür vorgesehene Activity
          * direkt geöffnet. So ist es möglich, den Text noch anzupassen und eine
          * vorhergehende Unterhaltung nochmals einzusehen.
+         * https://www.tutorialspoint.com/how-to-send-a-sms-using-smsmanager-in-dual-sim-mobile-in-android-using-kotlin
+         * https://www.androidcookbook.info/application-development/sending-sms-and-mms-from-your-application-using-intents-and-the-native-client.html
          * @param number String Die zu verwendende Telefonnummer
          * @param message String Der Text der SMS
          */
