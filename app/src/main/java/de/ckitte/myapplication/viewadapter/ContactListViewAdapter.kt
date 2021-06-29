@@ -4,7 +4,6 @@ import android.content.ContentResolver
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.telephony.SmsManager
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -133,7 +132,7 @@ class ContactListViewAdapter(
 
                 btnSms.setOnClickListener {
                     var title = "Kein Titel"
-                    val anrede = "Hallo ${tvContact.text.toString()}"
+                    val anrede = "Hallo ${tvContact.text}"
 
                     viewModel.getCurrentToDoItem()?.let {
                         title = "${it.toDoLocalTitle} am ${it.toDoLocalDoUntil.toLocalDate()}"
@@ -141,20 +140,20 @@ class ContactListViewAdapter(
 
                     sendSms(
                         currentPhoneNumber,
-                        "Betreff: ${title}. ${anrede}"
+                        "Betreff: ${title}. $anrede"
                     )
                 }
 
                 btnMail.setOnClickListener {
                     var title = "Kein Titel"
-                    val anrede = "Hallo ${tvContact.text.toString()}"
+                    val anrede = "Hallo ${tvContact.text}"
 
                     viewModel.getCurrentToDoItem()?.let {
                         title = "${it.toDoLocalTitle} am ${it.toDoLocalDoUntil.toLocalDate()}"
                     }
 
                     sendEmail(
-                        arrayOf<String>(currentEmail),
+                        arrayOf(currentEmail),
                         title,
                         anrede,
                         title
@@ -169,7 +168,7 @@ class ContactListViewAdapter(
          * @param number String Die zu verwendende Telefonnummer
          * @param title String der zu verwendende Titel
          */
-        fun callContact(number: String, title: String) {
+        private fun callContact(number: String, title: String) {
             val intent = Intent(Intent.ACTION_DIAL).apply {
                 data = Uri.parse("tel:${number}")
                 putExtra(Intent.EXTRA_TITLE, title)
@@ -213,7 +212,7 @@ class ContactListViewAdapter(
          * @param text String Der Text der eMail
          * @param title String Der Titel der eMail
          */
-        fun sendEmail(addresses: Array<String>, subject: String, text: String, title: String) {
+        private fun sendEmail(addresses: Array<String>, subject: String, text: String, title: String) {
             val intent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:") // only email apps should handle this
                 //z.B. "chkitte@web.de"
